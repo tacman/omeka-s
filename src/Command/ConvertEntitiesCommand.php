@@ -71,10 +71,63 @@ class ConvertEntitiesCommand
         'AttributeOverride',
     ];
 
+    /** @var string[] */
+    private const CLASS_ARGUMENT_NAMES = [
+        'targetEntity',
+        'targetDocument',
+        'repositoryClass',
+        'entityClass',
+    ];
+
+    /** @var array<string, string> */
+    private const DOCTRINE_TYPE_VALUE_MAP = [
+        'date' => 'DATE_MUTABLE',
+        'datetime' => 'DATETIME_MUTABLE',
+        'datetimetz' => 'DATETIMETZ_MUTABLE',
+        'time' => 'TIME_MUTABLE',
+    ];
+
+    /** @var string[] */
+    private const DOCTRINE_TYPE_CONSTANTS = [
+        'ASCII_STRING',
+        'BIGINT',
+        'BINARY',
+        'BLOB',
+        'BOOLEAN',
+        'DATE_MUTABLE',
+        'DATE_IMMUTABLE',
+        'DATEINTERVAL',
+        'DATETIME_MUTABLE',
+        'DATETIME_IMMUTABLE',
+        'DATETIMETZ_MUTABLE',
+        'DATETIMETZ_IMMUTABLE',
+        'DECIMAL',
+        'NUMBER',
+        'FLOAT',
+        'ENUM',
+        'GUID',
+        'INTEGER',
+        'JSON',
+        'JSON_OBJECT',
+        'JSONB',
+        'JSONB_OBJECT',
+        'SIMPLE_ARRAY',
+        'SMALLFLOAT',
+        'SMALLINT',
+        'STRING',
+        'TEXT',
+        'TIME_MUTABLE',
+        'TIME_IMMUTABLE',
+    ];
+
     private ?string $currentNamespace = null;
+    private ?\Nette\PhpGenerator\PhpNamespace $currentPhpNamespace = null;
 
     /** @var array<string, string> */
     private array $currentUseMap = [];
+
+    /** @var array<string, string> */
+    private array $currentUseAliases = [];
 
     public function __invoke(
         SymfonyStyle $io,
@@ -202,6 +255,8 @@ class ConvertEntitiesCommand
             $phpNamespace->addUse($useStatement['name'], $useStatement['alias']);
         }
         $phpNamespace->addUse('Doctrine\\ORM\\Mapping', 'ORM');
+
+        $this->currentPhpNamespace = $phpNamespace;
 
         $className = $classNode->name?->toString() ?? 'AnonymousClass';
         $class = $phpNamespace->addClass($className);
@@ -480,13 +535,16 @@ class ConvertEntitiesCommand
     {
         $this->currentNamespace = $namespace;
         $this->currentUseMap = [];
+        $this->currentUseAliases = [];
 
         foreach ($useStatements as $useStatement) {
             $full = ltrim($useStatement['name'], '\\');
             $alias = $useStatement['alias'] ?? null;
             $pos = strrpos($full, '\\');
             $short = $alias ?: ($pos === false ? $full : substr($full, $pos + 1));
-            $this->currentUseMap[strtolower($short)] = $full;
+            $lower = strtolower($short);
+            $this->currentUseMap[$lower] = $full;
+            $this->currentUseAliases[$lower] = $short;
         }
     }
 
@@ -515,6 +573,100 @@ class ConvertEntitiesCommand
         }
 
         return $this->currentNamespace ? $this->currentNamespace . '\\' . $trimmed : $trimmed;
+    }
+
+    private function formatAnnotationArgumentValue(?string $name, string $value): Literal
+    {
+        $stringValue = $this->unquoteString($value);
+        if ($name === 'type' && $stringValue !== null) {
+            $constant = $this->mapDoctrineTypeConstant($stringValue);
+            if ($constant !== null) {
+                $this->ensureUseForClass('Doctrine\\DBAL\\Types\\Types');
+                return new Literal('Types::' . $constant);
+            }
+        }
+        if ($stringValue !== null && $this->shouldConvertToClassConstant($name, $stringValue)) {
+            $className = $this->resolveClassName($stringValue);
+            $this->ensureUseForClass($className);
+            $className = $this->simplifyClassName($className);
+            return new Literal($className . '::class');
+        }
+
+        return new Literal($value);
+    }
+
+    private function unquoteString(string $value): ?string
+    {
+        if (preg_match('/^"(.*)"$/s', $value, $matches) === 1) {
+            return stripcslashes($matches[1]);
+        }
+
+        if (preg_match("/^'(.*)'$/s", $value, $matches) === 1) {
+            return str_replace(["\\\\", "\\'"], ["\\", "'"], $matches[1]);
+        }
+
+        return null;
+    }
+
+    private function shouldConvertToClassConstant(?string $name, string $value): bool
+    {
+        if ($name !== null && in_array($name, self::CLASS_ARGUMENT_NAMES, true)) {
+            return true;
+        }
+
+        return preg_match('/^[A-Z][A-Za-z0-9_\\\\]*$/', $value) === 1;
+    }
+
+    private function simplifyClassName(string $name): string
+    {
+        $trimmed = ltrim($name, '\\');
+        if ($trimmed === '') {
+            return $trimmed;
+        }
+
+        foreach ($this->currentUseMap as $alias => $full) {
+            if (strcasecmp($full, $trimmed) === 0) {
+                return $this->currentUseAliases[$alias] ?? $alias;
+            }
+        }
+
+        if ($this->currentNamespace && str_starts_with($trimmed, $this->currentNamespace . '\\')) {
+            return substr($trimmed, strlen($this->currentNamespace) + 1);
+        }
+
+        return $trimmed;
+    }
+
+    private function mapDoctrineTypeConstant(string $value): ?string
+    {
+        $normalized = strtolower($value);
+        if (isset(self::DOCTRINE_TYPE_VALUE_MAP[$normalized])) {
+            return self::DOCTRINE_TYPE_VALUE_MAP[$normalized];
+        }
+
+        $constant = strtoupper(preg_replace('/[^a-zA-Z0-9]+/', '_', $value) ?? $value);
+        return in_array($constant, self::DOCTRINE_TYPE_CONSTANTS, true) ? $constant : null;
+    }
+
+    private function ensureUseForClass(string $name): void
+    {
+        $full = ltrim($name, '\\');
+        if ($full === '' || $this->currentPhpNamespace === null) {
+            return;
+        }
+
+        foreach ($this->currentUseMap as $alias => $used) {
+            if (strcasecmp($used, $full) === 0) {
+                return;
+            }
+        }
+
+        $pos = strrpos($full, '\\');
+        $short = $pos === false ? $full : substr($full, $pos + 1);
+        $this->currentPhpNamespace->addUse($full);
+        $lower = strtolower($short);
+        $this->currentUseMap[$lower] = $full;
+        $this->currentUseAliases[$lower] = $short;
     }
 
     /**
@@ -565,9 +717,9 @@ class ConvertEntitiesCommand
 
             [$name, $value] = $this->splitNamedArgument($part);
             if ($name !== null) {
-                $args[$name] = new Literal($value);
+                $args[$name] = $this->formatAnnotationArgumentValue($name, $value);
             } else {
-                $args[] = new Literal($part);
+                $args[] = $this->formatAnnotationArgumentValue(null, $part);
             }
         }
 
