@@ -14,9 +14,9 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -24,7 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'app:convert:entities',
     description: 'Dump converted entity code without writing files',
 )]
-class ConvertEntitiesCommand extends Command
+class ConvertEntitiesCommand
 {
     /**
      * @var string[]
@@ -71,25 +71,21 @@ class ConvertEntitiesCommand extends Command
         'AttributeOverride',
     ];
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    private ?string $currentNamespace = null;
 
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('path', InputArgument::OPTIONAL, 'Path to entity directory or a single file')
-            ->addOption('single', null, InputOption::VALUE_OPTIONAL, 'Process a single file within the entity directory')
-        ;
-    }
+    /** @var array<string, string> */
+    private array $currentUseMap = [];
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(
+        SymfonyStyle $io,
+        #[Argument('Path to entity directory or a single file')]
+        ?string $path = null,
+        #[Option('Process a single file within the entity directory')]
+        ?string $single = null,
+    ): int
     {
-        $io = new SymfonyStyle($input, $output);
         $projectRoot = dirname(__DIR__, 2);
-        $path = $input->getArgument('path') ?: $projectRoot . '/application/src/Entity';
-        $single = $input->getOption('single');
+        $path = $path ?: $projectRoot . '/application/src/Entity';
         $targetPath = $single ? rtrim($path, '/\\') . DIRECTORY_SEPARATOR . $single : $path;
 
         if (!file_exists($targetPath)) {
@@ -193,6 +189,8 @@ class ConvertEntitiesCommand extends Command
             $useStatements = $this->collectUseStatements($ast);
         }
 
+        $this->setCurrentContext($namespace, $useStatements);
+
         if (!$classNode) {
             return null;
         }
@@ -215,15 +213,12 @@ class ConvertEntitiesCommand extends Command
             $class->setFinal();
         }
         if ($classNode->extends) {
-            $class->setExtends($classNode->extends->toString());
+            $class->setExtends($this->resolveClassName($classNode->extends->toString()));
         }
         if ($classNode->implements) {
-            $class->setImplements(array_map(static fn (Node\Name $name): string => $name->toString(), $classNode->implements));
+            $class->setImplements(array_map(fn (Node\Name $name): string => $this->resolveClassName($name->toString()), $classNode->implements));
         }
-        $classDoc = $this->normalizeDocComment($classNode->getDocComment());
-        if ($classDoc !== null) {
-            $class->setComment($classDoc);
-        }
+        $this->applyCommentAndAttributes($class, $classNode->getDocComment());
 
         foreach ($classNode->getConstants() as $constNode) {
             $this->addConstants($class, $constNode, $printer);
@@ -281,13 +276,10 @@ class ConvertEntitiesCommand extends Command
         }
 
         foreach ($constNode->consts as $const) {
-            $constant = $class->addConstant($const->name->toString());
+            $constant = $class->addConstant($const->name->toString(), $const->value->value);
             $constant->setVisibility($visibility);
             $constant->setValue(new Literal($printer->prettyPrintExpr($const->value)));
-            $comment = $this->normalizeDocComment($constNode->getDocComment());
-            if ($comment !== null) {
-                $constant->setComment($comment);
-            }
+            $this->applyCommentAndAttributes($constant, $constNode->getDocComment());
         }
     }
 
@@ -300,7 +292,7 @@ class ConvertEntitiesCommand extends Command
             $visibility = 'protected';
         }
 
-        $comment = $this->normalizeDocComment($propertyNode->getDocComment());
+        $docResult = $this->extractDoctrineAttributes($propertyNode->getDocComment());
 
         foreach ($propertyNode->props as $prop) {
             $property = $class->addProperty($prop->name->toString());
@@ -315,8 +307,11 @@ class ConvertEntitiesCommand extends Command
                 $property->setValue(new Literal($printer->prettyPrintExpr($prop->default)));
             }
 
-            if ($comment !== null) {
-                $property->setComment($comment);
+            if ($docResult['comment'] !== null) {
+                $property->setComment($docResult['comment']);
+            }
+            foreach ($docResult['attributes'] as $attribute) {
+                $property->addAttribute($attribute['name'], $attribute['args']);
             }
         }
     }
@@ -340,10 +335,7 @@ class ConvertEntitiesCommand extends Command
             $method->setAbstract();
         }
 
-        $comment = $this->normalizeDocComment($methodNode->getDocComment());
-        if ($comment !== null) {
-            $method->setComment($comment);
-        }
+        $this->applyCommentAndAttributes($method, $methodNode->getDocComment());
 
         foreach ($methodNode->params as $paramNode) {
             $param = $method->addParameter($paramNode->var->name);
@@ -368,7 +360,7 @@ class ConvertEntitiesCommand extends Command
         }
 
         if ($methodNode->stmts === null) {
-            $method->setBody(null);
+            $method->setBody('// @todo: body?');
             return;
         }
 
@@ -394,46 +386,306 @@ class ConvertEntitiesCommand extends Command
         }
 
         if ($type instanceof Node\Name) {
-            return $type->toString();
+            return $this->resolveClassName($type->toString());
         }
 
         return (string) $type;
     }
 
-    private function normalizeDocComment(?Doc $doc): ?string
+    /**
+     * @return array{comment: ?string, attributes: array<int, array{name: string, args: array}>}
+     */
+    private function extractDoctrineAttributes(?Doc $doc): array
     {
         if ($doc === null) {
-            return null;
+            return ['comment' => null, 'attributes' => []];
         }
 
         $lines = preg_split('/\R/', $doc->getText()) ?: [];
         if ($lines === []) {
-            return null;
+            return ['comment' => null, 'attributes' => []];
         }
 
         $lines = array_values(array_filter($lines, static fn (string $line): bool => trim($line) !== '/**' && trim($line) !== '*/'));
         $normalized = [];
+        $attributes = [];
 
-        foreach ($lines as $line) {
-            $line = preg_replace('/^\s*\*\s?/', '', $line);
+        $total = count($lines);
+        for ($i = 0; $i < $total; $i++) {
+            $line = preg_replace('/^\s*\*\s?/', '', $lines[$i]);
             if ($line === null) {
                 continue;
             }
-            $line = preg_replace_callback('/@([A-Za-z_][A-Za-z0-9_\\]*)/', function (array $matches): string {
-                $name = $matches[1];
-                if (str_contains($name, '\\')) {
-                    return '@' . $name;
+
+            $trimmed = ltrim($line);
+            if (str_starts_with($trimmed, '@')) {
+                if (preg_match('/^@([A-Za-z_][A-Za-z0-9_\\\]*)/', $trimmed, $matches) === 1) {
+                    $resolvedName = $this->resolveDoctrineAnnotationName($matches[1]);
+                    if ($resolvedName !== null) {
+                        $annotation = $trimmed;
+                        $balance = substr_count($annotation, '(') - substr_count($annotation, ')');
+                        while ($balance > 0 && $i + 1 < $total) {
+                            $i++;
+                            $nextLine = preg_replace('/^\s*\*\s?/', '', $lines[$i]);
+                            if ($nextLine === null) {
+                                $nextLine = '';
+                            }
+                            $annotation .= "\n" . ltrim($nextLine);
+                            $balance += substr_count($nextLine, '(') - substr_count($nextLine, ')');
+                        }
+
+                        $attributes[] = $this->annotationToAttribute($annotation);
+                        continue;
+                    }
                 }
-                if (in_array($name, self::DOCTRINE_ANNOTATIONS, true)) {
-                    return '@ORM\\' . $name;
-                }
-                return '@' . $name;
-            }, $line);
+            }
 
             $normalized[] = $line;
         }
 
         $comment = trim(implode("\n", $normalized));
-        return $comment !== '' ? $comment : null;
+        return [
+            'comment' => $comment !== '' ? $comment : null,
+            'attributes' => $attributes,
+        ];
+    }
+
+    private function applyCommentAndAttributes(object $target, ?Doc $doc): void
+    {
+        $result = $this->extractDoctrineAttributes($doc);
+        if ($result['comment'] !== null && method_exists($target, 'setComment')) {
+            $target->setComment($result['comment']);
+        }
+        if (!empty($result['attributes']) && method_exists($target, 'addAttribute')) {
+            foreach ($result['attributes'] as $attribute) {
+                $target->addAttribute($attribute['name'], $attribute['args']);
+            }
+        }
+    }
+
+    private function resolveDoctrineAnnotationName(string $name): ?string
+    {
+        $name = ltrim($name, '\\');
+        $short = str_contains($name, '\\') ? substr($name, strrpos($name, '\\') + 1) : $name;
+
+        return in_array($short, self::DOCTRINE_ANNOTATIONS, true)
+            ? 'Doctrine\\ORM\\Mapping\\' . $short
+            : null;
+    }
+
+    /**
+     * @param array<int, array{name: string, alias: ?string}> $useStatements
+     */
+    private function setCurrentContext(?string $namespace, array $useStatements): void
+    {
+        $this->currentNamespace = $namespace;
+        $this->currentUseMap = [];
+
+        foreach ($useStatements as $useStatement) {
+            $full = ltrim($useStatement['name'], '\\');
+            $alias = $useStatement['alias'] ?? null;
+            $pos = strrpos($full, '\\');
+            $short = $alias ?: ($pos === false ? $full : substr($full, $pos + 1));
+            $this->currentUseMap[strtolower($short)] = $full;
+        }
+    }
+
+    private function resolveClassName(string $name): string
+    {
+        $trimmed = ltrim($name, '\\');
+        if ($trimmed === '') {
+            return $trimmed;
+        }
+
+        $lower = strtolower($trimmed);
+        if (in_array($lower, ['self', 'parent', 'static'], true)) {
+            return $trimmed;
+        }
+
+        $parts = explode('\\', $trimmed);
+        $first = strtolower($parts[0]);
+        if (isset($this->currentUseMap[$first])) {
+            $base = $this->currentUseMap[$first];
+            $rest = array_slice($parts, 1);
+            return $rest ? $base . '\\' . implode('\\', $rest) : $base;
+        }
+
+        if (str_contains($trimmed, '\\')) {
+            return $trimmed;
+        }
+
+        return $this->currentNamespace ? $this->currentNamespace . '\\' . $trimmed : $trimmed;
+    }
+
+    /**
+     * @return array{name: string, args: array}
+     */
+    private function annotationToAttribute(string $annotation): array
+    {
+        $annotation = trim($annotation);
+        if (preg_match('/^@([A-Za-z_][A-Za-z0-9_\\\\]*)/s', $annotation, $matches) !== 1) {
+            return ['name' => $annotation, 'args' => []];
+        }
+
+        $rawName = $matches[1];
+        $resolvedName = $this->resolveDoctrineAnnotationName($rawName) ?? $rawName;
+        $argsString = '';
+        $parenPos = strpos($annotation, '(');
+        if ($parenPos !== false) {
+            $argsString = trim(substr($annotation, $parenPos + 1));
+            if (str_ends_with($argsString, ')')) {
+                $argsString = substr($argsString, 0, -1);
+            }
+        }
+
+        return [
+            'name' => $resolvedName,
+            'args' => $this->parseAnnotationArguments($argsString),
+        ];
+    }
+
+    /**
+     * @return array<int|string, Literal>
+     */
+    private function parseAnnotationArguments(string $argsString): array
+    {
+        if ($argsString === '') {
+            return [];
+        }
+
+        $converted = $this->convertAnnotationArgsToPhp($argsString);
+        $parts = $this->splitArguments($converted);
+        $args = [];
+
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if ($part === '') {
+                continue;
+            }
+
+            [$name, $value] = $this->splitNamedArgument($part);
+            if ($name !== null) {
+                $args[$name] = new Literal($value);
+            } else {
+                $args[] = new Literal($part);
+            }
+        }
+
+        return $args;
+    }
+
+    private function convertAnnotationArgsToPhp(string $args): string
+    {
+        $converted = preg_replace_callback('/@([A-Za-z_][A-Za-z0-9_\\\\]*)/', function (array $matches): string {
+            $name = $matches[1];
+            $resolved = $this->resolveDoctrineAnnotationName($name) ?? $name;
+            return 'new ' . $resolved;
+        }, $args);
+
+        if ($converted === null) {
+            $converted = $args;
+        }
+
+        $converted = preg_replace('/("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\')\s*=\s*/', '$1 => ', $converted) ?? $converted;
+        $converted = preg_replace('/\b([A-Za-z_][A-Za-z0-9_]*)\s*=\s*/', '$1: ', $converted) ?? $converted;
+        $converted = str_replace(['{', '}'], ['[', ']'], $converted);
+
+        return $converted;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function splitArguments(string $args): array
+    {
+        $parts = [];
+        $current = '';
+        $depth = 0;
+        $inString = null;
+        $length = strlen($args);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $args[$i];
+
+            if ($inString !== null) {
+                $current .= $char;
+                if ($char === $inString && ($i === 0 || $args[$i - 1] !== '\\')) {
+                    $inString = null;
+                }
+                continue;
+            }
+
+            if ($char === '"' || $char === '\'') {
+                $inString = $char;
+                $current .= $char;
+                continue;
+            }
+
+            if ($char === '(' || $char === '[') {
+                $depth++;
+            } elseif ($char === ')' || $char === ']') {
+                $depth = max(0, $depth - 1);
+            }
+
+            if ($char === ',' && $depth === 0) {
+                $parts[] = $current;
+                $current = '';
+                continue;
+            }
+
+            $current .= $char;
+        }
+
+        if (trim($current) !== '') {
+            $parts[] = $current;
+        }
+
+        return $parts;
+    }
+
+    /**
+     * @return array{0: ?string, 1: string}
+     */
+    private function splitNamedArgument(string $part): array
+    {
+        $depth = 0;
+        $inString = null;
+        $length = strlen($part);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $part[$i];
+            if ($inString !== null) {
+                if ($char === $inString && ($i === 0 || $part[$i - 1] !== '\\')) {
+                    $inString = null;
+                }
+                continue;
+            }
+
+            if ($char === '"' || $char === '\'') {
+                $inString = $char;
+                continue;
+            }
+
+            if ($char === '(' || $char === '[') {
+                $depth++;
+                continue;
+            }
+
+            if ($char === ')' || $char === ']') {
+                $depth = max(0, $depth - 1);
+                continue;
+            }
+
+            if ($char === ':' && $depth === 0) {
+                $name = trim(substr($part, 0, $i));
+                $value = trim(substr($part, $i + 1));
+                if ($name !== '') {
+                    return [$name, $value];
+                }
+                break;
+            }
+        }
+
+        return [null, $part];
     }
 }

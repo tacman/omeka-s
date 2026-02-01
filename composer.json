@@ -73,7 +73,7 @@
         "symfony/property-info": "^7.4",
         "symfony/serializer": "^7.4",
         "symfony/stimulus-bundle": "^2.32",
-        "symfony/string": "^6.4",
+        "symfony/string": "^6.0|^7.4",
         "symfony/translation": "^7.4",
         "symfony/twig-bundle": "^7.2",
         "twig/extra-bundle": "^2.12|^3.0",
@@ -81,7 +81,10 @@
         "symfony/ux-turbo": "^2.32",
         "symfony/validator": "^7.4",
         "symfony/web-link": "^7.4",
-        "monolog/monolog": "^2.11"
+        "monolog/monolog": "^2.11",
+        "symfony/console": "^7.2",
+        "nette/php-generator": "^4.2",
+        "nikic/php-parser": "^5.7"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",
@@ -89,7 +92,6 @@
         "symfony/debug-bundle": "^7.2",
         "symfony/stopwatch": "^6.4",
         "symfony/web-profiler-bundle": "^7.2",
-        "symfony/maker-bundle": "^1.0",
         "symfony/browser-kit": "^7.4",
         "symfony/css-selector": "^6.4",
         "symfony/phpunit-bridge": "^8.0"
