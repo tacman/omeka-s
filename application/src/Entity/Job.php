@@ -1,79 +1,54 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use DateTime;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\User;
 
-/**
- * @Entity
- * @HasLifecycleCallbacks
- */
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class Job extends AbstractEntity
 {
-    /**#@+
-     * Job statuses
-     *
-     * STATUS_STARTING:    The job was dispatched.
-     * STATUS_STOPPING:    The job is currently stopping.
-     * STATUS_IN_PROGRESS: The job was sent and is in progress.
-     * STATUS_COMPLETED:   The job was performed and is successfully completed.
-     * STATUS_STOPPED:     The job was stopped and most likely incomplete.
-     * STATUS_ERROR:       There was an unrecoverable error during the job.
-     */
-    const STATUS_STARTING = 'starting'; // @translate
-    const STATUS_STOPPING = 'stopping'; // @translate
-    const STATUS_IN_PROGRESS = 'in_progress'; // @translate
-    const STATUS_COMPLETED = 'completed'; // @translate
-    const STATUS_STOPPED = 'stopped'; // @translate
-    const STATUS_ERROR = 'error'; // @translate
-    /**#@-*/
+    public const STATUS_STARTING = 'starting';
+    public const STATUS_STOPPING = 'stopping';
+    public const STATUS_IN_PROGRESS = 'in_progress';
+    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_STOPPED = 'stopped';
+    public const STATUS_ERROR = 'error';
 
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     protected $pid;
 
-    /**
-     * @Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     protected $status;
 
-    /**
-     * @Column
-     */
+    #[ORM\Column]
     protected $class;
 
-    /**
-     * @Column(type="json_array", nullable=true)
-     */
+    #[ORM\Column(type: "json_array", nullable: true)]
     protected $args;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $log;
 
-    /**
-     * @ManyToOne(targetEntity="User")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $owner;
 
-    /**
-     * @Column(type="datetime")
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected $started;
 
-    /**
-     * @Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected $ended;
 
     public function getId()
@@ -166,9 +141,7 @@ class Job extends AbstractEntity
         return $this->ended;
     }
 
-    /**
-     * @PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist(LifecycleEventArgs $eventArgs)
     {
         $this->started = new DateTime('now');

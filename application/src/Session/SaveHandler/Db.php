@@ -51,7 +51,7 @@ class Db implements SaveHandlerInterface
     #[\ReturnTypeWillChange]
     public function read($id)
     {
-        $session = $this->conn->fetchAssoc('SELECT * FROM session WHERE id = ?', [$id]);
+        $session = $this->conn->fetchAssociative('SELECT * FROM session WHERE id = ?', [$id]);
         if ($session) {
             if (($session['modified'] + $this->lifetime) > time()) {
                 return $session['data'];

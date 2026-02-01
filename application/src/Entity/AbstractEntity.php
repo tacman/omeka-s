@@ -1,7 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Abstract entity.

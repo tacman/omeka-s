@@ -1,44 +1,40 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use DateInterval;
 use DateTime;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\User;
+use Omeka\Entity\CASCADE;
 
-/**
- * @Entity
- * @HasLifecycleCallbacks
- */
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class PasswordCreation extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(options={"collation"="utf8mb4_bin"}, length=32)
-     */
+    #[ORM\Id]
+    #[ORM\Column(options: ["collation" => "utf8mb4_bin"], length: 32)]
     protected $id;
 
-    /**
-     * @OneToOne(targetEntity="User")
-     * @JoinColumn(nullable=false, onDelete="CASCADE")
-     */
+    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
     protected $user;
 
-    /**
-     * @Column(type="datetime")
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected $created;
 
-    /**
-     * Whether to activate the user after setting a new password.
-     *
-     * @Column(type="boolean")
-     */
+    /** Whether to activate the user after setting a new password. */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $activate = true;
 
     public function setId()
     {
         // Reuse key generation from ApiKey entity.
-        $apiKey = new ApiKey;
+        $apiKey = new ApiKey();
         $apiKey->setId();
         $this->id = $apiKey->getId();
     }
@@ -83,9 +79,7 @@ class PasswordCreation extends AbstractEntity
         return $this->getCreated()->add(new DateInterval('P2W'));
     }
 
-    /**
-     * @PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist(LifecycleEventArgs $eventArgs)
     {
         $this->created = new DateTime('now');

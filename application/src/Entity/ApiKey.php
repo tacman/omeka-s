@@ -1,13 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use DateTime;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Laminas\Math\Rand;
+use Omeka\Entity\User;
+use Omeka\Entity\EAGER;
 
-/**
- * @Entity
- * @HasLifecycleCallbacks
- */
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class ApiKey extends AbstractEntity
 {
     /**
@@ -15,64 +20,43 @@ class ApiKey extends AbstractEntity
      *
      * If this changes the identity annotation must change as well.
      */
-    const STRING_LENGTH = 32;
+    public const STRING_LENGTH = 32;
 
-    /**
-     * The allowed character list for the key identity and credential.
-     */
-    const STRING_CHARLIST = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    /** The allowed character list for the key identity and credential. */
+    public const STRING_CHARLIST = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 
-    /**
-     * The key identity
-     *
-     * @Id
-     * @Column(length=32)
-     */
+    /** The key identity */
+    #[ORM\Id]
+    #[ORM\Column(length: 32)]
     protected $id;
 
-    /**
-     * @Column
-     */
+    #[ORM\Column]
     protected $label;
 
-    /**
-     * The hashed key credential
-     *
-     * @Column(length=60)
-     */
+    /** The hashed key credential */
+    #[ORM\Column(length: 60)]
     protected $credentialHash;
 
-    /**
-     * @Column(type="ip_address", nullable=true)
-     */
+    #[ORM\Column(type: "ip_address", nullable: true)]
     protected $lastIp;
 
-    /**
-     * @Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected $lastAccessed;
 
-    /**
-     * @Column(type="datetime")
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected $created;
 
-    /**
-     * The associated user
-     *
-     * @ManyToOne(targetEntity="User", inversedBy="keys", fetch="EAGER")
-     * @JoinColumn(nullable=false)
-     */
+    /** The associated user */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "keys", fetch: EAGER::class)]
+    #[ORM\JoinColumn(nullable: false)]
     protected $owner;
 
-    /**
-     * @PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
         if (null === $this->created) {
             // Set created datetime if not already set.
-            $this->created = new DateTime;
+            $this->created = new DateTime();
         }
     }
 

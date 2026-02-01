@@ -1,68 +1,52 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\SitePage;
+use Omeka\Entity\SiteBlockAttachment;
 
-/**
- * @Entity
- * @Table(
- *     indexes={
- *         @Index(
- *             name="page_position",
- *             columns={"page_id", "position"}
- *         )
- *     }
- * )
- */
+#[ORM\Entity]
+#[ORM\Table(indexes: [
+new ORM\Index(
+name: "page_position",
+columns: ["page_id", "position"]
+)
+])]
 class SitePageBlock extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @Column(length=80)
-     */
+    #[ORM\Column(length: 80)]
     protected $layout;
 
-    /**
-     * @Column(type="json_array")
-     */
+    #[ORM\Column(type: "json_array")]
     protected $data;
 
-    /**
-     * @Column(type="json", nullable=true)
-     */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     protected $layoutData;
 
-    /**
-     * @Column(type="integer")
-     */
+    #[ORM\Column(type: Types::INTEGER)]
     protected $position;
 
-    /**
-     * @ManyToOne(targetEntity="SitePage", inversedBy="blocks")
-     * @JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: SitePage::class, inversedBy: "blocks")]
+    #[ORM\JoinColumn(nullable: false)]
     protected $page;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="SiteBlockAttachment",
-     *     mappedBy="block",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove"}
-     * )
-     * @OrderBy({"position" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: SiteBlockAttachment::class, mappedBy: "block", orphanRemoval: true, cascade: ["persist", "remove"])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     protected $attachments;
 
     public function __construct()
     {
-        $this->attachments = new ArrayCollection;
+        $this->attachments = new ArrayCollection();
     }
 
     public function getId()

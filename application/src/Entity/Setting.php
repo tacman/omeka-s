@@ -1,20 +1,20 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
 class Setting extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="string", length=190)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING, length: 190)]
     protected $id;
 
-    /**
-     * @Column(type="json_array")
-     */
+    #[ORM\Column(type: "json_array")]
     protected $value;
 
     public function setId($id)

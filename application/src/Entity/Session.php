@@ -1,24 +1,22 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
 class Session
 {
-    /**
-     * @Id
-     * @Column(type="string", length=190)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING, length: 190)]
     protected $id;
 
-    /**
-     * @Column(type="blob")
-     */
+    #[ORM\Column(type: Types::BLOB)]
     protected $data;
 
-    /**
-     * @Column(type="integer")
-     */
+    #[ORM\Column(type: Types::INTEGER)]
     protected $modified;
 }

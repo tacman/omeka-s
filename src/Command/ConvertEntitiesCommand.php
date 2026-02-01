@@ -22,7 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:convert:entities',
-    description: 'Convert entity code and overwrite files',
+    description: 'Dump converted entity code without writing files',
 )]
 class ConvertEntitiesCommand
 {
@@ -138,6 +138,8 @@ class ConvertEntitiesCommand
         ?string $path = null,
         #[Option('Process a single file within the entity directory')]
         ?string $single = null,
+        #[Option('Force overwrite of entity files')]
+        bool $force = false,
     ): int
     {
         $projectRoot = dirname(__DIR__, 2);
@@ -180,14 +182,26 @@ class ConvertEntitiesCommand
 
             [$phpFile, $className] = $result;
             $printed = $this->injectForcedUses($psrPrinter->printFile($phpFile));
-            if (file_put_contents($filePath, $printed) === false) {
-                $io->warning(sprintf('Failed to write file: %s', $filePath));
-                continue;
+            
+            if ($force) {
+                file_put_contents($filePath, $printed);
+                $io->writeln(sprintf('Updated: %s (%s)', $filePath, $className));
+            } else {
+                $io->writeln(sprintf('\n//// %s (%s) - Top 15 lines:', $filePath, $className));
+                $lines = preg_split('/\R/', $printed) ?: [];
+                $topLines = array_slice($lines, 0, 15);
+                $io->writeln(implode("\n", $topLines));
+                if (count($lines) > 15) {
+                    $io->writeln(sprintf('... (%d more lines)', count($lines) - 15));
+                }
             }
-            $io->writeln(sprintf('Updated: %s (%s)', $filePath, $className));
         }
 
-        $io->success('Conversion complete. Files were overwritten.');
+        if ($force) {
+            $io->success('Update complete. All entity files have been overwritten.');
+        } else {
+            $io->success('Preview complete. Use --force to overwrite files.');
+        }
 
         return Command::SUCCESS;
     }
@@ -833,6 +847,7 @@ class ConvertEntitiesCommand
 
         $converted = preg_replace('/("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\')\s*=\s*/', '$1 => ', $converted) ?? $converted;
         $converted = preg_replace('/\b([A-Za-z_][A-Za-z0-9_]*)\s*=\s*/', '$1: ', $converted) ?? $converted;
+        $converted = preg_replace('/("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\')\\s*:\\s*/', '$1 => ', $converted) ?? $converted;
         $converted = str_replace(['{', '}'], ['[', ']'], $converted);
 
         return $converted;

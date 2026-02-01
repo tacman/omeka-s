@@ -1,47 +1,38 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- * @Table(
- *   indexes={
- *     @Index(columns={"title", "text"}, flags={"fulltext"})
- *   }
- * )
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\User;
+
+#[ORM\Entity]
+#[ORM\Table(indexes: [
+new ORM\Index(columns: ["title", "text"], flags: ["fulltext"])
+])]
 class FulltextSearch
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
     protected $id;
 
-    /**
-     * @Id
-     * @Column(type="string", length=190)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING, length: 190)]
     protected $resource;
 
-    /**
-     * @ManyToOne(targetEntity="User")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $owner;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $isPublic = true;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $title;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $text;
 
     /**

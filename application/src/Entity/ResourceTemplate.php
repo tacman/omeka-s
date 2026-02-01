@@ -1,73 +1,61 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\User;
+use Omeka\Entity\ResourceClass;
+use Omeka\Entity\Property;
+use Omeka\Entity\ResourceTemplateProperty;
+use Omeka\Entity\Resource;
 
-/**
- * @Entity
- */
+#[ORM\Entity]
 class ResourceTemplate extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @Column(unique=true, length=190)
-     */
+    #[ORM\Column(unique: true, length: 190)]
     protected $label;
 
-    /**
-     * @ManyToOne(targetEntity="User", inversedBy="resourceTemplates")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "resourceTemplates")]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $owner;
 
-    /**
-     * @ManyToOne(targetEntity="ResourceClass")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: ResourceClass::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $resourceClass;
 
-    /**
-     * @ManyToOne(targetEntity="Property")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: Property::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $titleProperty;
 
-    /**
-     * @ManyToOne(targetEntity="Property")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: Property::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $descriptionProperty;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="ResourceTemplateProperty",
-     *     mappedBy="resourceTemplate",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove", "detach"},
-     *     indexBy="property_id"
-     * )
-     * @OrderBy({"position" = "ASC"})
-     */
+    #[ORM\OneToMany(
+        targetEntity: ResourceTemplateProperty::class,
+        mappedBy: "resourceTemplate",
+        orphanRemoval: true,
+        cascade: ["persist", "remove", "detach"],
+        indexBy: "property_id",
+    )]
+    #[ORM\OrderBy(["position" => "ASC"])]
     protected $resourceTemplateProperties;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="Resource",
-     *     mappedBy="resourceTemplate",
-     *     fetch="EXTRA_LAZY"
-     * )
-     */
+    #[ORM\OneToMany(targetEntity: Resource::class, mappedBy: "resourceTemplate", fetch: 'EXTRA_LAZY')]
     protected $resources;
 
     public function __construct()
     {
-        $this->resourceTemplateProperties = new ArrayCollection;
+        $this->resourceTemplateProperties = new ArrayCollection();
     }
 
     public function getId()

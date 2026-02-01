@@ -1,40 +1,37 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\Item;
+use Omeka\Entity\SiteItemSet;
 
-/**
- * @Entity
- */
+#[ORM\Entity]
 class ItemSet extends Resource
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
     protected $id;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $isOpen = false;
 
-    /**
-     * @ManyToMany(targetEntity="Item", mappedBy="itemSets", fetch="EXTRA_LAZY")
-     * @JoinTable(name="item_item_set")
-     */
+    #[ORM\ManyToMany(targetEntity: Item::class, mappedBy: "itemSets", fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinTable(name: "item_item_set")]
     protected $items;
 
-    /**
-     * @OneToMany(targetEntity="SiteItemSet", mappedBy="itemSet")
-     */
+    #[ORM\OneToMany(targetEntity: SiteItemSet::class, mappedBy: "itemSet")]
     protected $siteItemSets;
 
     public function __construct()
     {
         parent::__construct();
-        $this->items = new ArrayCollection;
-        $this->siteItemSets = new ArrayCollection;
+        $this->items = new ArrayCollection();
+        $this->siteItemSets = new ArrayCollection();
     }
 
     public function getResourceName()

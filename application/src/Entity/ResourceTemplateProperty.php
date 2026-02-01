@@ -1,70 +1,55 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- * @Table(
- *     uniqueConstraints={
- *         @UniqueConstraint(
- *             columns={"resource_template_id", "property_id"}
- *         )
- *     }
- * )
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\ResourceTemplate;
+use Omeka\Entity\Property;
+use Omeka\Entity\CASCADE;
+
+#[ORM\Entity]
+#[ORM\Table(uniqueConstraints: [
+new ORM\UniqueConstraint(
+columns: ["resource_template_id", "property_id"]
+)
+])]
 class ResourceTemplateProperty extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="ResourceTemplate", inversedBy="resourceTemplateProperties")
-     * @JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: ResourceTemplate::class, inversedBy: "resourceTemplateProperties")]
+    #[ORM\JoinColumn(nullable: false)]
     protected $resourceTemplate;
 
-    /**
-     * @ManyToOne(targetEntity="Property")
-     * @JoinColumn(nullable=false, onDelete="CASCADE")
-     */
+    #[ORM\ManyToOne(targetEntity: Property::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
     protected $property;
 
-    /**
-     * @Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     protected $alternateLabel;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $alternateComment;
 
-    /**
-     * @Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
     protected $position;
 
-    /**
-     * @Column(type="json_array", nullable=true)
-     */
+    #[ORM\Column(type: "json_array", nullable: true)]
     protected $dataType;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $isRequired = false;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $isPrivate = false;
 
-    /**
-     * @Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     protected $defaultLang;
 
     public function getId()

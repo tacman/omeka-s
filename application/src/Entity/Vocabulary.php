@@ -1,76 +1,57 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\User;
+use Omeka\Entity\ResourceClass;
+use Omeka\Entity\Property;
 
 /**
  * A vocabulary.
  *
  * Vocabularies are defined sets of classes and properties.
- *
- * @Entity
  */
+#[ORM\Entity]
 class Vocabulary extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="User", inversedBy="vocabularies")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "vocabularies")]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $owner;
 
-    /**
-     * @Column(unique=true, length=190)
-     */
+    #[ORM\Column(unique: true, length: 190)]
     protected $namespaceUri;
 
-    /**
-     * @Column(unique=true, length=190)
-     */
+    #[ORM\Column(unique: true, length: 190)]
     protected $prefix;
 
-    /**
-     * @Column
-     */
+    #[ORM\Column]
     protected $label;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $comment;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="ResourceClass",
-     *     mappedBy="vocabulary",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove"}
-     * )
-     * @OrderBy({"label" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: ResourceClass::class, mappedBy: "vocabulary", orphanRemoval: true, cascade: ["persist", "remove"])]
+    #[ORM\OrderBy(["label" => "ASC"])]
     protected $resourceClasses;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="Property",
-     *     mappedBy="vocabulary",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove"}
-     * )
-     * @OrderBy({"label" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: Property::class, mappedBy: "vocabulary", orphanRemoval: true, cascade: ["persist", "remove"])]
+    #[ORM\OrderBy(["label" => "ASC"])]
     protected $properties;
 
     public function __construct()
     {
-        $this->resourceClasses = new ArrayCollection;
-        $this->properties = new ArrayCollection;
+        $this->resourceClasses = new ArrayCollection();
+        $this->properties = new ArrayCollection();
     }
 
     public function getId()

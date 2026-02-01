@@ -1,89 +1,69 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\Site;
+use Omeka\Entity\SitePageBlock;
 
-/**
- * @Entity
- * @Table(
- *     uniqueConstraints={
- *         @UniqueConstraint(
- *             columns={"site_id", "slug"}
- *         )
- *     },
- *     indexes={
- *         @Index(
- *             name="is_public",
- *             columns={"is_public"}
- *         )
- *     }
- * )
- */
+#[ORM\Entity]
+#[ORM\Table(
+    uniqueConstraints: [
+new ORM\UniqueConstraint(
+columns: ["site_id", "slug"]
+)
+],
+    indexes: [
+new ORM\Index(
+name: "is_public",
+columns: ["is_public"]
+)
+],
+)]
 class SitePage extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @Column(length=190)
-     */
+    #[ORM\Column(length: 190)]
     protected $slug;
 
-    /**
-     * @Column(length=190)
-     */
+    #[ORM\Column(length: 190)]
     protected $title;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $isPublic = true;
 
-    /**
-     * @Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: Types::STRING, nullable: true)]
     protected $layout;
 
-    /**
-     * @Column(type="json", nullable=true)
-     */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     protected $layoutData;
 
-    /**
-     * @ManyToOne(targetEntity="Site", inversedBy="pages")
-     * @JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: "pages")]
+    #[ORM\JoinColumn(nullable: false)]
     protected $site;
 
-    /**
-     * @Column(type="datetime")
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected $created;
 
-    /**
-     * @Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected $modified;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="SitePageBlock",
-     *     mappedBy="page",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove"}
-     * )
-     * @OrderBy({"position" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: SitePageBlock::class, mappedBy: "page", orphanRemoval: true, cascade: ["persist", "remove"])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     protected $blocks;
 
     public function __construct()
     {
-        $this->blocks = new ArrayCollection;
+        $this->blocks = new ArrayCollection();
     }
 
     public function getId()

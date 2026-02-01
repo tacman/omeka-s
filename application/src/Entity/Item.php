@@ -1,61 +1,56 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\Media;
+use Omeka\Entity\SiteBlockAttachment;
+use Omeka\Entity\ItemSet;
+use Omeka\Entity\Site;
 
-/**
- * @Entity
- */
+#[ORM\Entity]
 class Item extends Resource
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="Media")
-     * @JoinColumn(nullable=true, onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: Media::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
     protected $primaryMedia;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="Media",
-     *     mappedBy="item",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove", "detach"},
-     *     indexBy="id"
-     * )
-     * @OrderBy({"position" = "ASC"})
-     */
+    #[ORM\OneToMany(
+        targetEntity: Media::class,
+        mappedBy: "item",
+        orphanRemoval: true,
+        cascade: ["persist", "remove", "detach"],
+        indexBy: "id",
+    )]
+    #[ORM\OrderBy(["position" => "ASC"])]
     protected $media;
 
-    /**
-     * @OneToMany(targetEntity="SiteBlockAttachment", mappedBy="item")
-     */
+    #[ORM\OneToMany(targetEntity: SiteBlockAttachment::class, mappedBy: "item")]
     protected $siteBlockAttachments;
 
-    /**
-     * @ManyToMany(targetEntity="ItemSet", inversedBy="items", indexBy="id")
-     * @JoinTable(name="item_item_set")
-     */
+    #[ORM\ManyToMany(targetEntity: ItemSet::class, inversedBy: "items", indexBy: "id")]
+    #[ORM\JoinTable(name: "item_item_set")]
     protected $itemSets;
 
-    /**
-     * @ManyToMany(targetEntity="Site", inversedBy="items", indexBy="id")
-     * @JoinTable(name="item_site")
-     */
+    #[ORM\ManyToMany(targetEntity: Site::class, inversedBy: "items", indexBy: "id")]
+    #[ORM\JoinTable(name: "item_site")]
     protected $sites;
 
     public function __construct()
     {
         parent::__construct();
-        $this->media = new ArrayCollection;
-        $this->siteBlockAttachments = new ArrayCollection;
-        $this->itemSets = new ArrayCollection;
-        $this->sites = new ArrayCollection;
+        $this->media = new ArrayCollection();
+        $this->siteBlockAttachments = new ArrayCollection();
+        $this->itemSets = new ArrayCollection();
+        $this->sites = new ArrayCollection();
     }
 
     public function getResourceName()

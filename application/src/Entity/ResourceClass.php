@@ -1,64 +1,52 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
+
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\User;
+use Omeka\Entity\Vocabulary;
+use Omeka\Entity\Resource;
 
 /**
  * A resource class.
  *
  * Classes are logical groupings of resources that have specified ranges of
  * descriptive properties.
- *
- * @Entity
- * @Table(
- *     uniqueConstraints={
- *         @UniqueConstraint(
- *             columns={"vocabulary_id", "local_name"}
- *         )
- *     }
- * )
  */
+#[ORM\Entity]
+#[ORM\Table(uniqueConstraints: [
+new ORM\UniqueConstraint(
+columns: ["vocabulary_id", "local_name"]
+)
+])]
 class ResourceClass extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="User", inversedBy="resourceClasses")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "resourceClasses")]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $owner;
 
-    /**
-     * @ManyToOne(targetEntity="Vocabulary", inversedBy="resourceClasses")
-     * @JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Vocabulary::class, inversedBy: "resourceClasses")]
+    #[ORM\JoinColumn(nullable: false)]
     protected $vocabulary;
 
-    /**
-     * @Column(options={"collation"="utf8mb4_bin"}, length=190)
-     */
+    #[ORM\Column(options: ["collation" => "utf8mb4_bin"], length: 190)]
     protected $localName;
 
-    /**
-     * @Column
-     */
+    #[ORM\Column]
     protected $label;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $comment;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="Resource",
-     *     mappedBy="resourceClass",
-     *     fetch="EXTRA_LAZY"
-     * )
-     */
+    #[ORM\OneToMany(targetEntity: Resource::class, mappedBy: "resourceClass", fetch: 'EXTRA_LAZY')]
     protected $resources;
 
     public function getId()

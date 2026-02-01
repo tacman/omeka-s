@@ -1,133 +1,89 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\Asset;
+use Omeka\Entity\SitePage;
+use Omeka\Entity\User;
+use Omeka\Entity\SitePermission;
+use Omeka\Entity\SiteItemSet;
+use Omeka\Entity\Item;
 
-/**
- * @Entity
- */
+#[ORM\Entity]
 class Site extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @Column(length=190, unique=true)
-     */
+    #[ORM\Column(length: 190, unique: true)]
     protected $slug;
 
-    /**
-     * @Column(length=190)
-     */
+    #[ORM\Column(length: 190)]
     protected $theme;
 
-    /**
-     * @Column(length=190)
-     */
+    #[ORM\Column(length: 190)]
     protected $title;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $summary;
 
-    /**
-     * @ManyToOne(targetEntity="Asset")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: Asset::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $thumbnail;
 
-    /**
-     * @Column(type="json_array")
-     */
+    #[ORM\Column(type: "json_array")]
     protected $navigation;
 
-    /**
-     * @OneToOne(targetEntity="SitePage")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\OneToOne(targetEntity: SitePage::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $homepage;
 
-    /**
-     * @Column(type="json_array")
-     */
+    #[ORM\Column(type: "json_array")]
     protected $itemPool;
 
-    /**
-     * @ManyToOne(targetEntity="User", inversedBy="sites")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "sites")]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $owner;
 
-    /**
-     * @Column(type="datetime")
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected $created;
 
-    /**
-     * @Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected $modified;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $isPublic = true;
 
-    /**
-     * @Column(type="boolean", options={"default":false})
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $assignNewItems = false;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="SitePage",
-     *     mappedBy="site",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove"},
-     *     indexBy="id"
-     * )
-     */
+    #[ORM\OneToMany(targetEntity: SitePage::class, mappedBy: "site", orphanRemoval: true, cascade: ["persist", "remove"], indexBy: "id")]
     protected $pages;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="SitePermission",
-     *     mappedBy="site",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove"}
-     * )
-     */
+    #[ORM\OneToMany(targetEntity: SitePermission::class, mappedBy: "site", orphanRemoval: true, cascade: ["persist", "remove"])]
     protected $sitePermissions;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="SiteItemSet",
-     *     mappedBy="site",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove"}
-     * )
-     * @OrderBy({"position" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: SiteItemSet::class, mappedBy: "site", orphanRemoval: true, cascade: ["persist", "remove"])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     protected $siteItemSets;
 
-    /**
-     * @ManyToMany(targetEntity="Item", mappedBy="sites", fetch="EXTRA_LAZY")
-     * @JoinTable(name="item_site")
-     */
+    #[ORM\ManyToMany(targetEntity: Item::class, mappedBy: "sites", fetch: 'EXTRA_LAZY')]
     protected $items;
 
     public function __construct()
     {
-        $this->pages = new ArrayCollection;
-        $this->sitePermissions = new ArrayCollection;
-        $this->siteItemSets = new ArrayCollection;
-        $this->items = new ArrayCollection;
+        $this->pages = new ArrayCollection();
+        $this->sitePermissions = new ArrayCollection();
+        $this->siteItemSets = new ArrayCollection();
+        $this->items = new ArrayCollection();
     }
 
     public function getId()

@@ -1,70 +1,57 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\User;
+use Omeka\Entity\Vocabulary;
+use Omeka\Entity\Value;
 
 /**
  * A property, representing the predicate in an RDF triple.
  *
  * Properties define relationships between resources and their values.
- *
- * @Entity
- * @Table(
- *     uniqueConstraints={
- *         @UniqueConstraint(
- *             columns={"vocabulary_id", "local_name"}
- *         )
- *     }
- * )
  */
+#[ORM\Entity]
+#[ORM\Table(uniqueConstraints: [
+new ORM\UniqueConstraint(
+columns: ["vocabulary_id", "local_name"]
+)
+])]
 class Property extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="User", inversedBy="properties")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "properties")]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $owner;
 
-    /**
-     * @ManyToOne(targetEntity="Vocabulary", inversedBy="properties")
-     * @JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Vocabulary::class, inversedBy: "properties")]
+    #[ORM\JoinColumn(nullable: false)]
     protected $vocabulary;
 
-    /**
-     * @Column(options={"collation"="utf8mb4_bin"}, length=190)
-     */
+    #[ORM\Column(options: ["collation" => "utf8mb4_bin"], length: 190)]
     protected $localName;
 
-    /**
-     * @Column
-     */
+    #[ORM\Column]
     protected $label;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $comment;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="Value",
-     *     mappedBy="property",
-     *     fetch="EXTRA_LAZY"
-     * )
-     */
+    #[ORM\OneToMany(targetEntity: Value::class, mappedBy: "property", fetch: 'EXTRA_LAZY')]
     protected $values;
 
     public function __construct()
     {
-        $this->values = new ArrayCollection;
+        $this->values = new ArrayCollection();
     }
 
     public function getId()

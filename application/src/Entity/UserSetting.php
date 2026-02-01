@@ -1,27 +1,27 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\User;
+use Omeka\Entity\CASCADE;
+
+#[ORM\Entity]
 class UserSetting extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="string", length=190)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING, length: 190)]
     protected $id;
 
-    /**
-     * @Id
-     * @ManyToOne(targetEntity="User")
-     * @JoinColumn(nullable=false, onDelete="CASCADE")
-     */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
     protected $user;
 
-    /**
-     * @Column(type="json_array")
-     */
+    #[ORM\Column(type: "json_array")]
     protected $value;
 
     public function setId($id)

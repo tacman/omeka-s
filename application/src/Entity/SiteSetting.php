@@ -1,27 +1,27 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\Site;
+use Omeka\Entity\CASCADE;
+
+#[ORM\Entity]
 class SiteSetting extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="string", length=190)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING, length: 190)]
     protected $id;
 
-    /**
-     * @Id
-     * @ManyToOne(targetEntity="Site")
-     * @JoinColumn(nullable=false, onDelete="CASCADE")
-     */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Site::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
     protected $site;
 
-    /**
-     * @Column(type="json_array")
-     */
+    #[ORM\Column(type: "json_array")]
     protected $value;
 
     public function setId($id)

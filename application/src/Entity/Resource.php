@@ -1,100 +1,84 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\JOINED;
+use Omeka\Entity\User;
+use Omeka\Entity\ResourceClass;
+use Omeka\Entity\ResourceTemplate;
+use Omeka\Entity\Asset;
+use Omeka\Entity\Value;
 
 /**
  * A resource, representing the subject in an RDF triple.
  *
  * Note that the discriminator map is loaded dynamically.
  *
- * @Entity
- * @InheritanceType("JOINED")
- * @DiscriminatorColumn(name="resource_type", type="string")
- * @Table(
- *     indexes={
- *         @Index(
- *             name="title",
- *             columns={"title"},
- *             options={"lengths":{190}}
- *         ),
- *         @Index(
- *             name="is_public",
- *             columns={"is_public"}
- *         )
- *     }
- * )
  *
  * @see \Omeka\Db\Event\Listener\ResourceDiscriminatorMap
  */
+#[ORM\Entity]
+#[ORM\InheritanceType(JOINED::class)]
+#[ORM\DiscriminatorColumn(name: "resource_type", type: Types::STRING)]
+#[ORM\Table(indexes: [
+new ORM\Index(
+name: "title",
+columns: ["title"],
+options: ["lengths" => [190]]
+),
+new ORM\Index(
+name: "is_public",
+columns: ["is_public"]
+)
+])]
 abstract class Resource extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="User")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $owner;
 
-    /**
-     * @ManyToOne(targetEntity="ResourceClass", inversedBy="resources")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: ResourceClass::class, inversedBy: "resources")]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $resourceClass;
 
-    /**
-     * @ManyToOne(targetEntity="ResourceTemplate", inversedBy="resources")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: ResourceTemplate::class, inversedBy: "resources")]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $resourceTemplate;
 
-    /**
-     * @ManyToOne(targetEntity="Asset")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: Asset::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $thumbnail;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $title;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $isPublic = true;
 
-    /**
-     * @Column(type="datetime")
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected $created;
 
-    /**
-     * @Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected $modified;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="Value",
-     *     mappedBy="resource",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove", "detach"}
-     * )
-     * @OrderBy({"id" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: Value::class, mappedBy: "resource", orphanRemoval: true, cascade: ["persist", "remove", "detach"])]
+    #[ORM\OrderBy(["id" => "ASC"])]
     protected $values;
 
     public function __construct()
     {
-        $this->values = new ArrayCollection;
+        $this->values = new ArrayCollection();
     }
 
     /**
@@ -158,7 +142,7 @@ abstract class Resource extends AbstractEntity
         // Unlike a resource value, a resource title cannot be an empty string
         // or a string containing only whitespace.
         $title = trim((string) $title);
-        $this->title = ('' === $title) ? null : $title;
+        $this->title = '' === $title ? null : $title;
     }
 
     public function getTitle()

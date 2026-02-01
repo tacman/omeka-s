@@ -1,44 +1,41 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- * @Table(
- *     uniqueConstraints={
- *         @UniqueConstraint(
- *             columns={"site_id", "user_id"}
- *         )
- *     }
- * )
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\Site;
+use Omeka\Entity\CASCADE;
+use Omeka\Entity\User;
+
+#[ORM\Entity]
+#[ORM\Table(uniqueConstraints: [
+new ORM\UniqueConstraint(
+columns: ["site_id", "user_id"]
+)
+])]
 class SitePermission extends AbstractEntity
 {
-    const ROLE_ADMIN = 'admin';
-    const ROLE_EDITOR = 'editor';
-    const ROLE_VIEWER = 'viewer';
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_EDITOR = 'editor';
+    public const ROLE_VIEWER = 'viewer';
 
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="Site", inversedBy="sitePermissions")
-     * @JoinColumn(nullable=false, onDelete="CASCADE")
-     */
+    #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: "sitePermissions")]
+    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
     protected $site;
 
-    /**
-     * @ManyToOne(targetEntity="User")
-     * @JoinColumn(nullable=false, onDelete="CASCADE")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
     protected $user;
 
-    /**
-     * @Column(length=80)
-     */
+    #[ORM\Column(length: 80)]
     protected $role;
 
     public function getId()

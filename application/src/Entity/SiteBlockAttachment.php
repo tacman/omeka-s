@@ -1,52 +1,45 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- * @Table(
- *     indexes={
- *         @Index(
- *             name="block_position",
- *             columns={"block_id", "position"}
- *         )
- *     }
- * )
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\SitePageBlock;
+use Omeka\Entity\Item;
+use Omeka\Entity\Media;
+
+#[ORM\Entity]
+#[ORM\Table(indexes: [
+new ORM\Index(
+name: "block_position",
+columns: ["block_id", "position"]
+)
+])]
 class SiteBlockAttachment extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="SitePageBlock", inversedBy="attachments")
-     * @JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: SitePageBlock::class, inversedBy: "attachments")]
+    #[ORM\JoinColumn(nullable: false)]
     protected $block;
 
-    /**
-     * @ManyToOne(targetEntity="Item", inversedBy="siteBlockAttachments")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: Item::class, inversedBy: "siteBlockAttachments")]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $item;
 
-    /**
-     * @ManyToOne(targetEntity="Media")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: Media::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $media;
 
-    /**
-     * @Column(type="text")
-     */
+    #[ORM\Column(type: Types::TEXT)]
     protected $caption;
 
-    /**
-     * @Column(type="integer")
-     */
+    #[ORM\Column(type: Types::INTEGER)]
     protected $position;
 
     public function getId()

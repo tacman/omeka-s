@@ -1,47 +1,38 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\User;
+
+#[ORM\Entity]
 class Asset extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="User")
-     * @JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     protected $owner;
 
-    /**
-     * @Column
-     */
+    #[ORM\Column]
     protected $name;
 
-    /**
-     * @Column
-     */
+    #[ORM\Column]
     protected $mediaType;
 
-    /**
-     * @Column(length=190, unique=true)
-     */
+    #[ORM\Column(length: 190, unique: true)]
     protected $storageId;
 
-    /**
-     * @Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     protected $extension;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $altText;
 
     public function getId()

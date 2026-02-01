@@ -1,6 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity\Exception;
 
-class RuntimeException extends \RuntimeException implements ExceptionInterface
+use RuntimeException as BaseRuntimeException;
+
+class RuntimeException extends BaseRuntimeException implements ExceptionInterface
 {
 }

@@ -1,104 +1,79 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Mapping as ORM;
 use Laminas\Permissions\Acl\Role\RoleInterface;
+use Omeka\Entity\ApiKey;
+use Omeka\Entity\Site;
+use Omeka\Entity\Vocabulary;
+use Omeka\Entity\ResourceClass;
+use Omeka\Entity\Property;
+use Omeka\Entity\ResourceTemplate;
 
-/**
- * @Entity
- * @HasLifecycleCallbacks
- */
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class User extends AbstractEntity implements RoleInterface
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @Column(type="string", length=190, unique=true)
-     */
+    #[ORM\Column(type: Types::STRING, length: 190, unique: true)]
     protected $email;
 
-    /**
-     * @Column(type="string", length=190)
-     */
+    #[ORM\Column(type: Types::STRING, length: 190)]
     protected $name;
 
-    /**
-     * @Column(type="datetime")
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected $created;
 
-    /**
-     * @Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected $modified;
 
-    /**
-     * @Column(type="string", length=60, nullable=true)
-     */
+    #[ORM\Column(type: Types::STRING, length: 60, nullable: true)]
     protected $passwordHash;
 
-    /**
-     * @Column(type="string", length=190)
-     */
+    #[ORM\Column(type: Types::STRING, length: 190)]
     protected $role;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $isActive = false;
 
-    /**
-     * @OneToMany(
-     *     targetEntity="ApiKey",
-     *     mappedBy="owner",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove"},
-     *     indexBy="id"
-     * )
-     */
+    #[ORM\OneToMany(targetEntity: ApiKey::class, mappedBy: "owner", orphanRemoval: true, cascade: ["persist", "remove"], indexBy: "id")]
     protected $keys;
 
-    /**
-     * @OneToMany(targetEntity="Site", mappedBy="owner")
-     */
+    #[ORM\OneToMany(targetEntity: Site::class, mappedBy: "owner")]
     protected $sites;
 
-    /**
-     * @OneToMany(targetEntity="Vocabulary", mappedBy="owner")
-     */
+    #[ORM\OneToMany(targetEntity: Vocabulary::class, mappedBy: "owner")]
     protected $vocabularies;
 
-    /**
-     * @OneToMany(targetEntity="ResourceClass", mappedBy="owner")
-     */
+    #[ORM\OneToMany(targetEntity: ResourceClass::class, mappedBy: "owner")]
     protected $resourceClasses;
 
-    /**
-     * @OneToMany(targetEntity="Property", mappedBy="owner")
-     */
+    #[ORM\OneToMany(targetEntity: Property::class, mappedBy: "owner")]
     protected $properties;
 
-    /**
-     * @OneToMany(targetEntity="ResourceTemplate", mappedBy="owner")
-     */
+    #[ORM\OneToMany(targetEntity: ResourceTemplate::class, mappedBy: "owner")]
     protected $resourceTemplates;
 
     public function __construct()
     {
-        $this->keys = new ArrayCollection;
-        $this->sites = new ArrayCollection;
-        $this->vocabularies = new ArrayCollection;
-        $this->resourceClasses = new ArrayCollection;
-        $this->properties = new ArrayCollection;
-        $this->resourceTemplates = new ArrayCollection;
+        $this->keys = new ArrayCollection();
+        $this->sites = new ArrayCollection();
+        $this->vocabularies = new ArrayCollection();
+        $this->resourceClasses = new ArrayCollection();
+        $this->properties = new ArrayCollection();
+        $this->resourceTemplates = new ArrayCollection();
     }
 
     public function getId()
@@ -168,7 +143,6 @@ class User extends AbstractEntity implements RoleInterface
         if ($this->passwordHash === null) {
             return false;
         }
-
         return password_verify($possiblePassword, $this->passwordHash);
     }
 
@@ -222,17 +196,13 @@ class User extends AbstractEntity implements RoleInterface
         return $this->resourceTemplates;
     }
 
-    /**
-     * @PrePersist
-     */
+    #[ORM\PrePersist]
     public function prePersist(LifecycleEventArgs $eventArgs)
     {
         $this->created = $this->modified = new DateTime('now');
     }
 
-    /**
-     * @PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
         $this->modified = new DateTime('now');

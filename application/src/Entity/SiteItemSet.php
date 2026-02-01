@@ -1,46 +1,45 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- * @Table(
- *     uniqueConstraints={
- *         @UniqueConstraint(
- *             columns={"site_id", "item_set_id"}
- *         )
- *     },
- *     indexes={
- *         @Index(
- *             name="position",
- *             columns={"position"}
- *         )
- *     }
- * )
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\Site;
+use Omeka\Entity\CASCADE;
+use Omeka\Entity\ItemSet;
+
+#[ORM\Entity]
+#[ORM\Table(
+    uniqueConstraints: [
+new ORM\UniqueConstraint(
+columns: ["site_id", "item_set_id"]
+)
+],
+    indexes: [
+new ORM\Index(
+name: "position",
+columns: ["position"]
+)
+],
+)]
 class SiteItemSet extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\GeneratedValue]
     protected $id;
 
-    /**
-     * @ManyToOne(targetEntity="Site", inversedBy="siteItemSets")
-     * @JoinColumn(onDelete="CASCADE", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: "siteItemSets")]
+    #[ORM\JoinColumn(onDelete: CASCADE::class, nullable: false)]
     private $site;
 
-    /**
-     * @ManyToOne(targetEntity="ItemSet", inversedBy="siteItemSets")
-     * @JoinColumn(onDelete="CASCADE", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: ItemSet::class, inversedBy: "siteItemSets")]
+    #[ORM\JoinColumn(onDelete: CASCADE::class, nullable: false)]
     private $itemSet;
 
-    /**
-     * @Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
     protected $position;
 
     public function getId()

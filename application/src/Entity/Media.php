@@ -1,103 +1,74 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- * @Table(
- *     indexes={
- *         @Index(
- *             name="item_position",
- *             columns={"item_id", "position"}
- *         ),
- *         @Index(
- *             name="media_type",
- *             columns={"media_type"}
- *         )
- *     }
- * )
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Omeka\Entity\Item;
+
+#[ORM\Entity]
+#[ORM\Table(indexes: [
+new ORM\Index(
+name: "item_position",
+columns: ["item_id", "position"]
+),
+new ORM\Index(
+name: "media_type",
+columns: ["media_type"]
+)
+])]
 class Media extends Resource
 {
-    /**
-     * @Id
-     * @Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::INTEGER)]
     protected $id;
 
-    /**
-     * @Column
-     */
+    #[ORM\Column]
     protected $ingester;
 
-    /**
-     * @Column
-     */
+    #[ORM\Column]
     protected $renderer;
 
-    /**
-     * @Column(type="json_array", nullable=true)
-     */
+    #[ORM\Column(type: "json_array", nullable: true)]
     protected $data;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $source;
 
-    /**
-     * @Column(nullable=true, length=190)
-     */
+    #[ORM\Column(nullable: true, length: 190)]
     protected $mediaType;
 
-    /**
-     * @Column(nullable=true, unique=true, length=190)
-     */
+    #[ORM\Column(nullable: true, unique: true, length: 190)]
     protected $storageId;
 
-    /**
-     * @Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     protected $extension;
 
-    /**
-     * @Column(nullable=true, type="string", length=64, options={"fixed" = true})
-     */
+    #[ORM\Column(nullable: true, type: Types::STRING, length: 64, options: ["fixed" => true])]
     protected $sha256;
 
-    /**
-     * @Column(type="bigint", nullable=true)
-     */
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
     protected $size;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $hasOriginal = false;
 
-    /**
-     * @Column(type="boolean")
-     */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $hasThumbnails = false;
 
-    /**
-     * @Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
     protected $position;
 
-    /**
-     * @ManyToOne(targetEntity="Item", inversedBy="media")
-     * @JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Item::class, inversedBy: "media")]
+    #[ORM\JoinColumn(nullable: false)]
     protected $item;
 
-    /**
-     * @Column(nullable=true, length=190)
-     */
+    #[ORM\Column(nullable: true, length: 190)]
     protected $lang;
 
-    /**
-     * @Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected $altText;
 
     public function getResourceName()

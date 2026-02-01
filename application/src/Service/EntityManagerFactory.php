@@ -69,7 +69,8 @@ class EntityManagerFactory implements FactoryInterface
             OMEKA_PATH . '/application/data/doctrine-proxies',
             $cache
         );
-        if (class_exists(\Doctrine\ORM\Mapping\Driver\AttributeDriver::class)) {
+        $useAttributeDriver = $this->hasAttributeMappings($config['entity_manager']['mapping_classes_paths']);
+        if ($useAttributeDriver && class_exists(\Doctrine\ORM\Mapping\Driver\AttributeDriver::class)) {
             $driver = new \Doctrine\ORM\Mapping\Driver\AttributeDriver(
                 $config['entity_manager']['mapping_classes_paths']
             );
@@ -81,6 +82,11 @@ class EntityManagerFactory implements FactoryInterface
             $reader = new \Doctrine\Common\Annotations\AnnotationReader();
             $driver = new \Doctrine\ORM\Mapping\Driver\AnnotationDriver(
                 $reader,
+                $config['entity_manager']['mapping_classes_paths']
+            );
+            $emConfig->setMetadataDriverImpl($driver);
+        } elseif (class_exists(\Doctrine\ORM\Mapping\Driver\AttributeDriver::class)) {
+            $driver = new \Doctrine\ORM\Mapping\Driver\AttributeDriver(
                 $config['entity_manager']['mapping_classes_paths']
             );
             $emConfig->setMetadataDriverImpl($driver);
@@ -137,5 +143,39 @@ class EntityManagerFactory implements FactoryInterface
         $em->getFilters()->getFilter('site_page_visibility')->setServiceLocator($serviceLocator);
 
         return $em;
+    }
+
+    /**
+     * @param string[] $paths
+     */
+    private function hasAttributeMappings(array $paths): bool
+    {
+        foreach ($paths as $path) {
+            if (!is_dir($path)) {
+                continue;
+            }
+
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $file) {
+                if (!$file instanceof \SplFileInfo || !$file->isFile() || $file->getExtension() !== 'php') {
+                    continue;
+                }
+
+                $contents = @file_get_contents($file->getPathname());
+                if ($contents === false) {
+                    continue;
+                }
+
+                if (str_contains($contents, '#[ORM\\')
+                    || str_contains($contents, '#[\\ORM\\')
+                    || str_contains($contents, '#[Doctrine\\ORM\\Mapping\\')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

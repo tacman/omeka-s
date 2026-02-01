@@ -1,15 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Omeka\Entity;
 
-/**
- * @Entity
- */
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
 class Migration extends AbstractEntity
 {
-    /**
-     * @Id
-     * @Column(type="string", length=16)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING, length: 16)]
     protected $version;
 
     public function getId()
