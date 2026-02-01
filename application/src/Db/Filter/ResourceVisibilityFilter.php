@@ -2,7 +2,7 @@
 namespace Omeka\Db\Filter;
 
 use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Mapping\ClassMetaData;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Filter\SQLFilter;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
@@ -37,7 +37,7 @@ class ResourceVisibilityFilter extends SQLFilter
         $this->relatedEntities[$entity] = $column;
     }
 
-    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
+    public function addFilterConstraint(ClassMetadata $targetEntity, string $targetTableAlias): string
     {
         if ('Omeka\Entity\Resource' === $targetEntity->getName()) {
             return $this->getResourceConstraint($targetTableAlias);

@@ -69,7 +69,12 @@ class EntityManagerFactory implements FactoryInterface
             OMEKA_PATH . '/application/data/doctrine-proxies',
             $cache
         );
-        if (class_exists(\Doctrine\ORM\Mapping\Driver\AnnotationDriver::class)) {
+        if (class_exists(\Doctrine\ORM\Mapping\Driver\AttributeDriver::class)) {
+            $driver = new \Doctrine\ORM\Mapping\Driver\AttributeDriver(
+                $config['entity_manager']['mapping_classes_paths']
+            );
+            $emConfig->setMetadataDriverImpl($driver);
+        } elseif (class_exists(\Doctrine\ORM\Mapping\Driver\AnnotationDriver::class)) {
             if (class_exists(\Doctrine\Common\Annotations\AnnotationRegistry::class)) {
                 \Doctrine\Common\Annotations\AnnotationRegistry::registerLoader('class_exists');
             }
@@ -80,7 +85,7 @@ class EntityManagerFactory implements FactoryInterface
             );
             $emConfig->setMetadataDriverImpl($driver);
         } else {
-            throw new Exception\ConfigException('Doctrine ORM annotation driver is missing. Install an annotation driver or migrate mappings to attributes.');
+            throw new Exception\ConfigException('Doctrine ORM metadata driver is missing. Install the ORM attribute or annotation driver.');
         }
 
         // Force non-persistent query cache, workaround for issue with SQL filters
@@ -110,16 +115,13 @@ class EntityManagerFactory implements FactoryInterface
         $emConfig->setCustomDatetimeFunctions($config['entity_manager']['functions']['datetime']);
 
         // Load proxies from different directories
-        // HACK: Doctrine takes an integer here and just happens to do nothing (which is
-        // what we want) if the number is not one of the defined proxy generation
-        // constants.
-        $emConfig->setAutoGenerateProxyClasses(-1);
+        $emConfig->setAutoGenerateProxyClasses($isDevMode);
         ProxyAutoloader::register($config['entity_manager']['proxy_paths'],
             $emConfig->getProxyNamespace());
 
         // Set up the entity manager.
         $connection = $serviceLocator->get('Omeka\Connection');
-        $em = EntityManager::create($connection, $emConfig);
+        $em = new EntityManager($connection, $emConfig);
         $em->getEventManager()->addEventListener(
             Events::loadClassMetadata,
             new ResourceDiscriminatorMap($config['entity_manager']['resource_discriminator_map'])

@@ -85,6 +85,7 @@ return [
         ],
         'data_types' => [
             'ip_address' => Db\Type\IpAddress::class,
+            'json_array' => Db\Type\JsonArray::class,
         ],
         'functions' => [
              'datetime' => [

@@ -583,8 +583,15 @@ class ConvertEntitiesCommand
         return $this->currentNamespace ? $this->currentNamespace . '\\' . $trimmed : $trimmed;
     }
 
-    private function formatAnnotationArgumentValue(?string $name, string $value): Literal
+    private function formatAnnotationArgumentValue(?string $name, string $value): ?Literal
     {
+        if ($name === 'options') {
+            $optionsValue = $this->stripOptionsDefaultLiteral($value);
+            if ($optionsValue === null) {
+                return null;
+            }
+            $value = $optionsValue;
+        }
         $stringValue = $this->unquoteString($value);
         if ($name === 'type' && $stringValue !== null) {
             $constant = $this->mapDoctrineTypeConstant($stringValue);
@@ -601,6 +608,25 @@ class ConvertEntitiesCommand
         }
 
         return new Literal($value);
+    }
+
+    private function stripOptionsDefaultLiteral(string $value): ?string
+    {
+        $trimmed = trim($value);
+        if (!str_starts_with($trimmed, '[') || !str_ends_with($trimmed, ']')) {
+            return $value;
+        }
+
+        $without = preg_replace('/(["\']default["\']\s*=>\s*[^,\]]+)(\s*,\s*)?/', '', $trimmed);
+        if ($without === null) {
+            return $value;
+        }
+
+        $without = preg_replace('/\[\s*,/', '[', $without) ?? $without;
+        $without = preg_replace('/,\s*\]/', ']', $without) ?? $without;
+        $without = preg_replace('/\[\s*\]/', '[]', $without) ?? $without;
+
+        return $without === '[]' ? null : $without;
     }
 
     private function unquoteString(string $value): ?string
@@ -776,9 +802,17 @@ class ConvertEntitiesCommand
 
             [$name, $value] = $this->splitNamedArgument($part);
             if ($name !== null) {
-                $args[$name] = $this->formatAnnotationArgumentValue($name, $value);
+                $formatted = $this->formatAnnotationArgumentValue($name, $value);
+                if ($formatted === null) {
+                    continue;
+                }
+                $args[$name] = $formatted;
             } else {
-                $args[] = $this->formatAnnotationArgumentValue(null, $part);
+                $formatted = $this->formatAnnotationArgumentValue(null, $part);
+                if ($formatted === null) {
+                    continue;
+                }
+                $args[] = $formatted;
             }
         }
 

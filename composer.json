@@ -10,7 +10,6 @@
         "ext-pdo_mysql": "*",
         "ext-xml": "*",
         "doctrine/orm": "^2.11.2|^3.0",
-        "doctrine/annotations": "^1.14.1|^2.0",
         "doctrine/cache": "^1.12.1|^2.0",
         "doctrine/dbal": "^2.13.8|^3.0|^4.0",
         "sweetrdf/easyrdf": "^1.0",

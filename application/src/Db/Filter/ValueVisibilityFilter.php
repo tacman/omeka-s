@@ -18,7 +18,7 @@ class ValueVisibilityFilter extends SQLFilter
      */
     protected $serviceLocator;
 
-    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
+    public function addFilterConstraint(ClassMetadata $targetEntity, string $targetTableAlias): string
     {
         if ('Omeka\Entity\Value' === $targetEntity->getName()) {
             $acl = $this->serviceLocator->get('Omeka\Acl');

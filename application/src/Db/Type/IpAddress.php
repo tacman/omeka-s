@@ -11,17 +11,17 @@ class IpAddress extends Type
 {
     const IP_ADDRESS = 'ip_address';
 
-    public function getSqlDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
         return 'VARBINARY(16)';
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
         return is_null($value) ? null : inet_ntop($value);
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
     {
         return is_null($value) ? null : inet_pton($value);
     }

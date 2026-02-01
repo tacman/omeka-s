@@ -18,7 +18,7 @@ class SitePageVisibilityFilter extends SQLFilter
      */
     protected $serviceLocator;
 
-    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
+    public function addFilterConstraint(ClassMetadata $targetEntity, string $targetTableAlias): string
     {
         if ($targetEntity->getName() !== \Omeka\Entity\SitePage::class) {
             return '';
