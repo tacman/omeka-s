@@ -22,7 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:convert:entities',
-    description: 'Dump converted entity code without writing files',
+    description: 'Convert entity code and overwrite files',
 )]
 class ConvertEntitiesCommand
 {
@@ -129,6 +129,9 @@ class ConvertEntitiesCommand
     /** @var array<string, string> */
     private array $currentUseAliases = [];
 
+    /** @var array<string, string> */
+    private array $currentForcedUses = [];
+
     public function __invoke(
         SymfonyStyle $io,
         #[Argument('Path to entity directory or a single file')]
@@ -176,11 +179,15 @@ class ConvertEntitiesCommand
             }
 
             [$phpFile, $className] = $result;
-            $io->writeln(sprintf('\n//// %s (%s)', $filePath, $className));
-            $io->writeln($psrPrinter->printFile($phpFile));
+            $printed = $this->injectForcedUses($psrPrinter->printFile($phpFile));
+            if (file_put_contents($filePath, $printed) === false) {
+                $io->warning(sprintf('Failed to write file: %s', $filePath));
+                continue;
+            }
+            $io->writeln(sprintf('Updated: %s (%s)', $filePath, $className));
         }
 
-        $io->success('Dump complete. No files were written.');
+        $io->success('Conversion complete. Files were overwritten.');
 
         return Command::SUCCESS;
     }
@@ -536,6 +543,7 @@ class ConvertEntitiesCommand
         $this->currentNamespace = $namespace;
         $this->currentUseMap = [];
         $this->currentUseAliases = [];
+        $this->currentForcedUses = [];
 
         foreach ($useStatements as $useStatement) {
             $full = ltrim($useStatement['name'], '\\');
@@ -667,6 +675,57 @@ class ConvertEntitiesCommand
         $lower = strtolower($short);
         $this->currentUseMap[$lower] = $full;
         $this->currentUseAliases[$lower] = $short;
+
+        if ($this->currentNamespace && str_starts_with($full, $this->currentNamespace . '\\')) {
+            $this->currentForcedUses[$full] = $short;
+        }
+    }
+
+    private function injectForcedUses(string $printed): string
+    {
+        if ($this->currentForcedUses === []) {
+            return $printed;
+        }
+
+        $lines = preg_split('/\R/', $printed) ?: [];
+        $existing = [];
+        $namespaceIndex = null;
+        $lastUseIndex = null;
+
+        foreach ($lines as $index => $line) {
+            $trimmed = trim($line);
+            if (str_starts_with($trimmed, 'namespace ')) {
+                $namespaceIndex = $index;
+            }
+            if (str_starts_with($trimmed, 'use ') && str_ends_with($trimmed, ';')) {
+                $lastUseIndex = $index;
+                $useBody = trim(substr($trimmed, 4), ';');
+                $useName = trim(preg_split('/\s+as\s+/i', $useBody)[0] ?? '');
+                if ($useName !== '') {
+                    $existing[strtolower(ltrim($useName, '\\'))] = true;
+                }
+            }
+        }
+
+        $toAdd = [];
+        foreach ($this->currentForcedUses as $full => $alias) {
+            $key = strtolower(ltrim($full, '\\'));
+            if (!isset($existing[$key])) {
+                $toAdd[] = 'use ' . $full . ';';
+            }
+        }
+
+        if ($toAdd === []) {
+            return $printed;
+        }
+
+        $insertAt = $lastUseIndex !== null
+            ? $lastUseIndex + 1
+            : ($namespaceIndex !== null ? $namespaceIndex + 1 : 1);
+
+        array_splice($lines, $insertAt, 0, $toAdd);
+
+        return implode("\n", $lines);
     }
 
     /**
