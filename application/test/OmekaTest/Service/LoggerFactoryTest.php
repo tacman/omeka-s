@@ -1,7 +1,7 @@
 <?php
 namespace OmekaTest\Service;
 
-use Laminas\Log\Logger;
+use Monolog\Logger;
 use Omeka\Service\LoggerFactory;
 use Omeka\Test\TestCase;
 

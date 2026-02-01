@@ -2,7 +2,7 @@
 namespace Omeka\File\Store;
 
 use Omeka\File\Exception;
-use Laminas\Log\Logger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Local filesystem file store
@@ -24,16 +24,16 @@ class Local implements StoreInterface
     protected $baseUri;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
     /**
      * @param string $basePath
      * @param string $baseUri
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      */
-    public function __construct($basePath, $baseUri, Logger $logger)
+    public function __construct($basePath, $baseUri, LoggerInterface $logger)
     {
         $this->basePath = realpath($basePath);
         $this->baseUri = $baseUri;
@@ -56,7 +56,7 @@ class Local implements StoreInterface
     {
         $localPath = $this->getLocalPath($storagePath);
         if (!file_exists($localPath)) {
-            $this->logger->warn(
+            $this->logger->warning(
                 sprintf('Cannot delete file; file does not exist %s', $localPath)
             );
             return;

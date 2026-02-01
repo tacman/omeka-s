@@ -7,7 +7,7 @@ use Omeka\Job\DispatchStrategy\StrategyInterface;
 use Omeka\Entity\Job;
 use Omeka\Log\Writer\Job as JobWriter;
 use Laminas\Authentication\AuthenticationService;
-use Laminas\Log\Logger;
+use Psr\Log\LoggerInterface;
 
 class Dispatcher
 {
@@ -22,7 +22,7 @@ class Dispatcher
     protected $entityManager;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -36,11 +36,11 @@ class Dispatcher
      *
      * @param StrategyInterface $dispatchStrategy
      * @param EntityManager $entityManager
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      * @param AuthenticationService $auth
      */
     public function __construct(StrategyInterface $dispatchStrategy, EntityManager $entityManager,
-        Logger $logger, AuthenticationService $auth)
+        LoggerInterface $logger, AuthenticationService $auth)
     {
         $this->dispatchStrategy = $dispatchStrategy;
         $this->entityManager = $entityManager;
@@ -100,11 +100,15 @@ class Dispatcher
      */
     public function send(Job $job, StrategyInterface $strategy)
     {
-        $this->logger->addWriter(new JobWriter($job));
+        if (method_exists($this->logger, 'pushHandler')) {
+            $this->logger->pushHandler(new JobWriter($job));
+        } elseif (method_exists($this->logger, 'addWriter')) {
+            $this->logger->addWriter(new JobWriter($job));
+        }
         try {
             $strategy->send($job);
         } catch (\Throwable $e) {
-            $this->logger->err((string) $e);
+            $this->logger->error((string) $e);
             $job->setStatus(Job::STATUS_ERROR);
             $job->setEnded(new DateTime('now'));
 

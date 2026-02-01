@@ -1,7 +1,6 @@
 <?php
 namespace Omeka\Service;
 
-use Laminas\Log\PsrLoggerAdapter;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
 
@@ -13,10 +12,10 @@ class PsrLoggerFactory implements FactoryInterface
     /**
      * Create the logger service.
      *
-     * @return PsrLoggerAdapter
+     * @return \Psr\Log\LoggerInterface
      */
     public function __invoke(ContainerInterface $serviceLocator, $requestedName, ?array $options = null)
     {
-        return new PsrLoggerAdapter($serviceLocator->get('Omeka\Logger'));
+        return $serviceLocator->get('Omeka\Logger');
     }
 }

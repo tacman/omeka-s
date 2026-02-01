@@ -168,7 +168,7 @@ class ApiController extends AbstractRestfulController
             $this->checkContentType($request);
             parent::onDispatch($event);
         } catch (\Exception $e) {
-            $this->logger()->err((string) $e);
+            $this->logger()->error((string) $e);
             return $this->getErrorResult($event, $e);
         }
     }

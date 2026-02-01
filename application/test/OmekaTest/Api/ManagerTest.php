@@ -106,7 +106,7 @@ class ManagerTest extends TestCase
         $isAllowed = true, $validResource = true, $isBatchCreate = false
     ) {
         // Omeka\Logger
-        $mockLogger = $this->createMock('Laminas\Log\Logger');
+        $mockLogger = $this->createMock('Psr\Log\LoggerInterface');
 
         // MvcTranslator
         $mockTranslator = $this->createMock('Laminas\I18n\Translator\Translator');

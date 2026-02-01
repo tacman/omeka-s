@@ -114,7 +114,7 @@ class UserController extends AbstractActionController
                     try {
                         $this->mailer()->sendUserActivation($user);
                     } catch (MailException $e) {
-                        $this->logger()->err((string) $e);
+                        $this->logger()->error((string) $e);
                         $this->messenger()->addWarning('Unable to send user activation email.'); // @translate
                     }
                     $message = new Message(

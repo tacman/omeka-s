@@ -1,12 +1,10 @@
 <?php
 namespace Omeka\Service;
 
-use Laminas\Log\Exception;
-use Laminas\Log\Formatter\Simple;
-use Laminas\Log\Logger;
-use Laminas\Log\Writer\Noop;
-use Laminas\Log\Writer\Stream;
-use Laminas\Log\Filter\Priority;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\NullHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
 use Omeka\Log\Processor\PsrPlaceholder;
@@ -24,26 +22,24 @@ class LoggerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $serviceLocator, $requestedName, ?array $options = null)
     {
         $config = $serviceLocator->get('Config');
+        $level = Logger::toMonologLevel($config['logger']['priority'] ?? Logger::NOTICE);
+        $logger = new Logger('omeka');
         if (isset($config['logger']['log'])
             && $config['logger']['log']
             && isset($config['logger']['path'])
         ) {
             try {
-                $writer = new Stream($config['logger']['path']);
-                $writer->setFormatter(new Simple('%timestamp% %priorityName% (%priority%): %message%'));
-            } catch (Exception\RuntimeException $e) {
-                $writer = new Noop;
+                $handler = new StreamHandler($config['logger']['path'], $level);
+                $handler->setFormatter(new LineFormatter('%datetime% %level_name% (%level%): %message%' . "\n"));
+            } catch (\Throwable $e) {
+                $handler = new NullHandler;
                 error_log('Omeka S log initialization failed: ' . $e->getMessage());
             }
         } else {
-            $writer = new Noop;
+            $handler = new NullHandler;
         }
-        $logger = new Logger;
-        $logger->addWriter($writer);
-        $filter = new Priority($config['logger']['priority']);
-        $writer->addFilter($filter);
-        $psrProcessor = new PsrPlaceholder;
-        $logger->addProcessor($psrProcessor);
+        $logger->pushHandler($handler);
+        $logger->pushProcessor(new PsrPlaceholder());
         return $logger;
     }
 }

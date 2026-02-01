@@ -206,7 +206,7 @@ return [
     'logger' => [
         'log' => false,
         'path' => OMEKA_PATH . '/logs/application.log',
-        'priority' => \Laminas\Log\Logger::NOTICE,
+        'priority' => \Monolog\Logger::NOTICE,
     ],
     'http_client' => [
         'adapter' => \Laminas\Http\Client\Adapter\Socket::class,

@@ -3,7 +3,6 @@ namespace Omeka\Service;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Omeka\Db\Logging\FileSqlLogger;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
@@ -32,7 +31,10 @@ class ConnectionFactory implements FactoryInterface
 
         // Force the "generic" MySQL platform to avoid autodetecting and using exclusive features
         // of newer versions
-        $platform = new MySqlPlatform;
+        $platformClass = class_exists(\Doctrine\DBAL\Platforms\MySQLPlatform::class)
+            ? \Doctrine\DBAL\Platforms\MySQLPlatform::class
+            : \Doctrine\DBAL\Platforms\MySqlPlatform::class;
+        $platform = new $platformClass();
 
         $config['connection']['driver'] = self::DRIVER;
         $config['connection']['charset'] = self::CHARSET;
@@ -40,7 +42,9 @@ class ConnectionFactory implements FactoryInterface
         $connection = DriverManager::getConnection($config['connection']);
 
         // Manually-set platforms must have the event manager manually injected
-        $platform->setEventManager($connection->getEventManager());
+        if (method_exists($platform, 'setEventManager')) {
+            $platform->setEventManager($connection->getEventManager());
+        }
 
         if (isset($config['connection']['log_path'])
             && is_file($config['connection']['log_path'])

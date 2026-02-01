@@ -2,7 +2,7 @@
 namespace Omeka\File;
 
 use Omeka\Stdlib\ErrorStore;
-use Laminas\Log\Logger;
+use Psr\Log\LoggerInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Stdlib\Message;
 
@@ -22,7 +22,7 @@ class Downloader
     protected $tempFileFactory;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -31,7 +31,7 @@ class Downloader
      * @param TempFileFactory $tempFileFactory
      */
     public function __construct(ServiceLocatorInterface $services,
-        TempFileFactory $tempFileFactory, Logger $logger
+        TempFileFactory $tempFileFactory, LoggerInterface $logger
     ) {
         $this->services = $services;
         $this->tempFileFactory = $tempFileFactory;
@@ -65,7 +65,7 @@ class Downloader
                 break;
             } catch (\Exception $e) {
                 if (++$attempt === 3) {
-                    $this->logger->err((string) $e);
+                    $this->logger->error((string) $e);
                     if ($errorStore) {
                         $message = new Message(
                             'Error downloading %1$s: %2$s', // @translate
@@ -87,7 +87,7 @@ class Downloader
             if ($errorStore) {
                 $errorStore->addError('download', $message);
             }
-            $this->logger->err($message);
+            $this->logger->error($message);
             $tempFile->delete();
             return false;
         }

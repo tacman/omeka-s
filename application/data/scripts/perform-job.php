@@ -13,21 +13,21 @@ $logger = $serviceLocator->get('Omeka\Logger');
 
 $options = getopt('', ['job-id:', 'base-path:', 'server-url:']);
 if (!isset($options['job-id'])) {
-    $logger->err('No job ID given; use --job-id <id>');
+    $logger->error('No job ID given; use --job-id <id>');
     exit;
 }
 if (!isset($options['base-path'])) {
-    $logger->err('No base path given; use --base-path <basePath>');
+    $logger->error('No base path given; use --base-path <basePath>');
     exit;
 }
 if (!isset($options['server-url'])) {
-    $logger->err('No server URL given; use --server-url <serverUrl>');
+    $logger->error('No server URL given; use --server-url <serverUrl>');
     exit;
 }
 
 $job = $entityManager->find(Job::class, $options['job-id']);
 if (!$job) {
-    $logger->err('There is no job with the given ID');
+    $logger->error('There is no job with the given ID');
     exit;
 }
 

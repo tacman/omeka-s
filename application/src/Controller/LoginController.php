@@ -171,7 +171,7 @@ class LoginController extends AbstractActionController
                     try {
                         $this->mailer()->sendResetPassword($user);
                     } catch (MailException $e) {
-                        $this->logger()->err((string) $e);
+                        $this->logger()->error((string) $e);
                         $this->messenger()->addWarning('Unable to send password reset email.'); // @translate
                     }
                 }

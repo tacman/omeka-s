@@ -174,7 +174,7 @@ class UserAdapter extends AbstractEntityAdapter
         $key = array_search($userId, $ids);
         if ($key !== false) {
             $logger = $services->get('Omeka\Logger');
-            $logger->warn(
+            $logger->warning(
                 new Message(
                     'The current user #%d was removed from the batch process.', // @translate
                     $userId

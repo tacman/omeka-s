@@ -1,13 +1,13 @@
 <?php
 namespace Omeka\Service;
 
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\ApcuCache;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
-use Doctrine\ORM\Tools\Setup;
+use Doctrine\ORM\ORMSetup;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Omeka\Db\Event\Listener\ResourceDiscriminatorMap;
 use Omeka\Db\Event\Subscriber\Entity;
 use Omeka\Db\ProxyAutoloader;
@@ -29,8 +29,12 @@ class EntityManagerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $serviceLocator, $requestedName, ?array $options = null)
     {
-        require_once OMEKA_PATH . '/application/data/overrides/AbstractProxyFactory.php';
-        require_once OMEKA_PATH . '/application/data/overrides/ProxyFactory.php';
+        if (!class_exists(\Doctrine\Common\Proxy\AbstractProxyFactory::class, false)) {
+            require_once OMEKA_PATH . '/application/data/overrides/AbstractProxyFactory.php';
+        }
+        if (!class_exists(\Doctrine\ORM\Proxy\ProxyFactory::class, false)) {
+            require_once OMEKA_PATH . '/application/data/overrides/ProxyFactory.php';
+        }
 
         $appConfig = $serviceLocator->get('ApplicationConfig');
         $config = $serviceLocator->get('Config');
@@ -53,23 +57,35 @@ class EntityManagerFactory implements FactoryInterface
             $isDevMode = self::IS_DEV_MODE;
         }
 
-        if (extension_loaded('apcu') && !$isDevMode) {
-            $cache = new ApcuCache();
+        if (extension_loaded('apcu') && !$isDevMode && ApcuAdapter::isSupported()) {
+            $cache = new ApcuAdapter('omeka_doctrine');
         } else {
-            $cache = new ArrayCache();
+            $cache = new ArrayAdapter();
         }
 
         // Set up the entity manager configuration.
-        $emConfig = Setup::createAnnotationMetadataConfiguration(
-            $config['entity_manager']['mapping_classes_paths'],
+        $emConfig = ORMSetup::createConfiguration(
             $isDevMode,
             OMEKA_PATH . '/application/data/doctrine-proxies',
             $cache
         );
+        if (class_exists(\Doctrine\ORM\Mapping\Driver\AnnotationDriver::class)) {
+            if (class_exists(\Doctrine\Common\Annotations\AnnotationRegistry::class)) {
+                \Doctrine\Common\Annotations\AnnotationRegistry::registerLoader('class_exists');
+            }
+            $reader = new \Doctrine\Common\Annotations\AnnotationReader();
+            $driver = new \Doctrine\ORM\Mapping\Driver\AnnotationDriver(
+                $reader,
+                $config['entity_manager']['mapping_classes_paths']
+            );
+            $emConfig->setMetadataDriverImpl($driver);
+        } else {
+            throw new Exception\ConfigException('Doctrine ORM annotation driver is missing. Install an annotation driver or migrate mappings to attributes.');
+        }
 
         // Force non-persistent query cache, workaround for issue with SQL filters
         // that vary by user, permission level
-        $emConfig->setQueryCacheImpl(new ArrayCache());
+        $emConfig->setQueryCache(new ArrayAdapter());
 
         // Use the underscore naming strategy to preempt potential compatibility
         // issues with the case sensitivity of various operating systems.

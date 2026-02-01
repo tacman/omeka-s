@@ -413,7 +413,7 @@ abstract class AbstractEntityAdapter extends AbstractAdapter implements EntityAd
                 );
             } catch (\Exception $e) {
                 if ($request->getOption('continueOnError', false)) {
-                    $logger->err((string) $e);
+                    $logger->error((string) $e);
                     continue;
                 }
                 // Detach previously persisted entities before re-throwing.
@@ -494,7 +494,7 @@ abstract class AbstractEntityAdapter extends AbstractAdapter implements EntityAd
                 );
             } catch (\Exception $e) {
                 if ($request->getOption('continueOnError', false)) {
-                    $logger->err((string) $e);
+                    $logger->error((string) $e);
                     continue;
                 }
                 // Detach managed entities before re-throwing.
@@ -554,7 +554,7 @@ abstract class AbstractEntityAdapter extends AbstractAdapter implements EntityAd
                 );
             } catch (\Exception $e) {
                 if ($request->getOption('continueOnError', false)) {
-                    $logger->err((string) $e);
+                    $logger->error((string) $e);
                     continue;
                 }
                 // Detach managed entities before re-throwing.

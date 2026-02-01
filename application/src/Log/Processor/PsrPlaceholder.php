@@ -1,16 +1,28 @@
 <?php
 namespace Omeka\Log\Processor;
 
-use Laminas\Log\Processor\ProcessorInterface;
 use Omeka\Stdlib\PsrInterpolateTrait;
 
-class PsrPlaceholder implements ProcessorInterface
+class PsrPlaceholder
 {
     use PsrInterpolateTrait;
 
-    public function process(array $event)
+    /**
+     * @param array|object $record
+     * @return array|object
+     */
+    public function __invoke($record)
     {
-        $event['message'] = $this->interpolate($event['message'], $event['extra']);
-        return $event;
+        if (is_array($record)) {
+            $record['message'] = $this->interpolate($record['message'], $record['context']);
+            return $record;
+        }
+
+        $message = $this->interpolate($record->message, $record->context);
+        if (method_exists($record, 'with')) {
+            return $record->with(message: $message);
+        }
+        $record->message = $message;
+        return $record;
     }
 }

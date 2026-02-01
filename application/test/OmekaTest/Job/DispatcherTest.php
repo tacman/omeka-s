@@ -23,7 +23,7 @@ class DispatcherTest extends TestCase
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->logger = $this->createMock('Laminas\Log\Logger');
+        $this->logger = $this->createMock('Monolog\Logger');
 
         $this->dispatcher = new Dispatcher($strategy, $this->entityManager, $this->logger, $this->auth);
     }
@@ -54,7 +54,7 @@ class DispatcherTest extends TestCase
             ->method('flush');
 
         $this->logger->expects($this->once())
-            ->method('addWriter')
+            ->method('pushHandler')
             ->with($this->isInstanceOf('Omeka\Log\Writer\Job'));
 
         $class = 'Omeka\Job\AbstractJob';

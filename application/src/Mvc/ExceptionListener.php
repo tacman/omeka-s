@@ -51,7 +51,7 @@ class ExceptionListener extends AbstractListenerAggregate
         }
 
         $exception = $e->getParam('exception');
-        $e->getApplication()->getServiceManager()->get('Omeka\Logger')->err((string) $exception);
+        $e->getApplication()->getServiceManager()->get('Omeka\Logger')->error((string) $exception);
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 namespace Omeka\Stdlib;
 
-use Laminas\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 class Cli
 {
@@ -102,7 +102,7 @@ class Cli
     {
         exec($command, $output, $exitCode);
         if (0 !== $exitCode) {
-            $this->logger->err(sprintf('Command "%s" failed with status code %s.', $command, $exitCode)); // @translate
+            $this->logger->error(sprintf('Command "%s" failed with status code %s.', $command, $exitCode)); // @translate
             return false;
         }
         return implode(PHP_EOL, $output);
@@ -156,8 +156,8 @@ class Cli
         $exitCode = proc_close($proc);
         if (0 !== $exitCode) {
             // Log standard error
-            $this->logger->err($errors);
-            $this->logger->err(sprintf('Command "%s" failed with status code %s.', $command, $exitCode)); // @translate
+            $this->logger->error($errors);
+            $this->logger->error(sprintf('Command "%s" failed with status code %s.', $command, $exitCode)); // @translate
             return false;
         }
         return trim($output);

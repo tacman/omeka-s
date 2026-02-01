@@ -1,7 +1,7 @@
 <?php
 namespace Omeka\View\Helper;
 
-use Laminas\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Laminas\View\Helper\AbstractHelper;
 
 /**

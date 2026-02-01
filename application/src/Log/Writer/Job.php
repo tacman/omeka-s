@@ -2,10 +2,11 @@
 namespace Omeka\Log\Writer;
 
 use Omeka\Entity\Job as JobEntity;
-use Laminas\Log\Writer\AbstractWriter;
-use Laminas\Log\Formatter\Simple as SimpleFormatter;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
 
-class Job extends AbstractWriter
+class Job extends AbstractProcessingHandler
 {
     /**
      * @var JobEntity
@@ -15,10 +16,11 @@ class Job extends AbstractWriter
     /**
      * @param JobEntity $job
      */
-    public function __construct(JobEntity $job)
+    public function __construct(JobEntity $job, $level = Logger::DEBUG, bool $bubble = true)
     {
+        parent::__construct($level, $bubble);
         $this->job = $job;
-        $this->formatter = new SimpleFormatter;
+        $this->setFormatter(new LineFormatter('%datetime% %level_name% (%level%): %message%' . "\n"));
     }
 
     /**
@@ -26,8 +28,16 @@ class Job extends AbstractWriter
      *
      * @param array $event
      */
-    protected function doWrite(array $event)
+    /**
+     * @param array|object $record
+     */
+    protected function write($record): void
     {
-        $this->job->addLog($this->formatter->format($event));
+        if (is_array($record)) {
+            $message = $record['formatted'] ?? $record['message'];
+        } else {
+            $message = $record->formatted ?? $record->message;
+        }
+        $this->job->addLog($message);
     }
 }
