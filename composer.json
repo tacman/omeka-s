@@ -4,7 +4,7 @@
     "description": "The Omeka S collections management system. A local network of independently curated exhibits sharing a collaboratively built pool of items and their metadata.",
     "license": "GPL-3.0",
     "require": {
-        "php": ">=8.1",
+        "php": "^8.2",
         "ext-fileinfo": "*",
         "ext-mbstring": "*",
         "ext-pdo_mysql": "*",
@@ -48,7 +48,12 @@
         "omeka/composer-addon-installer": "*",
         "omeka-s-themes/default": "dev-develop",
         "beberlei/doctrineextensions": "^1.0",
-        "fileeye/pel": "^0.12.0"
+        "fileeye/pel": "^0.12.0",
+        "symfony/flex": "^2.10",
+        "symfony/skeleton": "^6.4||^7.4||^8.0",
+        "symfony/webapp-pack": "*",
+        "symfony/runtime": "*",
+        "symfony/yaml": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",
@@ -56,12 +61,17 @@
         "laminas/laminas-test": "^4.0.0|^5.0"
     },
     "autoload": {
-        "psr-4": {"Omeka\\": "application/src"}
+        "psr-4": {
+            "App\\": "src",
+            "Omeka\\": "application/src"
+        }
     },
     "config": {
-        "platform": {"php": "8.1"},
+        "platform": {"php": "8.2"},
         "allow-plugins": {
-            "omeka/composer-addon-installer": true
+            "omeka/composer-addon-installer": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
         }
     },
     "repositories": [
@@ -81,5 +91,17 @@
             "type": "vcs",
             "url": "https://github.com/omeka/laminas-log"
         }
-    ]
+    ],
+    "extra": {
+        "symfony": {
+            "allow-contrib": "true"
+        }
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
+        }
+    }
 }
