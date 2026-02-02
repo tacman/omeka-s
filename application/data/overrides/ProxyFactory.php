@@ -481,7 +481,11 @@ EOPHP;
         $entityPersister  = $this->uow->getEntityPersister($className);
         $initializer      = $this->createLazyInitializer($class, $entityPersister, $this->identifierFlattener);
         $proxyClassName   = $this->loadProxyClass($class);
-        $identifierFields = array_intersect_key($class->getReflectionProperties(), $identifiers);
+        $reflectionProperties = $class->getReflectionProperties();
+        if (!is_array($reflectionProperties)) {
+            $reflectionProperties = iterator_to_array($reflectionProperties);
+        }
+        $identifierFields = array_intersect_key($reflectionProperties, $identifiers);
 
         $proxyFactory = Closure::bind(static function (array $identifier) use ($initializer, $skippedProperties, $identifierFields, $className): InternalProxy {
             $proxy = self::createLazyGhost(static function (InternalProxy $object) use ($initializer, $identifier): void {
@@ -593,12 +597,13 @@ EOPHP;
         $code = substr($code, 7 + (int) strpos($code, "\n{"));
         $code = substr($code, 0, (int) strpos($code, "\n}"));
         $code = str_replace('LazyGhostTrait;', str_replace("\n    ", "\n", 'LazyGhostTrait {
-            initializeLazyObject as __load;
             setLazyObjectAsInitialized as public __setInitialized;
             isLazyObjectInitialized as private;
             createLazyGhost as private;
             resetLazyObject as private;
         }'), $code);
+
+        $code .= "\n\n    public function __load(): void\n    {\n        \$this->initializeLazyObject();\n    }";
 
         return $code;
     }

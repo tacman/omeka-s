@@ -4,7 +4,7 @@ namespace Doctrine\Common\Proxy;
 
 use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Doctrine\Common\Proxy\Exception\OutOfBoundsException;
-use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 
@@ -174,7 +174,7 @@ abstract class AbstractProxyFactory
             throw InvalidArgumentException::unitializedProxyExpected($proxy);
         }
 
-        $className  = ClassUtils::getClass($proxy);
+        $className  = DefaultProxyClassNameResolver::getClass($proxy);
         $definition = $this->definitions[$className] ?? $this->getProxyDefinition($className);
 
         $proxy->__setInitializer($definition->initializer);

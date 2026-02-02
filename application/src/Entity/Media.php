@@ -21,10 +21,6 @@ columns: ["media_type"]
 ])]
 class Media extends Resource
 {
-    #[ORM\Id]
-    #[ORM\Column(type: Types::INTEGER)]
-    protected $id;
-
     #[ORM\Column]
     protected $ingester;
 

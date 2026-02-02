@@ -77,7 +77,7 @@ class JobTest extends TestCase
     public function testPrePersist()
     {
         $lifecycleEventArgs = $this
-            ->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
+            ->getMockBuilder('Doctrine\Persistence\Event\LifecycleEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
         $this->job->prePersist($lifecycleEventArgs);

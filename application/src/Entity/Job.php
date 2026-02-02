@@ -6,7 +6,7 @@ namespace Omeka\Entity;
 
 use DateTime;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Omeka\Entity\User;
 

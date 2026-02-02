@@ -7,7 +7,6 @@ namespace Omeka\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Omeka\Entity\Site;
-use Omeka\Entity\CASCADE;
 
 #[ORM\Entity]
 class SiteSetting extends AbstractEntity
@@ -18,7 +17,7 @@ class SiteSetting extends AbstractEntity
 
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Site::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     protected $site;
 
     #[ORM\Column(type: "json_array")]

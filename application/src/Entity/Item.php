@@ -15,10 +15,6 @@ use Omeka\Entity\Site;
 #[ORM\Entity]
 class Item extends Resource
 {
-    #[ORM\Id]
-    #[ORM\Column(type: Types::INTEGER)]
-    protected $id;
-
     #[ORM\ManyToOne(targetEntity: Media::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
     protected $primaryMedia;

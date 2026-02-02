@@ -2,6 +2,7 @@
 namespace Omeka\Authentication\Storage;
 
 use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Laminas\Authentication\Storage\StorageInterface;
 
@@ -24,6 +25,11 @@ class DoctrineWrapper implements StorageInterface
     protected $repository;
 
     /**
+     * @var EntityManagerInterface|null
+     */
+    protected $entityManager;
+
+    /**
      * Cached identity lookup result
      *
      * False (the default) indicates no cached result, and the lookup must be
@@ -41,11 +47,17 @@ class DoctrineWrapper implements StorageInterface
      *
      * @param StorageInterface $storage "Base" storage class
      * @param EntityRepository $repository Repository storing Users
+     * @param EntityManagerInterface|null $entityManager
      */
-    public function __construct(StorageInterface $storage, EntityRepository $repository)
+    public function __construct(
+        StorageInterface $storage,
+        EntityRepository $repository,
+        ?EntityManagerInterface $entityManager = null
+    )
     {
         $this->setStorage($storage);
         $this->setRepository($repository);
+        $this->entityManager = $entityManager;
     }
 
     public function isEmpty()
@@ -63,7 +75,26 @@ class DoctrineWrapper implements StorageInterface
     public function read()
     {
         if ($this->cachedIdentity !== false) {
-            return $this->cachedIdentity;
+            if ($this->cachedIdentity === null) {
+                return null;
+            }
+            if ($this->entityManager
+                && $this->entityManager->contains($this->cachedIdentity)
+            ) {
+                return $this->cachedIdentity;
+            }
+            $id = $this->cachedIdentity->getId();
+            if ($id) {
+                try {
+                    $identity = $this->repository->findOneBy(['id' => $id, 'isActive' => true]);
+                } catch (DBALException $e) {
+                    $identity = null;
+                }
+                $this->cachedIdentity = $identity;
+                return $identity;
+            }
+            $this->cachedIdentity = null;
+            return null;
         }
 
         $identity = null;

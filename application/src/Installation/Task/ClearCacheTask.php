@@ -11,12 +11,20 @@ class ClearCacheTask implements TaskInterface
     public function perform(Installer $installer)
     {
         $em = $installer->getServiceLocator()->get('Omeka\EntityManager');
-        $cache = $em->getConfiguration()->getMetadataCacheImpl();
-
-        if (!$cache) {
+        $config = $em->getConfiguration();
+        if (method_exists($config, 'getMetadataCache')) {
+            $cache = $config->getMetadataCache();
+            if ($cache) {
+                $cache->clear();
+            }
             return;
         }
 
-        $cache->deleteAll();
+        if (method_exists($config, 'getMetadataCacheImpl')) {
+            $cache = $config->getMetadataCacheImpl();
+            if ($cache) {
+                $cache->deleteAll();
+            }
+        }
     }
 }

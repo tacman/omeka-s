@@ -7,7 +7,6 @@ namespace Omeka\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Omeka\Entity\Site;
-use Omeka\Entity\CASCADE;
 use Omeka\Entity\ItemSet;
 
 #[ORM\Entity]
@@ -32,11 +31,11 @@ class SiteItemSet extends AbstractEntity
     protected $id;
 
     #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: "siteItemSets")]
-    #[ORM\JoinColumn(onDelete: CASCADE::class, nullable: false)]
+    #[ORM\JoinColumn(onDelete: 'CASCADE', nullable: false)]
     private $site;
 
     #[ORM\ManyToOne(targetEntity: ItemSet::class, inversedBy: "siteItemSets")]
-    #[ORM\JoinColumn(onDelete: CASCADE::class, nullable: false)]
+    #[ORM\JoinColumn(onDelete: 'CASCADE', nullable: false)]
     private $itemSet;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]

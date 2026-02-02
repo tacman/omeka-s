@@ -13,15 +13,10 @@ use Omeka\Entity\SiteItemSet;
 #[ORM\Entity]
 class ItemSet extends Resource
 {
-    #[ORM\Id]
-    #[ORM\Column(type: Types::INTEGER)]
-    protected $id;
-
     #[ORM\Column(type: Types::BOOLEAN)]
     protected $isOpen = false;
 
     #[ORM\ManyToMany(targetEntity: Item::class, mappedBy: "itemSets", fetch: 'EXTRA_LAZY')]
-    #[ORM\JoinTable(name: "item_item_set")]
     protected $items;
 
     #[ORM\OneToMany(targetEntity: SiteItemSet::class, mappedBy: "itemSet")]

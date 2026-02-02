@@ -7,16 +7,12 @@ if (getenv('OMEKA_REPORT_DEPRECATED') === '1') {
     error_reporting(E_ALL & ~E_DEPRECATED);
 }
 
-if ((isset($_SERVER['APPLICATION_ENV'])
-        && 'development' == $_SERVER['APPLICATION_ENV'])
-    ||
-    (isset($_SERVER['REDIRECT_APPLICATION_ENV'])
-        && 'development' == $_SERVER['REDIRECT_APPLICATION_ENV'])
-) {
-    ini_set('display_errors', 1);
-} else {
-    ini_set('display_errors', 0);
-}
+$displayErrors = (getenv('OMEKA_DISPLAY_ERRORS') === '1')
+    || (isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] === 'dev')
+    || (isset($_SERVER['APPLICATION_ENV']) && 'development' == $_SERVER['APPLICATION_ENV'])
+    || (isset($_SERVER['REDIRECT_APPLICATION_ENV']) && 'development' == $_SERVER['REDIRECT_APPLICATION_ENV']);
+
+ini_set('display_errors', $displayErrors ? '1' : '0');
 
 require 'bootstrap.php';
 

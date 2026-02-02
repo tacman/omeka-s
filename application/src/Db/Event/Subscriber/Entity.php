@@ -2,8 +2,8 @@
 namespace Omeka\Db\Event\Subscriber;
 
 use Doctrine\Common\EventSubscriber;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events as DoctrineEvent;
 use Omeka\Entity\Resource as OmekaResource;
 use Laminas\EventManager\EventManagerInterface;
@@ -106,8 +106,10 @@ class Entity implements EventSubscriber
      */
     protected function trigger($eventName, LifecycleEventArgs $args)
     {
-        $entity = $args->getEntity();
-        $identifiers = [ClassUtils::getClass($entity)];
+        $entity = method_exists($args, 'getObject')
+            ? $args->getObject()
+            : $args->getEntity();
+        $identifiers = [DefaultProxyClassNameResolver::getClass($entity)];
         if ($entity instanceof OmekaResource) {
             // Add the identifier for a generic resource entity.
             $identifiers[] = 'Omeka\Entity\Resource';

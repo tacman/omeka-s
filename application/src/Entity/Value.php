@@ -8,7 +8,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Omeka\Entity\Resource;
 use Omeka\Entity\Property;
-use Omeka\Entity\CASCADE;
 use Omeka\Entity\ValueAnnotation;
 
 /**
@@ -35,7 +34,7 @@ class Value extends AbstractEntity
     protected $resource;
 
     #[ORM\ManyToOne(targetEntity: Property::class, inversedBy: "values")]
-    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     protected $property;
 
     #[ORM\Column]
@@ -51,7 +50,7 @@ class Value extends AbstractEntity
     protected $uri;
 
     #[ORM\ManyToOne(targetEntity: Resource::class)]
-    #[ORM\JoinColumn(onDelete: CASCADE::class)]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     protected $valueResource;
 
     #[ORM\Column(type: Types::BOOLEAN)]

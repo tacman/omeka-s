@@ -7,10 +7,9 @@ namespace Omeka\Entity;
 use DateInterval;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Omeka\Entity\User;
-use Omeka\Entity\CASCADE;
 
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
@@ -21,7 +20,7 @@ class PasswordCreation extends AbstractEntity
     protected $id;
 
     #[ORM\OneToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     protected $user;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

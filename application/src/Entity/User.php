@@ -7,7 +7,7 @@ namespace Omeka\Entity;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Laminas\Permissions\Acl\Role\RoleInterface;
@@ -197,7 +197,7 @@ class User extends AbstractEntity implements RoleInterface
     }
 
     #[ORM\PrePersist]
-    public function prePersist(LifecycleEventArgs $eventArgs)
+    public function prePersist(PrePersistEventArgs $eventArgs)
     {
         $this->created = $this->modified = new DateTime('now');
     }

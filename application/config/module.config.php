@@ -68,7 +68,7 @@ return [
         ],
     ],
     'entity_manager' => [
-        'is_dev_mode' => false,
+        'is_dev_mode' => true,
         'mapping_classes_paths' => [
             OMEKA_PATH . '/application/src/Entity',
         ],

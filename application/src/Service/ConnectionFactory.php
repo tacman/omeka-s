@@ -50,8 +50,10 @@ class ConnectionFactory implements FactoryInterface
             && is_file($config['connection']['log_path'])
             && is_writable($config['connection']['log_path'])
         ) {
-            $connection->getConfiguration()
-                ->setSQLLogger(new FileSqlLogger($config['connection']['log_path']));
+            $configuration = $connection->getConfiguration();
+            if (method_exists($configuration, 'setSQLLogger')) {
+                $configuration->setSQLLogger(new FileSqlLogger($config['connection']['log_path']));
+            }
         }
 
         return $connection;

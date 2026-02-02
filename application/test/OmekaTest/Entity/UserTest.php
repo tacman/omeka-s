@@ -77,7 +77,7 @@ class UserTest extends TestCase
 
     public function testPrePersist()
     {
-        $lifecycleEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
+        $lifecycleEventArgs = $this->getMockBuilder('Doctrine\Persistence\Event\LifecycleEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
         $this->user->prePersist($lifecycleEventArgs);

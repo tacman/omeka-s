@@ -9,7 +9,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Laminas\Math\Rand;
 use Omeka\Entity\User;
-use Omeka\Entity\EAGER;
 
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
@@ -47,7 +46,7 @@ class ApiKey extends AbstractEntity
     protected $created;
 
     /** The associated user */
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "keys", fetch: EAGER::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "keys", fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: false)]
     protected $owner;
 

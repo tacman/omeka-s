@@ -33,11 +33,11 @@ class EntityTest extends TestCase
             ->with($this->isInstanceOf('Laminas\EventManager\Event'));
         $entity = new Entity($eventManager);
 
-        $eventArgs = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
+        $eventArgs = $this->getMockBuilder('Doctrine\Persistence\Event\LifecycleEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
         $eventArgs->expects($this->any())
-            ->method('getEntity')
+            ->method('getObject')
             ->willReturn($entity);
         foreach ($this->subscribedEvents as $callback) {
             $entity->$callback($eventArgs);

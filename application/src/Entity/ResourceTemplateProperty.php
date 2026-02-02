@@ -8,7 +8,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Omeka\Entity\ResourceTemplate;
 use Omeka\Entity\Property;
-use Omeka\Entity\CASCADE;
 
 #[ORM\Entity]
 #[ORM\Table(uniqueConstraints: [
@@ -28,7 +27,7 @@ class ResourceTemplateProperty extends AbstractEntity
     protected $resourceTemplate;
 
     #[ORM\ManyToOne(targetEntity: Property::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     protected $property;
 
     #[ORM\Column(nullable: true)]

@@ -883,6 +883,12 @@ abstract class AbstractEntityAdapter extends AbstractAdapter implements EntityAd
             $owner = $this->getServiceLocator()
                 ->get('Omeka\AuthenticationService')->getIdentity();
         }
+        if ($owner instanceof User && $owner->getId()) {
+            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+            if (!$entityManager->contains($owner)) {
+                $owner = $entityManager->getReference(User::class, $owner->getId());
+            }
+        }
         $entity->setOwner($owner);
     }
 

@@ -26,7 +26,7 @@ class InstallSchemaTask implements TaskInterface
                 if ('' === $statement) {
                     continue;
                 }
-                $connection->exec($statement);
+                $connection->executeStatement($statement);
             }
         } catch (DBALException $e) {
             $installer->addError($e->getMessage());

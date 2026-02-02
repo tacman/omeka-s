@@ -8,7 +8,6 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Omeka\Entity\JOINED;
 use Omeka\Entity\User;
 use Omeka\Entity\ResourceClass;
 use Omeka\Entity\ResourceTemplate;
@@ -24,7 +23,7 @@ use Omeka\Entity\Value;
  * @see \Omeka\Db\Event\Listener\ResourceDiscriminatorMap
  */
 #[ORM\Entity]
-#[ORM\InheritanceType(JOINED::class)]
+#[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: "resource_type", type: Types::STRING)]
 #[ORM\Table(indexes: [
 new ORM\Index(

@@ -145,7 +145,7 @@ class Manager
     {
         $completed = $this->conn
             ->executeQuery("SELECT version FROM migration")
-            ->fetchAll(PDO::FETCH_COLUMN);
+            ->fetchFirstColumn();
         if (!$completed) {
             $completed = [];
         }

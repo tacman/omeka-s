@@ -7,7 +7,6 @@ namespace Omeka\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Omeka\Entity\Site;
-use Omeka\Entity\CASCADE;
 use Omeka\Entity\User;
 
 #[ORM\Entity]
@@ -28,11 +27,11 @@ class SitePermission extends AbstractEntity
     protected $id;
 
     #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: "sitePermissions")]
-    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     protected $site;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: CASCADE::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     protected $user;
 
     #[ORM\Column(length: 80)]

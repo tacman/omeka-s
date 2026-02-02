@@ -80,7 +80,7 @@ class Environment
             }
         }
         try {
-            $connection->connect();
+            $connection->getNativeConnection();
         } catch (\Exception $e) {
             $this->errorMessages[] = new Message($e->getMessage());
             // Error establishing a connection, no need to check MySQL version.
@@ -89,7 +89,7 @@ class Environment
         // MariaDB includes a fake 5.5.5- leading version in many cases to the
         // client handshake, which is what you get if you ask PDO for the server
         // version. The VERSION() function doesn't include that junk.
-        $mysqlVersion = $connection->fetchColumn('SELECT VERSION()');
+        $mysqlVersion = $connection->fetchOne('SELECT VERSION()');
         if (strpos($mysqlVersion, 'MariaDB') === false) {
             if (!version_compare($mysqlVersion, self::MYSQL_MINIMUM_VERSION, '>=')) {
                 $this->errorMessages[] = new Message(

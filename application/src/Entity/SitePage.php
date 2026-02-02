@@ -41,7 +41,7 @@ class SitePage extends AbstractEntity
     #[ORM\Column(type: Types::BOOLEAN)]
     protected $isPublic = true;
 
-    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 190, nullable: true)]
     protected $layout;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
