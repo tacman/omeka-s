@@ -70,6 +70,7 @@ class EntityManagerFactory implements FactoryInterface
             OMEKA_PATH . '/application/data/doctrine-proxies',
             $cache
         );
+        $emConfig->enableNativeLazyObjects(true);
         $useAttributeDriver = $this->hasAttributeMappings($config['entity_manager']['mapping_classes_paths']);
         if ($useAttributeDriver && class_exists(\Doctrine\ORM\Mapping\Driver\AttributeDriver::class)) {
             $driver = new \Doctrine\ORM\Mapping\Driver\AttributeDriver(
