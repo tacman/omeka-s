@@ -1,0 +1,89 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Item: {{ item.displayTitle() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ item.displayTitle() }}</h1>
+    <p>ID: {{ item.id() }}</p>
+    <p>Created: {{ item.created() ? item.created().format('Y-m-d H:i') : '' }}</p>
+    <p>Modified: {{ item.modified() ? item.modified().format('Y-m-d H:i') : '' }}</p>
+    <p>Public: {{ item.isPublic() ? 'Yes' : 'No' }}</p>
+    <p>Owner: {{ item.owner() ? item.owner().name() : '' }}</p>
+    <p>Resource class: {{ item.resourceClass() ? item.resourceClass().label() : '' }}</p>
+    <p>Resource template: {{ item.resourceTemplate() ? item.resourceTemplate().label() : '' }}</p>
+
+    <h2>Related resources</h2>
+    <div>
+        <h3>Item sets</h3>
+        {% set itemSets = item.itemSets() %}
+        {% if itemSets is empty %}
+            <p>None.</p>
+        {% else %}
+            <ul>
+                {% for itemSet in itemSets %}
+                    <li>
+                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: 'item-set', action: 'show', id: itemSet.id()}) }}">
+                            {{ ux_icon('item_set') }} {{ itemSet.displayTitle() }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div>
+        <h3>Sites</h3>
+        {% set sites = item.sites() %}
+        {% if sites is empty %}
+            <p>None.</p>
+        {% else %}
+            <ul>
+                {% for site in sites %}
+                    <li>
+                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/site/slug', 'site-slug': site.slug()}) }}">
+                            {{ ux_icon('site') }} {{ site.title() }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div>
+        <h3>Media</h3>
+        {% set mediaItems = item.media() %}
+        {% if mediaItems is empty %}
+            <p>None.</p>
+        {% else %}
+            <ul>
+                {% for media in mediaItems %}
+                    <li>
+                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: 'media', action: 'show', id: media.id()}) }}">
+                            {{ ux_icon('media') }} {{ media.displayTitle() }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <h2>Values</h2>
+    {% set values = item.values() %}
+    {% if values is empty %}
+        <p>No values.</p>
+    {% else %}
+        <dl>
+            {% for term, info in values %}
+                <dt>{{ info.property.label() }} ({{ term }})</dt>
+                <dd>
+                    {% for value in info.values %}
+                        <div>{{ value.asHtml()|raw }}</div>
+                    {% endfor %}
+                </dd>
+            {% endfor %}
+        </dl>
+    {% endif %}
+
+    <div class="admin-actions">
+        <a href="{{ path('app_admin_item_edit', {itemId: item.id()}) }}">{{ ux_icon('edit') }} Edit</a>
+        <a href="{{ path('app_admin_item_delete', {itemId: item.id()}) }}">{{ ux_icon('delete') }} Delete</a>
+    </div>
+{% endblock %}

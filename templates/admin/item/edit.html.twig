@@ -1,0 +1,14 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Edit Item: {{ item.displayTitle() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>Edit {{ item.displayTitle() }}</h1>
+    <p>ID: {{ item.id() }}</p>
+    {{ form_start(form) }}
+        {{ form_row(form.title) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.is_public) }}
+        <button type="submit">Save (disabled)</button>
+    {{ form_end(form) }}
+{% endblock %}

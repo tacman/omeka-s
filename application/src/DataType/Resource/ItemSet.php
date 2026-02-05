@@ -5,7 +5,7 @@ use Omeka\DataType\ValueAnnotatingInterface;
 use Omeka\Entity;
 use Laminas\View\Renderer\PhpRenderer;
 
-class Itemset extends AbstractResource implements ValueAnnotatingInterface
+class ItemSet extends AbstractResource implements ValueAnnotatingInterface
 {
     public function getName()
     {

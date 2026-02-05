@@ -8,13 +8,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/symfony/admin')]
 final class AdminLegacyBrowseController extends AbstractController
 {
     public function __construct(private readonly OmekaBrowseService $browseService)
     {
     }
 
-    #[Route('/admin/{controller}', name: 'app_admin_legacy_browse', requirements: ['controller' => '[a-zA-Z0-9_-]+'])]
+    #[Route('/{controller}', name: 'app_admin_legacy_browse', requirements: ['controller' => '[a-zA-Z0-9_-]+'])]
     public function browse(Request $request, string $controller): Response
     {
         $resourceType = $this->controllerToResourceType($controller);

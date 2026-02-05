@@ -63,6 +63,8 @@ class LoadSampleDataCommand
             return Command::FAILURE;
         }
         $hasDescription = $this->hasProperty($api, 'dcterms:description');
+        $resourceClassId = $this->getFirstId($api, 'resource_classes');
+        $resourceTemplateId = $this->getFirstId($api, 'resource_templates');
 
         $sites = max(0, $sites);
         $itemSets = max(0, $itemSets);
@@ -81,7 +83,19 @@ class LoadSampleDataCommand
                 'o:is_public' => true,
                 'o:assign_new_items' => $assignNewItems,
             ];
-            $createdSites[] = $this->createResource($io, $api, 'sites', $siteData);
+            $site = $this->createResource($io, $api, 'sites', $siteData);
+            $createdSites[] = $site;
+            $pages = $this->createSamplePages($io, $api, $site, $i);
+            if ($pages) {
+                $navigation = array_map(
+                    fn ($page) => ['type' => 'page', 'links' => [], 'data' => ['id' => $page->id(), 'label' => null]],
+                    $pages
+                );
+                $api->update('sites', $site->id(), [
+                    'o:navigation' => $navigation,
+                    'o:homepage' => ['o:id' => $pages[0]->id()],
+                ], [], ['isPartial' => true]);
+            }
         }
 
         for ($i = 1; $i <= $itemSets; $i++) {
@@ -90,6 +104,12 @@ class LoadSampleDataCommand
                 'dcterms:title' => [$this->literalValue($title)],
                 'o:is_public' => true,
             ];
+            if ($resourceClassId) {
+                $data['o:resource_class'] = ['o:id' => $resourceClassId];
+            }
+            if ($resourceTemplateId) {
+                $data['o:resource_template'] = ['o:id' => $resourceTemplateId];
+            }
             if ($hasDescription) {
                 $data['dcterms:description'] = [
                     $this->literalValue("Generated sample item set $i."),
@@ -107,6 +127,12 @@ class LoadSampleDataCommand
                 'dcterms:title' => [$this->literalValue($title)],
                 'o:is_public' => true,
             ];
+            if ($resourceClassId) {
+                $data['o:resource_class'] = ['o:id' => $resourceClassId];
+            }
+            if ($resourceTemplateId) {
+                $data['o:resource_template'] = ['o:id' => $resourceTemplateId];
+            }
             if ($hasDescription) {
                 $data['dcterms:description'] = [
                     $this->literalValue("Generated sample item $i."),
@@ -152,6 +178,77 @@ class LoadSampleDataCommand
             $candidate = $base . '-' . $suffix;
             $suffix++;
         }
+    }
+
+    private function createSamplePages(SymfonyStyle $io, ApiManager $api, $site, int $index): array
+    {
+        $pages = [];
+        $pageSpecs = [
+            [
+                'title' => $index === 1 ? 'Welcome' : "Welcome $index",
+                'slug' => $index === 1 ? 'welcome' : "welcome-$index",
+                'html' => sprintf('<p>This is the welcome page for %s.</p>', $site->title()),
+            ],
+            [
+                'title' => $index === 1 ? 'About' : "About $index",
+                'slug' => $index === 1 ? 'about' : "about-$index",
+                'html' => '<p>Sample content page created by the load-sample-data command.</p>',
+            ],
+        ];
+
+        foreach ($pageSpecs as $spec) {
+            $slug = $this->makeUniquePageSlug($api, $site->id(), $this->slugify($spec['slug']));
+            $pageData = [
+                'o:site' => ['o:id' => $site->id()],
+                'o:title' => $spec['title'],
+                'o:slug' => $slug,
+                'o:is_public' => true,
+                'o:block' => [
+                    [
+                        'o:layout' => 'pageTitle',
+                        'o:data' => [],
+                    ],
+                    [
+                        'o:layout' => 'html',
+                        'o:data' => ['html' => $spec['html']],
+                    ],
+                ],
+            ];
+            $pages[] = $this->createResource($io, $api, 'site_pages', $pageData);
+        }
+
+        return $pages;
+    }
+
+    private function makeUniquePageSlug(ApiManager $api, int $siteId, string $slug): string
+    {
+        $base = $slug !== '' ? $slug : 'page';
+        $candidate = $base;
+        $suffix = 1;
+
+        while (true) {
+            $existing = $api->search('site_pages', [
+                'site_id' => $siteId,
+                'slug' => $candidate,
+            ])->getContent();
+            if (empty($existing)) {
+                return $candidate;
+            }
+            $candidate = $base . '-' . $suffix;
+            $suffix++;
+        }
+    }
+
+    private function getFirstId(ApiManager $api, string $resource): ?int
+    {
+        $response = $api->search($resource, ['limit' => 1]);
+        $results = $response->getContent();
+        if (!$results) {
+            return null;
+        }
+
+        $first = $results[0];
+        return $first->id();
     }
 
     private function createResource(SymfonyStyle $io, ApiManager $api, string $resource, array $data)

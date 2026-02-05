@@ -6,34 +6,5 @@
     <h1>{{ result.resourceType|replace({'_': ' '})|title }}</h1>
     <p>Total: {{ result.total }}</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                {% for column in result.columns %}
-                    <th>{{ browse_header(column) }}</th>
-                {% endfor %}
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for resource in result.resources %}
-                <tr>
-                    <td>{{ browse_title(resource) }}</td>
-                    {% for column in result.columns %}
-                        <td>{{ browse_cell(resource, column) }}</td>
-                    {% endfor %}
-                    <td class="admin-actions">
-                        <a href="#" title="View">{{ ux_icon('view') }}</a>
-                        <a href="#" title="Edit">{{ ux_icon('edit') }}</a>
-                        <a href="#" title="Delete">{{ ux_icon('delete') }}</a>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="{{ result.columns|length + 2 }}">No results.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <twig:AdminBrowseTable :result="result" />
 {% endblock %}

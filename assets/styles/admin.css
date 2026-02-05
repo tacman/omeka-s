@@ -10,6 +10,12 @@ body.admin #content { max-width: none; padding: 0; }
 .admin-menu li { margin: 0 0 0.35rem; }
 .admin-menu a { display: block; padding: 0.35rem 0.4rem; border-radius: 3px; color: #1a4b7a; }
 .admin-menu a:hover { background: #e9eef5; text-decoration: none; }
+.admin-menu .current > a,
+.admin-menu .active > a {
+    background: #dbe6f4;
+    color: #123458;
+    font-weight: 600;
+}
 .admin-legacy { margin-bottom: 1rem; font-size: 0.9rem; }
 
 .panel { border: 1px solid #e5e5e5; border-radius: 4px; padding: 1rem; margin-bottom: 1rem; background: #fff; }
