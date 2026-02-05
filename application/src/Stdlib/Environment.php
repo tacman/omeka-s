@@ -86,6 +86,15 @@ class Environment
             // Error establishing a connection, no need to check MySQL version.
             return;
         }
+        $platform = $connection->getDatabasePlatform();
+        $platformName = method_exists($platform, 'getName') ? $platform->getName() : '';
+        if ($platformName === '' && $platform instanceof \Doctrine\DBAL\Platforms\SQLitePlatform) {
+            $platformName = 'sqlite';
+        }
+        if ($platformName !== 'mysql' && $platformName !== 'mariadb') {
+            // Only check versions for MySQL/MariaDB connections.
+            return;
+        }
         // MariaDB includes a fake 5.5.5- leading version in many cases to the
         // client handshake, which is what you get if you ask PDO for the server
         // version. The VERSION() function doesn't include that junk.

@@ -20,5 +20,28 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    Omeka\Db\Event\Subscriber\Schema:
+        arguments:
+            - '@doctrine.dbal.default_connection'
+        tags:
+            - { name: doctrine.event_listener, event: postGenerateSchemaTable }
+
+    App\Menu\SiteMenuBuilder:
+        tags:
+            - { name: knp_menu.menu_builder, method: createSiteMenu, alias: site_admin }
+
+    App\Menu\AdminMenuBuilder:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+        tags:
+            - { name: knp_menu.menu_builder, method: createAdminSiteMenu, alias: admin_site }
+            - { name: knp_menu.menu_builder, method: createAdminResourceMenu, alias: admin_resource }
+            - { name: knp_menu.menu_builder, method: createAdminGlobalMenu, alias: admin_global }
+            - { name: knp_menu.menu_builder, method: createAdminModuleMenu, alias: admin_module }
+
+    App\Service\LegacyOmekaApplication:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -4,6 +4,37 @@ Omeka S is a web publication system for universities, galleries, libraries, arch
 
 See the [user manual](https://omeka.org/s/docs/user-manual) for more information.
 
+## Project Status (Symfony Integration)
+
+- Symfony console commands are available for defaults and sample data: `app:install-defaults`, `app:load-sample-data`.
+- We are beginning to render select Omeka routes through Symfony/Twig; next target is `/browse/item`.
+
+## Local Dev Quick Start
+
+### Install
+1. Install dependencies:
+   - `composer install`
+   - `npm install` and `npx gulp init` (only if you need legacy asset tooling)
+2. Configure the database in `config/database.ini` or via `.env`/`.env.local`.
+   - `OMEKA_DB_CONNECTION_URL="mysql://user:pass@host:3306/dbname"`
+   - Or granular overrides: `OMEKA_DB_USER`, `OMEKA_DB_PASSWORD`, `OMEKA_DB_NAME`, `OMEKA_DB_HOST`, `OMEKA_DB_PORT`
+3. Run the web installer in the browser, then install defaults:
+   - `bin/console app:install-defaults`
+
+### Fixtures and sample data
+- Bootstrap and users (dev only): `bin/console doctrine:fixtures:load`
+  - Default fixture password: `ChangeMe123!`
+- Sample content (sites, item sets, items):
+  - `bin/console app:load-sample-data --sites=1 --item-sets=2 --items=12`
+
+### Run with Symfony
+- `php -S 127.0.0.1:8000 -t public`
+- Or, if you have the Symfony CLI: `symfony server:start`
+
+### Run Omeka without Symfony
+- `php -S 127.0.0.1:8001 -t . index.php`
+- Or point your web server document root at the repo root and use `index.php`.
+
 ## Installation
 
 ### Requirements

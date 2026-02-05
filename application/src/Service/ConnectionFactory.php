@@ -29,20 +29,22 @@ class ConnectionFactory implements FactoryInterface
             throw new Exception\ConfigException('Missing database connection configuration');
         }
 
-        // Force the "generic" MySQL platform to avoid autodetecting and using exclusive features
-        // of newer versions
-        $platformClass = class_exists(\Doctrine\DBAL\Platforms\MySQLPlatform::class)
-            ? \Doctrine\DBAL\Platforms\MySQLPlatform::class
-            : \Doctrine\DBAL\Platforms\MySqlPlatform::class;
-        $platform = new $platformClass();
+        $driver = $config['connection']['driver'] ?? null;
+        if ($driver === self::DRIVER) {
+            // Force the "generic" MySQL platform to avoid autodetecting and using exclusive features
+            // of newer versions
+            $platformClass = class_exists(\Doctrine\DBAL\Platforms\MySQLPlatform::class)
+                ? \Doctrine\DBAL\Platforms\MySQLPlatform::class
+                : \Doctrine\DBAL\Platforms\MySqlPlatform::class;
+            $platform = new $platformClass();
 
-        $config['connection']['driver'] = self::DRIVER;
-        $config['connection']['charset'] = self::CHARSET;
-        $config['connection']['platform'] = $platform;
+            $config['connection']['charset'] = $config['connection']['charset'] ?? self::CHARSET;
+            $config['connection']['platform'] = $platform;
+        }
         $connection = DriverManager::getConnection($config['connection']);
 
         // Manually-set platforms must have the event manager manually injected
-        if (method_exists($platform, 'setEventManager')) {
+        if (isset($platform) && method_exists($platform, 'setEventManager')) {
             $platform->setEventManager($connection->getEventManager());
         }
 

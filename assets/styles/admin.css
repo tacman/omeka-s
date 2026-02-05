@@ -1,0 +1,23 @@
+body.admin #content { max-width: none; padding: 0; }
+
+.admin-layout { display: flex; min-height: 80vh; }
+.admin-sidebar { width: 260px; border-right: 1px solid #e6e6e6; padding: 1.25rem 1rem; background: #f8f8f8; }
+.admin-main { flex: 1; padding: 1.5rem; }
+.admin-logo { font-weight: 700; margin-bottom: 1.5rem; font-size: 1.1rem; }
+.admin-section { margin-bottom: 1.25rem; }
+.admin-section h5 { margin: 0 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; color: #666; letter-spacing: 0.03em; }
+.admin-menu { list-style: none; margin: 0; padding: 0; }
+.admin-menu li { margin: 0 0 0.35rem; }
+.admin-menu a { display: block; padding: 0.35rem 0.4rem; border-radius: 3px; color: #1a4b7a; }
+.admin-menu a:hover { background: #e9eef5; text-decoration: none; }
+.admin-legacy { margin-bottom: 1rem; font-size: 0.9rem; }
+
+.panel { border: 1px solid #e5e5e5; border-radius: 4px; padding: 1rem; margin-bottom: 1rem; background: #fff; }
+.panel h2 { margin-top: 0; font-size: 1.1rem; }
+.resource-row, .site-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #eee; }
+.resource-row:last-child, .site-row:last-child { border-bottom: 0; }
+.site-row a.public { font-size: 0.9rem; }
+
+.admin-actions { display: flex; gap: 0.5rem; align-items: center; }
+.admin-actions a { display: inline-flex; gap: 0.25rem; align-items: center; }
+.admin-actions .icon { display: inline-flex; }

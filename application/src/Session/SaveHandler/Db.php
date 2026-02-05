@@ -67,11 +67,26 @@ class Db implements SaveHandlerInterface
     #[\ReturnTypeWillChange]
     public function write($id, $data)
     {
-        $sql = 'INSERT INTO session (id, modified, data) VALUES (:id, :modified, :data) '
-             . 'ON DUPLICATE KEY UPDATE modified = :modified, data = :data';
-        $this->conn->executeStatement($sql, [
-            'id' => $id, 'modified' => time(), 'data' => $data,
-        ]);
+        $params = [
+            'id' => $id,
+            'modified' => time(),
+            'data' => $data,
+        ];
+
+        $platform = $this->conn->getDatabasePlatform();
+        $platformName = method_exists($platform, 'getName') ? $platform->getName() : '';
+        if ($platformName === 'sqlite'
+            || $platformName === 'sqlite3'
+            || $platform instanceof \Doctrine\DBAL\Platforms\SQLitePlatform
+        ) {
+            $sql = 'INSERT INTO session (id, modified, data) VALUES (:id, :modified, :data) '
+                 . 'ON CONFLICT(id) DO UPDATE SET modified = :modified, data = :data';
+        } else {
+            $sql = 'INSERT INTO session (id, modified, data) VALUES (:id, :modified, :data) '
+                 . 'ON DUPLICATE KEY UPDATE modified = :modified, data = :data';
+        }
+
+        $this->conn->executeStatement($sql, $params);
         return true;
     }
 

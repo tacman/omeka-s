@@ -3,7 +3,20 @@ namespace Omeka;
 
 $reader = new \Laminas\Config\Reader\Ini;
 
-$url = getenv('OMEKA_DB_CONNECTION_URL');
+$envValue = function (string $key) {
+  return $_SERVER[$key]
+    ?? $_ENV[$key]
+    ?? getenv($key);
+};
+
+$url = $envValue('OMEKA_DB_CONNECTION_URL');
+if (!$url) {
+  $url = $envValue('DATABASE_URL');
+}
+if ($url) {
+  $appEnv = $envValue('APP_ENV') ?: $envValue('APPLICATION_ENV') ?: 'dev';
+  $url = str_replace(['%kernel.project_dir%', '%kernel.environment%'], [OMEKA_PATH, $appEnv], $url);
+}
 
 try {
   $database = $reader->fromFile(OMEKA_PATH . '/config/database.ini');
@@ -12,8 +25,38 @@ try {
     throw $e;
   }
 } finally {
-  if ($url) {
-    $database['url'] = $url;
+}
+
+$envOverrides = [
+  'OMEKA_DB_DRIVER' => 'driver',
+  'OMEKA_DB_HOST' => 'host',
+  'OMEKA_DB_PORT' => 'port',
+  'OMEKA_DB_NAME' => 'dbname',
+  'OMEKA_DB_USER' => 'user',
+  'OMEKA_DB_PASSWORD' => 'password',
+  'OMEKA_DB_UNIX_SOCKET' => 'unix_socket',
+  'OMEKA_DB_LOG_PATH' => 'log_path',
+  'OMEKA_DB_CHARSET' => 'charset',
+];
+
+if (!$url) {
+  foreach ($envOverrides as $envKey => $configKey) {
+    $value = $envValue($envKey);
+    if ($value !== false && $value !== '') {
+      $database[$configKey] = $value;
+    }
+  }
+} else {
+  $parser = new \Doctrine\DBAL\Tools\DsnParser([
+    'sqlite' => 'pdo_sqlite',
+    'sqlite3' => 'pdo_sqlite',
+  ]);
+  $parsed = $parser->parse($url);
+  $logPath = $envValue('OMEKA_DB_LOG_PATH') ?: ($database['log_path'] ?? null);
+  $database = $parsed;
+  $database['url'] = $url;
+  if ($logPath) {
+    $database['log_path'] = $logPath;
   }
 }
 

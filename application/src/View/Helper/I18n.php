@@ -8,7 +8,7 @@ use Laminas\View\Helper\AbstractHelper;
 /**
  * View helper for rendering localized data.
  */
-class i18n extends AbstractHelper
+class I18n extends AbstractHelper
 {
     const DATE_FORMAT_NONE = 'none';
     const DATE_FORMAT_FULL = 'full';

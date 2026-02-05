@@ -7,4 +7,11 @@ import './bootstrap.js';
  */
 import './styles/app.css';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+import $ from 'jquery';
+import Sortable from 'sortablejs';
+import lightGallery from 'lightgallery';
+
+window.$ = $;
+window.jQuery = $;
+window.Sortable = Sortable;
+window.lightGallery = lightGallery;

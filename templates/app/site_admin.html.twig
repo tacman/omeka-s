@@ -1,0 +1,19 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Site Admin: {{ site.title }}{% endblock %}
+
+{% block admin_sidebar %}
+    <div class="admin-section">
+        <h5>{{ site.title }}</h5>
+        {{ knp_menu_render('site_admin') }}
+    </div>
+    {{ parent() }}
+{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ site.title }}</h1>
+    <p>Slug: {{ site.slug }}</p>
+    <p>
+        <a href="{{ legacy_url('admin/site/slug', {'site-slug': site.slug}) }}">Legacy site admin</a>
+    </p>
+{% endblock %}

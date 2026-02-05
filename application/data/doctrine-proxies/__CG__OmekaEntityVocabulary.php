@@ -8,11 +8,18 @@ namespace DoctrineProxies\__CG__\Omeka\Entity;
 class Vocabulary extends \Omeka\Entity\Vocabulary implements \Doctrine\ORM\Proxy\InternalProxy
 {
     use \Symfony\Component\VarExporter\LazyGhostTrait {
+        initializeLazyObject as private;
         setLazyObjectAsInitialized as public __setInitialized;
         isLazyObjectInitialized as private;
         createLazyGhost as private;
         resetLazyObject as private;
     }
+
+    public function __load(): void
+    {
+        $this->initializeLazyObject();
+    }
+    
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [
         "\0".'*'."\0".'comment' => [parent::class, 'comment', null, 8],
@@ -32,11 +39,6 @@ class Vocabulary extends \Omeka\Entity\Vocabulary implements \Doctrine\ORM\Proxy
         'properties' => [parent::class, 'properties', null, 8],
         'resourceClasses' => [parent::class, 'resourceClasses', null, 8],
     ];
-
-    public function __load(): void
-    {
-        $this->initializeLazyObject();
-    }
 
     public function __isInitialized(): bool
     {

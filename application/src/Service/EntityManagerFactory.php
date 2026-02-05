@@ -10,6 +10,7 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Omeka\Db\Event\Listener\ResourceDiscriminatorMap;
 use Omeka\Db\Event\Subscriber\Entity;
+use Omeka\Db\Event\Subscriber\Schema;
 use Omeka\Db\ProxyAutoloader;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
@@ -133,6 +134,7 @@ class EntityManagerFactory implements FactoryInterface
             new ResourceDiscriminatorMap($config['entity_manager']['resource_discriminator_map'])
         );
         $em->getEventManager()->addEventSubscriber(new Entity($serviceLocator->get('EventManager')));
+        $em->getEventManager()->addEventSubscriber(new Schema($connection));
 
         // Instantiate the visibility filters and inject the service locator.
         $em->getFilters()->enable('resource_visibility');

@@ -1,20 +1,52 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AppController!{% endblock %}
+{% block title %}Omeka Sites{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div>
+    <h1><a href="{{ laminas_url('top') }}">Omeka S</a></h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    {% if sites is empty %}
+        <p>No sites found.</p>
+    {% else %}
+        <h2>Sites</h2>
+        <ul>
+            {% for site in sites %}
+                <li>
+                    <a href="{{ laminas_url('site', {'site-slug': site.slug}) }}">{{ site.title }}</a>
+                    ({{ site.slug }})
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/tac/g/sites/omeka-s/src/Controller/AppController.php</code></li>
-        <li>Your template at <code>/home/tac/g/sites/omeka-s/templates/app/index.html.twig</code></li>
-    </ul>
+    <p>
+        <a href="{{ path('app_admin') }}">Admin dashboard (Symfony)</a>
+        | <a href="{{ laminas_url('admin') }}">Admin dashboard (Legacy)</a>
+    </p>
+
+    <h2>Laminas Routes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Route</th>
+                <th>Type</th>
+                <th>Defaults</th>
+                <th>Constraints</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for route in laminas_route_table() %}
+                <tr>
+                    <td>{{ route.name }}</td>
+                    <td>{{ route.route }}</td>
+                    <td>{{ route.type }}</td>
+                    <td>{{ route.defaults|json_encode }}</td>
+                    <td>{{ route.constraints|json_encode }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

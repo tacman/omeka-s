@@ -9,6 +9,9 @@
 /files/
 /modules/
 /themes/
+/public/files/
+/public/modules/
+/public/themes/
 /application/test/config/database.ini
 /application/test/.phpunit.result.cache
 /application/asset/css/font-awesome/
@@ -47,3 +50,7 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+.castor.stub.php
+application/data/doctrine-proxies/
+logs/db.log

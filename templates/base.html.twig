@@ -2,16 +2,37 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}Omeka S{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
+        <style>
+            body { font-family: Lato, Arial, sans-serif; margin: 0; color: #222; }
+            #content { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+            h1, h2 { margin: 0 0 0.75rem; }
+            table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+            th, td { border: 1px solid #ddd; padding: 0.4rem 0.5rem; text-align: left; vertical-align: top; }
+            th { background: #f4f4f4; }
+            a { color: #1a4b7a; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+            .site-admin-menu { list-style: none; padding: 0; margin: 0 0 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+            .site-admin-menu li { margin: 0; }
+            .site-admin-menu a { display: inline-block; padding: 0.35rem 0.6rem; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; }
+            .site-admin-menu a:hover { background: #f0f0f0; }
+            footer { border-top: 1px solid #eee; margin-top: 2rem; padding: 1rem 0; text-align: center; color: #666; }
+        </style>
         {% endblock %}
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    <body class="{% block body_class %}minimal{% endblock %}">
+        <div id="content" role="main">
+            {% block body %}{% endblock %}
+        </div>
+        <footer>
+            <span class="powered-by">Powered by Omeka S and Symfony</span>
+        </footer>
     </body>
 </html>

@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body_class %}admin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="admin-logo">
+            <a href="{{ path('app_admin') }}">Omeka S</a>
+        </div>
+        <div class="admin-legacy">
+            {% set legacyRoute = legacy_route|default('admin') %}
+            {% set legacyParams = legacy_params|default({}) %}
+            <a href="{{ legacy_url(legacyRoute, legacyParams) }}">View legacy page</a>
+        </div>
+        {% block admin_sidebar %}
+            <div class="admin-section">
+                <h5>Sites</h5>
+                {{ knp_menu_render('admin_site') }}
+            </div>
+            <div class="admin-section">
+                <h5>Resources</h5>
+                {{ knp_menu_render('admin_resource') }}
+            </div>
+            <div class="admin-section">
+                <h5>Admin</h5>
+                {{ knp_menu_render('admin_global') }}
+            </div>
+            <div class="admin-section">
+                <h5>Modules</h5>
+                {{ knp_menu_render('admin_module') }}
+            </div>
+        {% endblock %}
+    </aside>
+    <main class="admin-main">
+        {% block admin_body %}{% endblock %}
+    </main>
+</div>
+{% endblock %}
