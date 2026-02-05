@@ -1,42 +1,42 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Admin dashboard{% endblock %}
+{% block title %}{{ 'Admin dashboard'|trans }}{% endblock %}
 
 {% block admin_body %}
-    <h1>Admin dashboard</h1>
+    <h1>{{ 'Admin dashboard'|trans }}</h1>
 
     <div class="panel">
-        <h2>Manage resources</h2>
+        <h2>{{ 'Manage resources'|trans }}</h2>
         <div class="resource-row">
-            <span><a href="{{ path('app_admin_legacy_browse', {controller: 'item'}) }}">{{ ux_icon('item') }} Items ({{ itemCount }})</a></span>
-            <span class="admin-actions"><a href="{{ legacy_url('admin/default', {controller: 'item', action: 'add'}) }}">{{ ux_icon('add') }} Add</a></span>
+            <span><a href="{{ path('app_admin_legacy_browse', {controller: 'item'}) }}">{{ ux_icon('item') }} {{ 'Items'|trans }} ({{ itemCount }})</a></span>
+            <span class="admin-actions"><a href="{{ legacy_url('admin/default', {controller: 'item', action: 'add'}) }}">{{ ux_icon('add') }} {{ 'Add'|trans }}</a></span>
         </div>
         <div class="resource-row">
-            <span><a href="{{ path('app_admin_legacy_browse', {controller: 'item-set'}) }}">{{ ux_icon('item_set') }} Item sets ({{ itemSetCount }})</a></span>
-            <span class="admin-actions"><a href="{{ legacy_url('admin/default', {controller: 'item-set', action: 'add'}) }}">{{ ux_icon('add') }} Add</a></span>
+            <span><a href="{{ path('app_admin_legacy_browse', {controller: 'item-set'}) }}">{{ ux_icon('item_set') }} {{ 'Item sets'|trans }} ({{ itemSetCount }})</a></span>
+            <span class="admin-actions"><a href="{{ legacy_url('admin/default', {controller: 'item-set', action: 'add'}) }}">{{ ux_icon('add') }} {{ 'Add'|trans }}</a></span>
         </div>
         <div class="resource-row">
-            <span><a href="{{ path('app_admin_legacy_browse', {controller: 'vocabulary'}) }}">{{ ux_icon('vocabulary') }} Vocabularies ({{ vocabularyCount }})</a></span>
-            <span class="admin-actions"><a href="{{ legacy_url('admin/default', {controller: 'vocabulary', action: 'import'}) }}">{{ ux_icon('add') }} Import</a></span>
+            <span><a href="{{ path('app_admin_legacy_browse', {controller: 'vocabulary'}) }}">{{ ux_icon('vocabulary') }} {{ 'Vocabularies'|trans }} ({{ vocabularyCount }})</a></span>
+            <span class="admin-actions"><a href="{{ legacy_url('admin/default', {controller: 'vocabulary', action: 'import'}) }}">{{ ux_icon('add') }} {{ 'Import'|trans }}</a></span>
         </div>
         <div class="resource-row">
-            <span><a href="{{ path('app_admin_legacy_browse', {controller: 'resource-template'}) }}">{{ ux_icon('resource_template') }} Resource templates ({{ resourceTemplateCount }})</a></span>
-            <span class="admin-actions"><a href="{{ legacy_url('admin/default', {controller: 'resource-template', action: 'add'}) }}">{{ ux_icon('add') }} Add</a></span>
+            <span><a href="{{ path('app_admin_legacy_browse', {controller: 'resource-template'}) }}">{{ ux_icon('resource_template') }} {{ 'Resource templates'|trans }} ({{ resourceTemplateCount }})</a></span>
+            <span class="admin-actions"><a href="{{ legacy_url('admin/default', {controller: 'resource-template', action: 'add'}) }}">{{ ux_icon('add') }} {{ 'Add'|trans }}</a></span>
         </div>
     </div>
 
     <div class="panel">
-        <h2>Manage sites</h2>
+        <h2>{{ 'Manage sites'|trans }}</h2>
         {% for site in sites %}
             <div class="site-row">
                 <span class="site-name"><a href="{{ path('app_site_admin', {siteSlug: site.slug()}) }}">{{ ux_icon('site') }} {{ site.title() }}</a></span>
-                <span class="admin-actions"><a class="public" href="{{ laminas_url('site', {'site-slug': site.slug()}) }}" target="_blank">{{ ux_icon('public') }} Public</a></span>
+                <span class="admin-actions"><a class="public" href="{{ laminas_url('site', {'site-slug': site.slug()}) }}" target="_blank">{{ ux_icon('public') }} {{ 'Public'|trans }}</a></span>
             </div>
         {% else %}
-            <p>No sites found.</p>
+            <p>{{ 'No sites found.'|trans }}</p>
         {% endfor %}
         <div class="site-row">
-            <span><a href="{{ legacy_url('admin/site/add') }}">{{ ux_icon('add') }} Add site</a></span>
+            <span><a href="{{ legacy_url('admin/site/add') }}">{{ ux_icon('add') }} {{ 'Add site'|trans }}</a></span>
         </div>
     </div>
 {% endblock %}

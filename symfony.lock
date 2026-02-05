@@ -62,6 +62,19 @@
     "knplabs/knp-menu-bundle": {
         "version": "v3.7.0"
     },
+    "league/flysystem-bundle": {
+        "version": "3.6",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "913dc3d7a5a1af0d2b044c5ac3a16e2f851d7380"
+        },
+        "files": [
+            "config/packages/flysystem.yaml",
+            "var/storage/.gitignore"
+        ]
+    },
     "phpunit/phpunit": {
         "version": "9.6",
         "recipe": {
@@ -309,6 +322,21 @@
             "templates/base.html.twig"
         ]
     },
+    "symfony/ux-autocomplete": {
+        "version": "2.32",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.6",
+            "ref": "07d9602b7231ba355f484305d6cea58310c01741"
+        },
+        "files": [
+            "config/routes/ux_autocomplete.yaml"
+        ]
+    },
+    "symfony/ux-dropzone": {
+        "version": "v2.32.0"
+    },
     "symfony/ux-icons": {
         "version": "2.32",
         "recipe": {
@@ -320,6 +348,20 @@
         "files": [
             "assets/icons/symfony.svg",
             "config/packages/ux_icons.yaml"
+        ]
+    },
+    "symfony/ux-translator": {
+        "version": "2.32",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.32",
+            "ref": "20e2abac415da4c3a9a6bafa059a6419beb74593"
+        },
+        "files": [
+            "assets/translator.js",
+            "config/packages/ux_translator.yaml",
+            "var/translations/index.js"
         ]
     },
     "symfony/ux-turbo": {

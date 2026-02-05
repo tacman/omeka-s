@@ -532,4 +532,47 @@ return [
         'version' => '2.9.0',
         'type' => 'css',
     ],
+    'intl-messageformat' => [
+        'version' => '10.7.18',
+    ],
+    'tslib' => [
+        'version' => '2.8.1',
+    ],
+    '@formatjs/fast-memoize' => [
+        'version' => '2.2.7',
+    ],
+    '@formatjs/icu-messageformat-parser' => [
+        'version' => '2.11.4',
+    ],
+    '@formatjs/icu-skeleton-parser' => [
+        'version' => '1.8.16',
+    ],
+    '@symfony/ux-translator' => [
+        'path' => './vendor/symfony/ux-translator/assets/dist/translator_controller.js',
+    ],
+    'tom-select' => [
+        'version' => '2.4.5',
+    ],
+    '@orchidjs/sifter' => [
+        'version' => '1.1.0',
+    ],
+    '@orchidjs/unicode-variants' => [
+        'version' => '1.1.2',
+    ],
+    'tom-select/dist/css/tom-select.default.min.css' => [
+        'version' => '2.4.5',
+        'type' => 'css',
+    ],
+    'tom-select/dist/css/tom-select.default.css' => [
+        'version' => '2.4.5',
+        'type' => 'css',
+    ],
+    'tom-select/dist/css/tom-select.bootstrap4.css' => [
+        'version' => '2.4.5',
+        'type' => 'css',
+    ],
+    'tom-select/dist/css/tom-select.bootstrap5.css' => [
+        'version' => '2.4.5',
+        'type' => 'css',
+    ],
 ];

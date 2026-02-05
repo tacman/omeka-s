@@ -1,23 +1,23 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Item: {{ item.displayTitle() }}{% endblock %}
+{% block title %}{{ 'Item'|trans }}: {{ item.displayTitle() }}{% endblock %}
 
 {% block admin_body %}
     <h1>{{ item.displayTitle() }}</h1>
-    <p>ID: {{ item.id() }}</p>
-    <p>Created: {{ item.created() ? item.created().format('Y-m-d H:i') : '' }}</p>
-    <p>Modified: {{ item.modified() ? item.modified().format('Y-m-d H:i') : '' }}</p>
-    <p>Public: {{ item.isPublic() ? 'Yes' : 'No' }}</p>
-    <p>Owner: {{ item.owner() ? item.owner().name() : '' }}</p>
-    <p>Resource class: {{ item.resourceClass() ? item.resourceClass().label() : '' }}</p>
-    <p>Resource template: {{ item.resourceTemplate() ? item.resourceTemplate().label() : '' }}</p>
+    <p>{{ 'ID'|trans }}: {{ item.id() }}</p>
+    <p>{{ 'Created'|trans }}: {{ item.created() ? item.created().format('Y-m-d H:i') : '' }}</p>
+    <p>{{ 'Modified'|trans }}: {{ item.modified() ? item.modified().format('Y-m-d H:i') : '' }}</p>
+    <p>{{ 'Public'|trans }}: {{ item.isPublic() ? 'Yes'|trans : 'No'|trans }}</p>
+    <p>{{ 'Owner'|trans }}: {{ item.owner() ? item.owner().name() : '' }}</p>
+    <p>{{ 'Resource class'|trans }}: {{ item.resourceClass() ? item.resourceClass().label() : '' }}</p>
+    <p>{{ 'Resource template'|trans }}: {{ item.resourceTemplate() ? item.resourceTemplate().label() : '' }}</p>
 
-    <h2>Related resources</h2>
+    <h2>{{ 'Related resources'|trans }}</h2>
     <div>
-        <h3>Item sets</h3>
+        <h3>{{ 'Item sets'|trans }}</h3>
         {% set itemSets = item.itemSets() %}
         {% if itemSets is empty %}
-            <p>None.</p>
+            <p>{{ 'None.'|trans }}</p>
         {% else %}
             <ul>
                 {% for itemSet in itemSets %}
@@ -31,10 +31,10 @@
         {% endif %}
     </div>
     <div>
-        <h3>Sites</h3>
+        <h3>{{ 'Sites'|trans }}</h3>
         {% set sites = item.sites() %}
         {% if sites is empty %}
-            <p>None.</p>
+            <p>{{ 'None.'|trans }}</p>
         {% else %}
             <ul>
                 {% for site in sites %}
@@ -48,10 +48,10 @@
         {% endif %}
     </div>
     <div>
-        <h3>Media</h3>
+        <h3>{{ 'Media'|trans }}</h3>
         {% set mediaItems = item.media() %}
         {% if mediaItems is empty %}
-            <p>None.</p>
+            <p>{{ 'None.'|trans }}</p>
         {% else %}
             <ul>
                 {% for media in mediaItems %}
@@ -65,10 +65,10 @@
         {% endif %}
     </div>
 
-    <h2>Values</h2>
+    <h2>{{ 'Values'|trans }}</h2>
     {% set values = item.values() %}
     {% if values is empty %}
-        <p>No values.</p>
+        <p>{{ 'No values.'|trans }}</p>
     {% else %}
         <dl>
             {% for term, info in values %}
@@ -83,7 +83,7 @@
     {% endif %}
 
     <div class="admin-actions">
-        <a href="{{ path('app_admin_item_edit', {itemId: item.id()}) }}">{{ ux_icon('edit') }} Edit</a>
-        <a href="{{ path('app_admin_item_delete', {itemId: item.id()}) }}">{{ ux_icon('delete') }} Delete</a>
+        <a href="{{ path('app_admin_item_edit', {itemId: item.id()}) }}">{{ ux_icon('edit') }} {{ 'Edit'|trans }}</a>
+        <a href="{{ path('app_admin_item_delete', {itemId: item.id()}) }}">{{ ux_icon('delete') }} {{ 'Delete'|trans }}</a>
     </div>
 {% endblock %}

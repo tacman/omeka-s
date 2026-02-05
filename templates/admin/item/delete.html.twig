@@ -1,9 +1,9 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Delete Item: {{ item.displayTitle() }}{% endblock %}
+{% block title %}{{ 'Delete Item'|trans }}: {{ item.displayTitle() }}{% endblock %}
 
 {% block admin_body %}
-    <h1>Delete {{ item.displayTitle() }}</h1>
-    <p>ID: {{ item.id() }}</p>
-    <p>This is a placeholder for the Symfony delete confirmation.</p>
+    <h1>{{ 'Delete'|trans }} {{ item.displayTitle() }}</h1>
+    <p>{{ 'ID'|trans }}: {{ item.id() }}</p>
+    <p>{{ 'This is a placeholder for the Symfony delete confirmation.'|trans }}</p>
 {% endblock %}

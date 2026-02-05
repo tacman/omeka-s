@@ -4,40 +4,71 @@
 
 {% block stylesheets %}
     {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('application/asset/css/iconfonts.css') }}">
+    <link rel="stylesheet" href="{{ asset('application/asset/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('application/asset/vendor/chosen-js/chosen.css') }}">
+    <link rel="stylesheet" href="{{ asset('application/asset/vendor/tablesaw/tablesaw.stackonly.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('application/asset/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('application/asset/vendor/tablesaw/tablesaw.stackonly.jquery.js') }}"></script>
+    <script src="{{ asset('application/asset/vendor/chosen-js/chosen.jquery.js') }}"></script>
+    <script src="{{ asset('application/asset/js/chosen-options.js') }}"></script>
+    <script src="{{ asset('application/asset/js/global.js') }}"></script>
+    <script>
+        window.Omeka = window.Omeka || {};
+        Omeka.jsTranslate = Omeka.jsTranslate || function (str) { return str; };
+    </script>
+    <script src="{{ asset('application/asset/js/admin.js') }}"></script>
+    {{ parent() }}
 {% endblock %}
 
 {% block body %}
 <div class="admin-layout">
     <aside class="admin-sidebar">
         <div class="admin-logo">
-            <a href="{{ path('app_admin') }}">Omeka S</a>
+            <a href="{{ path('app_admin') }}">{{ 'Omeka S'|trans }}</a>
+        </div>
+        <div class="admin-legacy">
+            <label for="locale-select">{{ 'Language'|trans }}</label>
+            <select id="locale-select" onchange="if (this.value) { window.location = this.value; }">
+                {% for locale in app_supported_locales %}
+                    <option value="{{ path('app_set_locale', {'_locale': locale}) }}"{% if app.request.locale == locale %} selected{% endif %}>{{ locale|upper }}</option>
+                {% endfor %}
+            </select>
         </div>
         <div class="admin-legacy">
             {% set legacyRoute = legacy_route|default('admin') %}
             {% set legacyParams = legacy_params|default({}) %}
-            <a href="{{ legacy_url(legacyRoute, legacyParams) }}">View legacy page</a>
+            <a href="{{ legacy_url(legacyRoute, legacyParams) }}">{{ 'View legacy page'|trans }}</a>
         </div>
         {% block admin_sidebar %}
             <div class="admin-section">
-                <h5>Sites</h5>
+                <h5>{{ 'Sites'|trans }}</h5>
                 {{ knp_menu_render('admin_site') }}
             </div>
             <div class="admin-section">
-                <h5>Resources</h5>
+                <h5>{{ 'Resources'|trans }}</h5>
                 {{ knp_menu_render('admin_resource') }}
             </div>
             <div class="admin-section">
-                <h5>Admin</h5>
+                <h5>{{ 'Admin'|trans }}</h5>
                 {{ knp_menu_render('admin_global') }}
             </div>
             <div class="admin-section">
-                <h5>Modules</h5>
+                <h5>{{ 'Modules'|trans }}</h5>
                 {{ knp_menu_render('admin_module') }}
             </div>
         {% endblock %}
     </aside>
-    <main class="admin-main">
+    <main class="admin-main" data-controller="legacy-omeka">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="flash flash-{{ label }}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
         {% block admin_body %}{% endblock %}
     </main>
 </div>

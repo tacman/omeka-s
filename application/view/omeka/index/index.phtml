@@ -30,7 +30,7 @@ endforeach;
 <?php endif; ?>
 <p><?php echo sprintf(
     $translate('Go to the %1$s to start working with %2$s.'),
-    $this->hyperlink($translate('Admin dashboard'), $this->url('admin')),
-    $this->hyperlink($translate('Hello, Symfony!'), '/symfony/app'),
+    $this->hyperlink($translate('version 4 dashboard'), $this->url('admin')),
+    $this->hyperlink($translate('Symfony Admin Dashboard'), 'symfony/admin'),
     $this->escapeHtml($title)
 ); ?></p>

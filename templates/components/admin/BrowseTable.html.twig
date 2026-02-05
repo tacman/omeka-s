@@ -1,33 +1,46 @@
 <table>
     <thead>
         <tr>
-            <th>Title</th>
+            <th>{{ 'Title'|trans }}</th>
             {% for column in result.columns %}
                 <th>{{ browse_header(column) }}</th>
             {% endfor %}
-            <th>Actions</th>
+            <th>{{ 'Actions'|trans }}</th>
         </tr>
     </thead>
     <tbody>
-            {% for resource in result.resources %}
-                <tr>
+        {% for resource in result.resources %}
+            <tr>
                 <td>{{ browse_title(resource) }}</td>
                 {% for column in result.columns %}
                     <td>{{ browse_cell(resource, column) }}</td>
                 {% endfor %}
                 <td class="admin-actions">
                     {% if result.resourceType == 'items' %}
-                        <a href="{{ path('app_admin_item_show', {itemId: resource.id()}) }}" title="View">{{ ux_icon('view') }}</a>
-                        <a href="{{ path('app_admin_item_edit', {itemId: resource.id()}) }}" title="Edit">{{ ux_icon('edit') }}</a>
-                        <a href="{{ path('app_admin_item_delete', {itemId: resource.id()}) }}" title="Delete">{{ ux_icon('delete') }}</a>
+                        <a href="{{ path('app_admin_item_show', {itemId: resource.id()}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a>
+                        <a href="{{ path('app_admin_item_edit', {itemId: resource.id()}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a>
+                        <a href="{{ path('app_admin_item_delete', {itemId: resource.id()}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a>
+                    {% elseif result.resourceType in ['item_sets', 'media', 'resource_templates', 'vocabularies'] %}
+                        {% set controller = {
+                            'item_sets': 'item-set',
+                            'resource_templates': 'resource-template',
+                            'vocabularies': 'vocabulary'
+                        }[result.resourceType]|default(result.resourceType|slice(0, -1)) %}
+                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: controller, id: resource.id(), action: 'show'}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a>
+                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: controller, id: resource.id(), action: 'edit'}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a>
+                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: controller, id: resource.id(), action: 'delete'}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a>
+                    {% elseif result.resourceType == 'sites' %}
+                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/site/slug', 'site-slug': resource.slug()}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a>
+                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/site/slug/action', 'site-slug': resource.slug(), action: 'edit'}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a>
+                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/site/slug/action', 'site-slug': resource.slug(), action: 'delete'}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a>
                     {% else %}
-                        <a href="#" title="View">{{ ux_icon('view') }}</a>
+                        <a href="#" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a>
                     {% endif %}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="{{ result.columns|length + 2 }}">No results.</td>
+                <td colspan="{{ result.columns|length + 2 }}">{{ 'No results.'|trans }}</td>
             </tr>
         {% endfor %}
     </tbody>

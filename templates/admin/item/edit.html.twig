@@ -1,14 +1,51 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Edit Item: {{ item.displayTitle() }}{% endblock %}
+{% block title %}{{ 'Edit Item'|trans }}: {{ item.displayTitle() }}{% endblock %}
 
 {% block admin_body %}
-    <h1>Edit {{ item.displayTitle() }}</h1>
-    <p>ID: {{ item.id() }}</p>
-    {{ form_start(form) }}
-        {{ form_row(form.title) }}
-        {{ form_row(form.description) }}
-        {{ form_row(form.is_public) }}
-        <button type="submit">Save (disabled)</button>
-    {{ form_end(form) }}
+    {% if errors %}
+        <pre>{{ errors|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+    {% endif %}
+    <script>
+        window.valuesJson = {{ item.values()|json_encode|raw }};
+    </script>
+    {{ form_open|raw }}
+    {{ section_nav_html|raw }}
+    <twig:AdminResourceFields :form="form" :resource="item" action="edit" />
+
+    <fieldset id="item-media" class="section" aria-labelledby="media-label">
+        <div class="media-upload">
+            {{ form_row(upload_form.file) }}
+        </div>
+        {{ media_html|raw }}
+    </fieldset>
+
+    <fieldset id="item-sets" class="section" aria-labelledby="item-sets-label">
+        {{ item_sets_html|raw }}
+    </fieldset>
+
+    <fieldset id="sites" class="section" aria-labelledby="sites-label">
+        {{ sites_html|raw }}
+    </fieldset>
+
+    <div id="page-actions">
+        {% if item and item.isPublic() or (not item) and not default_to_private_items %}
+            <a href="#" class="o-icon-public button" title="{{ 'Make private'|trans }}"></a>
+            <input type="hidden" name="o:is_public" value="1">
+        {% else %}
+            <a href="#" class="o-icon-private button" title="{{ 'Make public'|trans }}"></a>
+            <input type="hidden" name="o:is_public" value="0">
+        {% endif %}
+        {{ delete_button_html|raw }}
+        {{ cancel_button_html|raw }}
+        <button type="submit" name="add-item-submit">{{ 'Save'|trans }}</button>
+    </div>
+
+    {{ form_close|raw }}
+
+    {{ resource_form_templates_html|raw }}
+    <script src="{{ asset('application/asset/vendor/sortablejs/Sortable.min.js') }}"></script>
+    <script src="{{ asset('application/asset/js/resource-form.js') }}"></script>
+    <script src="{{ asset('application/asset/js/resource-selector.js') }}"></script>
+    <script src="{{ asset('application/asset/js/item-manage-media.js') }}"></script>
 {% endblock %}

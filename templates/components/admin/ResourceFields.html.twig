@@ -1,0 +1,27 @@
+<fieldset id="resource-values"
+    class="section active"
+    aria-labelledby="resource-values-label"
+    data-resource-id="{{ resource ? resource.id() : '' }}">
+    <div class="non-properties">
+        {{ this.resourceTemplateRow()|raw }}
+        {{ this.resourceClassRow()|raw }}
+    </div>
+    <div id="properties"></div>
+    <input type="hidden" name="values_json" id="values-json">
+    <datalist id="value-languages" class="value-languages">
+        {% for value, language in this.valueLanguages() %}
+            <option value="{{ value }}" label="{{ language|length ? language : value }}"></option>
+        {% endfor %}
+    </datalist>
+    {{ this.propertySelector()|raw }}
+    <button id="property-selector-button" class="mobile-only" data-watch-target="#properties">{{ 'Add property'|trans }}</button>
+    {{ this.valueAnnotationSidebar()|raw }}
+    {{ this.resourceSelectSidebar()|raw }}
+</fieldset>
+
+<fieldset id="advanced-settings" class="section" aria-labelledby="advanced-settings-label">
+    {{ this.thumbnailRow()|raw }}
+    {% if resource and resource.userIsAllowed('change-owner') %}
+        {{ this.ownerRow()|raw }}
+    {% endif %}
+</fieldset>

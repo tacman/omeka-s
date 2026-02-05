@@ -1,10 +1,10 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Browse {{ result.resourceType }}{% endblock %}
+{% block title %}{{ 'Browse'|trans }} {{ result.resourceType }}{% endblock %}
 
 {% block admin_body %}
     <h1>{{ result.resourceType|replace({'_': ' '})|title }}</h1>
-    <p>Total: {{ result.total }}</p>
+    <p>{{ 'Total'|trans }}: {{ result.total }}</p>
 
     <twig:AdminBrowseTable :result="result" />
 {% endblock %}
