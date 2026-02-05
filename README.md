@@ -1,6 +1,6 @@
-# Omeka S
+# Omeka T
 
-Omeka S is a web publication system for universities, galleries, libraries, archives, and museums. It consists of a local network of independently curated exhibits sharing a collaboratively built pool of items, media, and their metadata.
+Omeka S is a Symfony-powered web publication system for universities, galleries, libraries, archives, and museums. It consists of a local network of independently curated exhibits sharing a collaboratively built pool of items, media, and their metadata.
 
 See the [user manual](https://omeka.org/s/docs/user-manual) for more information.
 
@@ -14,7 +14,6 @@ See the [user manual](https://omeka.org/s/docs/user-manual) for more information
 ### Install
 1. Install dependencies:
    - `composer install`
-   - `npm install` and `npx gulp init` (only if you need legacy asset tooling)
 2. Configure the database in `config/database.ini` or via `.env`/`.env.local`.
    - `OMEKA_DB_CONNECTION_URL="mysql://user:pass@host:3306/dbname"`
    - Or granular overrides: `OMEKA_DB_USER`, `OMEKA_DB_PASSWORD`, `OMEKA_DB_NAME`, `OMEKA_DB_HOST`, `OMEKA_DB_PORT`
