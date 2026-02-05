@@ -35,7 +35,10 @@
             <label for="locale-select">{{ 'Language'|trans }}</label>
             <select id="locale-select" onchange="if (this.value) { window.location = this.value; }">
                 {% for locale in app_supported_locales %}
-                    <option value="{{ path('app_set_locale', {'_locale': locale}) }}"{% if app.request.locale == locale %} selected{% endif %}>{{ locale|upper }}</option>
+                    {% set currentRoute = app.request.attributes.get('_route') %}
+                    {% set currentParams = app.request.attributes.get('_route_params')|default({}) %}
+                    {% set targetPath = path(currentRoute, currentParams|merge({'_locale': locale})) %}
+                    <option value="{{ path('app_set_locale', {'_locale': app.request.locale, 'newLocale': locale, 'redirect_to': targetPath}) }}"{% if app.request.locale == locale %} selected{% endif %}>{{ locale|language_name(locale) }}</option>
                 {% endfor %}
             </select>
         </div>

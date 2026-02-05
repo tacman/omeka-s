@@ -16,10 +16,8 @@
         "ml/json-ld": "^1.1",
         "ezyang/htmlpurifier": "^4.8",
         "composer/semver": "^3.2",
-        "laminas/laminas-zendframework-bridge": "^1.0",
         "laminas/laminas-authentication": "^2.5.3",
         "laminas/laminas-config": "^3.7.0",
-        "laminas/laminas-dom": "^2.6",
         "laminas/laminas-eventmanager": "^3.0.1",
         "laminas/laminas-filter": "^2.7.1|^3.0",
         "laminas/laminas-form": "^3.1.1",
@@ -84,13 +82,14 @@
         "symfony/console": "^7.2",
         "nette/php-generator": "^4.2",
         "nikic/php-parser": "^5.7",
-        "laminas/laminas-mvc-plugins": "^1.2",
         "symfony/ux-icons": "^2.32",
         "symfony/ux-twig-component": "^2.32",
         "symfony/ux-translator": "^2.32",
         "symfony/ux-dropzone": "^2.32",
         "symfony/ux-autocomplete": "^2.32",
-        "league/flysystem-bundle": "^3.6"
+        "league/flysystem-bundle": "^3.6",
+        "twig/intl-extra": "^3.23",
+        "survos/data-bundle": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",

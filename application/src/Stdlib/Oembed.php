@@ -1,7 +1,6 @@
 <?php
 namespace Omeka\Stdlib;
 
-use Laminas\Dom\Query;
 use Laminas\Http\Client as HttpClient;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Uri\Http as HttpUri;
@@ -59,15 +58,11 @@ class Oembed
             if (!$response) {
                 return false;
             }
-            $dom = new Query($response->getBody());
-            $xpath = '//link[@rel="alternate" or @rel="alternative"][@type="application/json+oembed" or @type="text/json+oembed"]';
-            $oembedLinks = $dom->queryXpath($xpath);
-            if (!$oembedLinks->count()) {
+            $oembedUrl = $this->extractOembedEndpoint($response->getBody());
+            if (!$oembedUrl) {
                 $errorStore->addError($errorKey, sprintf($this->translator->translate('oEmbed: links cannot be found at %s'), $url));
                 return false;
             }
-            // Use the endpoint provided by the discovery link.
-            $oembedUrl = $oembedLinks->current()->getAttribute('href');
         }
 
         // Get the oEmbed response.
@@ -78,10 +73,46 @@ class Oembed
         }
         $oembed = json_decode($response->getBody(), true);
         if (!$oembed) {
-            $errorStore->addError($errorKey, sprintf($this->translator->translate('oEmbed: response cannot be decoded to JSON %s'), $oembedLinkUrl));
+            $errorStore->addError($errorKey, sprintf($this->translator->translate('oEmbed: response cannot be decoded to JSON %s'), $oembedUrl));
             return false;
         }
         return $oembed;
+    }
+
+    protected function extractOembedEndpoint(string $html): ?string
+    {
+        if ($html === '') {
+            return null;
+        }
+
+        $dom = new \DOMDocument();
+        $previous = libxml_use_internal_errors(true);
+        $dom->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NONET);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        foreach ($dom->getElementsByTagName('link') as $link) {
+            $rel = strtolower(trim((string) $link->getAttribute('rel')));
+            if ($rel === '') {
+                continue;
+            }
+            $relTokens = preg_split('/\s+/', $rel, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+            if (!array_intersect($relTokens, ['alternate', 'alternative'])) {
+                continue;
+            }
+
+            $type = strtolower(trim((string) $link->getAttribute('type')));
+            if (!in_array($type, ['application/json+oembed', 'text/json+oembed'], true)) {
+                continue;
+            }
+
+            $href = trim((string) $link->getAttribute('href'));
+            if ($href !== '') {
+                return $href;
+            }
+        }
+
+        return null;
     }
 
     /**

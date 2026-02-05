@@ -2,11 +2,14 @@
 
 namespace App\Command;
 
+use App\Command\Input\TenantInput;
+use App\Tenant\TenantContext;
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Api\Exception\ValidationException;
 use Omeka\Entity\User;
 use Omeka\Mvc\Application as OmekaApplication;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -19,6 +22,8 @@ class LoadSampleDataCommand
 {
     public function __invoke(
         SymfonyStyle $io,
+        #[MapInput] TenantInput $tenantInput,
+        TenantContext $tenantContext,
         #[Option('Admin email to run as')]
         string $adminEmail = 'admin@example.com',
         #[Option('Number of sites to create')]
@@ -32,6 +37,10 @@ class LoadSampleDataCommand
         #[Option('Assign new items to created sites')]
         bool $assignNewItems = true,
     ): int {
+        if ($tenantInput->tenantCode !== null) {
+            $tenantContext->setTenantCode($tenantInput->tenantCode);
+        }
+
         $projectRoot = dirname(__DIR__, 2);
         $bootstrapPath = $projectRoot . '/bootstrap.php';
         if (file_exists($bootstrapPath)) {

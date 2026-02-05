@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'Choose a language'|trans }}{% endblock %}
+
+{% block body %}
+<div>
+    <h1>{{ 'Choose a language'|trans }}</h1>
+    <p>{{ 'Select the language you want to use.'|trans }}</p>
+    <ul>
+        {% for locale in locales %}
+            <li>
+                <a href="{{ path('app_locale_root', {'_locale': locale}) }}">{{ locale|upper }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

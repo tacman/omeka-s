@@ -8,6 +8,7 @@ parameters:
         - en
         - fr
         - es
+    app.tenant_base_domain: '%env(APP_TENANT_BASE_DOMAIN)%'
 
 services:
     # default configuration for services in *this* file

@@ -7,8 +7,16 @@
 # To list all registered routes, run the following command:
 #   bin/console debug:router
 
+locale_landing:
+    resource: ../src/Controller/LocaleLandingController.php
+    type: attribute
+
 controllers:
     resource:
         path: ../src/Controller/
         namespace: App\Controller
+        exclude: ../src/Controller/LocaleLandingController.php
     type: attribute
+    prefix: /{_locale}
+    requirements:
+        _locale: '[a-zA-Z_\-]+'

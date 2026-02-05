@@ -2,12 +2,15 @@
 
 namespace App\Command;
 
+use App\Command\Input\TenantInput;
+use App\Tenant\TenantContext;
 use Omeka\Entity\User;
 use Omeka\Installation\Installer;
 use Omeka\Installation\Task\InstallDefaultTemplatesTask;
 use Omeka\Installation\Task\InstallDefaultVocabulariesTask;
 use Omeka\Mvc\Application as OmekaApplication;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -20,6 +23,8 @@ class InstallDefaultsCommand
 {
     public function __invoke(
         SymfonyStyle $io,
+        #[MapInput] TenantInput $tenantInput,
+        TenantContext $tenantContext,
         #[Option('Skip installing default vocabularies')]
         bool $skipVocabularies = false,
         #[Option('Skip installing default resource templates')]
@@ -27,6 +32,10 @@ class InstallDefaultsCommand
         #[Option('Admin email to run as')]
         string $adminEmail = 'admin@example.com',
     ): int {
+        if ($tenantInput->tenantCode !== null) {
+            $tenantContext->setTenantCode($tenantInput->tenantCode);
+        }
+
         $projectRoot = dirname(__DIR__, 2);
         $bootstrapPath = $projectRoot . '/bootstrap.php';
         if (file_exists($bootstrapPath)) {

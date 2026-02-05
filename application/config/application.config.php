@@ -65,10 +65,8 @@ return [
         'Laminas\Form',
         'Laminas\I18n',
         'Laminas\Mvc\I18n',
-        'Laminas\Mvc\Plugin\Identity',
         'Laminas\Navigation',
         'Laminas\Router',
-        'Laminas\ZendFrameworkBridge',
         'Omeka',
     ],
     'module_listener_options' => [

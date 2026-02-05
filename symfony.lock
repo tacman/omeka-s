@@ -89,6 +89,9 @@
             "tests/bootstrap.php"
         ]
     },
+    "survos/data-bundle": {
+        "version": "2.0.109"
+    },
     "symfony/asset-mapper": {
         "version": "7.0",
         "recipe": {

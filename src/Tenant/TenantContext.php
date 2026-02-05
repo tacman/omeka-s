@@ -9,6 +9,8 @@ use Doctrine\Persistence\ObjectRepository;
 
 final class TenantContext
 {
+    private ?string $tenantCode = null;
+
     public function __construct(private readonly EntityManagerInterface $entityManager)
     {
     }
@@ -21,5 +23,15 @@ final class TenantContext
     public function getRepository(string $class): ObjectRepository
     {
         return $this->entityManager->getRepository($class);
+    }
+
+    public function setTenantCode(?string $tenantCode): void
+    {
+        $this->tenantCode = $tenantCode !== '' ? $tenantCode : null;
+    }
+
+    public function getTenantCode(): ?string
+    {
+        return $this->tenantCode;
     }
 }
