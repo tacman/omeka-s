@@ -146,6 +146,11 @@ class User extends AbstractEntity implements RoleInterface
         return password_verify($possiblePassword, $this->passwordHash);
     }
 
+    public function getPasswordHash(): ?string
+    {
+        return $this->passwordHash;
+    }
+
     public function setRole($role)
     {
         $this->role = $role;

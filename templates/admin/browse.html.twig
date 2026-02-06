@@ -7,4 +7,9 @@
     <p>{{ 'Total'|trans }}: {{ result.total }}</p>
 
     <twig:AdminBrowseTable :result="result" />
+
+    <div class="sidebar">
+        <a href="#" class="sidebar-close o-icon-close" title="{{ 'Close'|trans }}"></a>
+        <div class="sidebar-content"></div>
+    </div>
 {% endblock %}

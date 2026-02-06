@@ -107,7 +107,7 @@ final class ItemController extends AbstractController
             'resource_form_templates_html' => $resourceFormTemplatesHtml,
             'cancel_button_html' => $this->legacyViewRenderer->cancelButton(),
             'delete_button_html' => $item->userIsAllowed('delete')
-                ? $this->legacyViewRenderer->hyperlink('', '#', ['class' => 'delete button'])
+                ? $this->legacyViewRenderer->hyperlink('', '#', ['class' => 'delete button o-icon-delete'])
                 : '',
             'default_to_private_items' => (bool) $settings->get('default_to_private_items', false),
             'upload_form' => $uploadForm->createView(),

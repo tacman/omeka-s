@@ -30,10 +30,10 @@ class EntityManagerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $serviceLocator, $requestedName, ?array $options = null)
     {
-        if (!class_exists(\Doctrine\Common\Proxy\AbstractProxyFactory::class, false)) {
+        if (!class_exists(\Doctrine\Common\Proxy\AbstractProxyFactory::class)) {
             require_once OMEKA_PATH . '/application/data/overrides/AbstractProxyFactory.php';
         }
-        if (!class_exists(\Doctrine\ORM\Proxy\ProxyFactory::class, false)) {
+        if (!class_exists(\Doctrine\ORM\Proxy\ProxyFactory::class)) {
             require_once OMEKA_PATH . '/application/data/overrides/ProxyFactory.php';
         }
 
@@ -65,7 +65,7 @@ class EntityManagerFactory implements FactoryInterface
         }
 
         // Set up the entity manager configuration.
-        $emConfig = ORMSetup::createConfiguration(
+        $emConfig = ORMSetup::createConfig(
             $isDevMode,
             OMEKA_PATH . '/application/data/doctrine-proxies',
             $cache

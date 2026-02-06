@@ -1,3 +1,1 @@
-@import "../vendor/lightgallery/css/lightgallery.css";
-@import "../vendor/lightgallery/css/lg-thumbnail.css";
-@import "../vendor/lightgallery/css/lg-zoom.css";
+@import "../../application/asset/vendor/lightgallery/css/lightgallery-bundle.min.css";

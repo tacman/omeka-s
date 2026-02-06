@@ -11,11 +11,6 @@ use Omeka\Entity\ItemSet;
 
 #[ORM\Entity]
 #[ORM\Table(
-    uniqueConstraints: [
-new ORM\UniqueConstraint(
-columns: ["site_id", "item_set_id"]
-)
-],
     indexes: [
 new ORM\Index(
 name: "position",
@@ -23,6 +18,7 @@ columns: ["position"]
 )
 ],
 )]
+#[ORM\UniqueConstraint(columns: ["site_id", "item_set_id"])]
 class SiteItemSet extends AbstractEntity
 {
     #[ORM\Id]

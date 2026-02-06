@@ -10,11 +10,8 @@ use Omeka\Entity\Site;
 use Omeka\Entity\User;
 
 #[ORM\Entity]
-#[ORM\Table(uniqueConstraints: [
-new ORM\UniqueConstraint(
-columns: ["site_id", "user_id"]
-)
-])]
+#[ORM\Table]
+#[ORM\UniqueConstraint(columns: ["site_id", "user_id"])]
 class SitePermission extends AbstractEntity
 {
     public const ROLE_ADMIN = 'admin';

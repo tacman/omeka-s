@@ -7,7 +7,8 @@
         <pre>{{ errors|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
     {% endif %}
     <script>
-        window.valuesJson = {{ item.values()|json_encode|raw }};
+        var valuesJson = {{ item.values()|json_encode|raw }};
+        window.valuesJson = valuesJson;
     </script>
     {{ form_open|raw }}
     {{ section_nav_html|raw }}
@@ -30,10 +31,10 @@
 
     <div id="page-actions">
         {% if item and item.isPublic() or (not item) and not default_to_private_items %}
-            <a href="#" class="o-icon-public button" title="{{ 'Make private'|trans }}"></a>
+            <a href="#" class="button" title="{{ 'Make private'|trans }}">{{ ux_icon('private') }}</a>
             <input type="hidden" name="o:is_public" value="1">
         {% else %}
-            <a href="#" class="o-icon-private button" title="{{ 'Make public'|trans }}"></a>
+            <a href="#" class="button" title="{{ 'Make public'|trans }}">{{ ux_icon('public') }}</a>
             <input type="hidden" name="o:is_public" value="0">
         {% endif %}
         {{ delete_button_html|raw }}

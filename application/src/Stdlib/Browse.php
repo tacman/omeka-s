@@ -149,7 +149,7 @@ class Browse
         $browseConfig = null;
         if ('public' === $context) {
             $browseConfig = $this->getSiteSettings()->get($browseDefaultsSetting, null);
-        } elseif ('admin' === $context) {
+        } elseif ('admin' === $context && $userId !== null) {
             $browseConfig = $this->getUserSettings()->get($browseDefaultsSetting, null, $userId);
         }
 
@@ -186,7 +186,7 @@ class Browse
         $userColumnsData = null;
         if ('public' === $context) {
             $userColumnsData = $this->getSiteSettings()->get($userColumnsSetting, null);
-        } elseif ('admin' === $context) {
+        } elseif ('admin' === $context && $userId !== null) {
             $userColumnsData = $this->getUserSettings()->get($userColumnsSetting, null, $userId);
         }
         if (!is_array($userColumnsData) || !$userColumnsData) {

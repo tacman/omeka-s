@@ -17,6 +17,8 @@ doctrine:
     orm:
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        identity_generation_preferences:
+            Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
         auto_mapping: true
         mappings:
             Omeka:
@@ -25,6 +27,12 @@ doctrine:
                 dir: '%kernel.project_dir%/application/src/Entity'
                 prefix: 'Omeka\Entity'
                 alias: Omeka
+            App:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
 
 when@test:
     doctrine:
@@ -35,7 +43,6 @@ when@test:
 when@prod:
     doctrine:
         orm:
-            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
             query_cache_driver:
                 type: pool
                 pool: doctrine.system_cache_pool

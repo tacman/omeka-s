@@ -17,11 +17,8 @@ use Omeka\Entity\Value;
  * Properties define relationships between resources and their values.
  */
 #[ORM\Entity]
-#[ORM\Table(uniqueConstraints: [
-new ORM\UniqueConstraint(
-columns: ["vocabulary_id", "local_name"]
-)
-])]
+#[ORM\Table]
+#[ORM\UniqueConstraint(columns: ["vocabulary_id", "local_name"])]
 class Property extends AbstractEntity
 {
     #[ORM\Id]

@@ -20,7 +20,13 @@ final class OmekaBrowseService
     public function browse(string $resourceType, array $query = []): BrowseResult
     {
         $browse = $this->getBrowseService();
-        $defaults = $browse->getBrowseConfig('admin', $resourceType);
+        $userId = $this->resolveUserId();
+        if ($userId !== null) {
+            $this->legacyApp->getServiceManager()
+                ->get('Omeka\Settings\User')
+                ->setTargetId($userId);
+        }
+        $defaults = $browse->getBrowseConfig('admin', $resourceType, $userId);
 
         $query['sort_by'] ??= $defaults['sort_by'] ?? 'id';
         $query['sort_order'] ??= $defaults['sort_order'] ?? 'desc';
@@ -32,10 +38,26 @@ final class OmekaBrowseService
         return new BrowseResult(
             $resourceType,
             $response->getContent(),
-            $browse->getColumnsData('admin', $resourceType),
+            $browse->getColumnsData('admin', $resourceType, $userId),
             $response->getTotalResults(),
             $query,
         );
+    }
+
+    private function resolveUserId(): ?int
+    {
+        $auth = $this->legacyApp->getServiceManager()->get('Omeka\AuthenticationService');
+        if (!$auth->hasIdentity()) {
+            return null;
+        }
+
+        $identity = $auth->getIdentity();
+        if (!method_exists($identity, 'getId')) {
+            return null;
+        }
+
+        $userId = $identity->getId();
+        return is_int($userId) ? $userId : null;
     }
 
     private function getBrowseService(): OmekaBrowse

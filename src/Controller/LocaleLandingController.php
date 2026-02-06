@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class LocaleLandingController extends AbstractController
 {
-    #[Route('/', name: 'app_locale_landing')]
+//    #[Route('/', name: 'app_locale_landing')]
     public function landing(Request $request): Response
     {
         $supportedLocales = $this->getParameter('app.supported_locales');

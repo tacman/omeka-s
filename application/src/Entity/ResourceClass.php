@@ -17,11 +17,8 @@ use Omeka\Entity\Resource;
  * descriptive properties.
  */
 #[ORM\Entity]
-#[ORM\Table(uniqueConstraints: [
-new ORM\UniqueConstraint(
-columns: ["vocabulary_id", "local_name"]
-)
-])]
+#[ORM\Table]
+#[ORM\UniqueConstraint(columns: ["vocabulary_id", "local_name"])]
 class ResourceClass extends AbstractEntity
 {
     #[ORM\Id]

@@ -20,10 +20,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class LoadSampleDataCommand
 {
+    public function __construct(private readonly TenantContext $tenantContext)
+    {
+    }
+
     public function __invoke(
         SymfonyStyle $io,
         #[MapInput] TenantInput $tenantInput,
-        TenantContext $tenantContext,
         #[Option('Admin email to run as')]
         string $adminEmail = 'admin@example.com',
         #[Option('Number of sites to create')]
@@ -38,7 +41,7 @@ class LoadSampleDataCommand
         bool $assignNewItems = true,
     ): int {
         if ($tenantInput->tenantCode !== null) {
-            $tenantContext->setTenantCode($tenantInput->tenantCode);
+            $this->tenantContext->setTenantCode($tenantInput->tenantCode);
         }
 
         $projectRoot = dirname(__DIR__, 2);

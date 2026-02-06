@@ -1,9 +1,10 @@
 body.admin #content { max-width: none; padding: 0; }
+body.admin.sidebar-open #content { width: 100%; }
 
 .admin-layout { display: flex; min-height: 80vh; }
 .admin-sidebar { width: 260px; border-right: 1px solid #e6e6e6; padding: 1.25rem 1rem; background: #f8f8f8; }
 .admin-main { flex: 1; padding: 1.5rem; position: relative; }
-body.sidebar-open .admin-main { padding-right: 24rem; }
+body.admin.sidebar-open .admin-main { padding-right: 25%; }
 .admin-logo { font-weight: 700; margin-bottom: 1.5rem; font-size: 1.1rem; }
 .admin-section { margin-bottom: 1.25rem; }
 .admin-section h5 { margin: 0 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; color: #666; letter-spacing: 0.03em; }

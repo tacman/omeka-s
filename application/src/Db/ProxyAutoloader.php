@@ -1,7 +1,7 @@
 <?php
 namespace Omeka\Db;
 
-use Doctrine\Common\Proxy\Autoloader;
+use Doctrine\ORM\Proxy\Autoloader;
 
 class ProxyAutoloader
 {

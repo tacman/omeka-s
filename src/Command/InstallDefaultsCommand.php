@@ -21,10 +21,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class InstallDefaultsCommand
 {
+    public function __construct(private readonly TenantContext $tenantContext)
+    {
+    }
+
     public function __invoke(
         SymfonyStyle $io,
         #[MapInput] TenantInput $tenantInput,
-        TenantContext $tenantContext,
         #[Option('Skip installing default vocabularies')]
         bool $skipVocabularies = false,
         #[Option('Skip installing default resource templates')]
@@ -33,7 +36,7 @@ class InstallDefaultsCommand
         string $adminEmail = 'admin@example.com',
     ): int {
         if ($tenantInput->tenantCode !== null) {
-            $tenantContext->setTenantCode($tenantInput->tenantCode);
+            $this->tenantContext->setTenantCode($tenantInput->tenantCode);
         }
 
         $projectRoot = dirname(__DIR__, 2);

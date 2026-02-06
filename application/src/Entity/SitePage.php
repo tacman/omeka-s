@@ -13,11 +13,6 @@ use Omeka\Entity\SitePageBlock;
 
 #[ORM\Entity]
 #[ORM\Table(
-    uniqueConstraints: [
-new ORM\UniqueConstraint(
-columns: ["site_id", "slug"]
-)
-],
     indexes: [
 new ORM\Index(
 name: "is_public",
@@ -25,6 +20,7 @@ columns: ["is_public"]
 )
 ],
 )]
+#[ORM\UniqueConstraint(columns: ["site_id", "slug"])]
 class SitePage extends AbstractEntity
 {
     #[ORM\Id]

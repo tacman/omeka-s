@@ -10,11 +10,8 @@ use Omeka\Entity\ResourceTemplate;
 use Omeka\Entity\Property;
 
 #[ORM\Entity]
-#[ORM\Table(uniqueConstraints: [
-new ORM\UniqueConstraint(
-columns: ["resource_template_id", "property_id"]
-)
-])]
+#[ORM\Table]
+#[ORM\UniqueConstraint(columns: ["resource_template_id", "property_id"])]
 class ResourceTemplateProperty extends AbstractEntity
 {
     #[ORM\Id]

@@ -11,7 +11,10 @@ final class OmekaApiService
 {
     private ?Manager $apiManager = null;
 
-    public function __construct(private readonly LegacyOmekaApplication $legacyApp)
+    public function __construct(
+        private readonly LegacyOmekaApplication $legacyApp,
+        private readonly LegacyOmekaAuthService $authService,
+    )
     {
     }
 
@@ -21,6 +24,7 @@ final class OmekaApiService
             return $this->apiManager;
         }
 
+        $this->authService->ensureIdentity();
         $this->apiManager = $this->legacyApp->getServiceManager()->get('Omeka\ApiManager');
 
         return $this->apiManager;

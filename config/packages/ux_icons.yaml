@@ -28,6 +28,7 @@ ux_icons:
         resources: 'mdi:database-outline'
         theme: 'mdi:palette-outline'
         public: 'mdi:open-in-new'
+        private: 'mdi:lock-outline'
         admin: 'mdi:shield-account-outline'
         site: 'mdi:web'
         item: 'mdi:package-variant'
