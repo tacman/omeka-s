@@ -1,0 +1,52 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ 'Resource template'|trans }}: {{ template.label() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ template.label() }}</h1>
+    <p>{{ 'ID'|trans }}: {{ template.id() }}</p>
+    <p>{{ 'Owner'|trans }}: {{ template.owner() ? template.owner().name() : '' }}</p>
+    {% if template.resourceClass() %}
+        <p>{{ 'Resource class'|trans }}: {{ template.resourceClass().label() }}</p>
+    {% endif %}
+    {% if template.titleProperty() %}
+        <p>{{ 'Title property'|trans }}: {{ template.titleProperty().label() }}</p>
+    {% endif %}
+    {% if template.descriptionProperty() %}
+        <p>{{ 'Description property'|trans }}: {{ template.descriptionProperty().label() }}</p>
+    {% endif %}
+
+    <h2>{{ 'Properties'|trans }}</h2>
+    {% set templateProperties = template.resourceTemplateProperties() %}
+    {% if templateProperties is empty %}
+        <p>{{ 'No properties.'|trans }}</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>{{ 'Property'|trans }}</th>
+                    <th>{{ 'Alternate label'|trans }}</th>
+                    <th>{{ 'Alternate comment'|trans }}</th>
+                    <th>{{ 'Required'|trans }}</th>
+                    <th>{{ 'Private'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tp in templateProperties %}
+                    <tr>
+                        <td>{{ tp.property().label() }}</td>
+                        <td>{{ tp.alternateLabel() }}</td>
+                        <td>{{ tp.alternateComment() }}</td>
+                        <td>{{ tp.isRequired() ? 'Yes'|trans : 'No'|trans }}</td>
+                        <td>{{ tp.isPrivate() ? 'Yes'|trans : 'No'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <div class="admin-actions">
+        <a href="{{ path('app_admin_resource_template_edit', {id: template.id()}) }}">{{ ux_icon('edit') }} {{ 'Edit'|trans }}</a>
+        <a href="{{ path('app_admin_resource_template_delete', {id: template.id()}) }}">{{ ux_icon('delete') }} {{ 'Delete'|trans }}</a>
+    </div>
+{% endblock %}

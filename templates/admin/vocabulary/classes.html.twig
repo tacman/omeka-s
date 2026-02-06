@@ -1,0 +1,32 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ 'Resource classes'|trans }}: {{ vocabulary.label() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ 'Resource classes'|trans }}: {{ vocabulary.label() }}</h1>
+
+    <p><a href="{{ path('app_admin_vocabulary_show', {id: vocabulary.id()}) }}">&larr; {{ 'Back to vocabulary'|trans }}</a></p>
+
+    {% if classes is empty %}
+        <p>{{ 'No resource classes.'|trans }}</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>{{ 'Label'|trans }}</th>
+                    <th>{{ 'Term'|trans }}</th>
+                    <th>{{ 'Comment'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for class in classes %}
+                    <tr>
+                        <td>{{ class.label() }}</td>
+                        <td>{{ vocabulary.prefix() }}:{{ class.localName() }}</td>
+                        <td>{{ class.comment() }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

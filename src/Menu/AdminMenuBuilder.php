@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Menu;
 
-use App\Service\LegacyUrlGenerator;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -15,7 +14,6 @@ final class AdminMenuBuilder
 
     public function __construct(
         private readonly FactoryInterface $factory,
-        private readonly LegacyUrlGenerator $legacyUrlGenerator,
         private readonly UrlGeneratorInterface $router,
         private readonly string $projectDir,
     ) {
@@ -62,33 +60,140 @@ final class AdminMenuBuilder
                 $params['action'] = $item['action'];
             }
 
-            $menu->addChild($label, [
+            // Items gets restructured: parent is just a label with Metadata + Media children
+            if (($item['controller'] ?? '') === 'item') {
+                $menuItem = $menu->addChild($label, [
+                    'uri' => $this->resolveMenuUri($routeName, $params),
+                ]);
+                $menuItem->setAttribute('class', $item['class'] ?? '');
+
+                $menuItem->addChild('Metadata', [
+                    'uri' => $this->router->generate('app_admin_item_browse'),
+                ])->setAttribute('class', 'items');
+
+                $menuItem->addChild('Media', [
+                    'uri' => $this->router->generate('app_admin_media_browse'),
+                ])->setAttribute('class', 'media');
+
+                continue;
+            }
+
+            $menuItem = $menu->addChild($label, [
                 'uri' => $this->resolveMenuUri($routeName, $params),
-            ])->setAttribute('class', $item['class'] ?? '');
+            ]);
+            $menuItem->setAttribute('class', $item['class'] ?? '');
+
+            // Add visible child pages as submenu items
+            if (!empty($item['pages'])) {
+                $this->addChildPages($menuItem, $item['pages']);
+            }
         }
 
         return $menu;
     }
 
+    private function addChildPages(ItemInterface $parent, array $pages): void
+    {
+        foreach ($pages as $page) {
+            // Only add visible pages
+            if (!($page['visible'] ?? false)) {
+                continue;
+            }
+
+            $label = $page['label'] ?? null;
+            $routeName = $page['route'] ?? null;
+            if (!$label || !$routeName) {
+                continue;
+            }
+
+            $params = [];
+            if (isset($page['controller'])) {
+                $params['controller'] = $page['controller'];
+            }
+            if (isset($page['action'])) {
+                $params['action'] = $page['action'];
+            }
+
+            $child = $parent->addChild($label, [
+                'uri' => $this->resolveMenuUri($routeName, $params),
+            ]);
+            $child->setAttribute('class', $page['class'] ?? '');
+
+            // Recursively add children
+            if (!empty($page['pages'])) {
+                $this->addChildPages($child, $page['pages']);
+            }
+        }
+    }
+
     private function resolveMenuUri(string $routeName, array $params): string
     {
+        // Map legacy routes to Symfony routes
         if ($routeName === 'admin/default') {
             $controller = $params['controller'] ?? null;
             $action = $params['action'] ?? 'browse';
-            if ($controller && $action === 'browse') {
-                return $this->router->generate('app_admin_legacy_browse', [
-                    'controller' => $controller,
-                ]);
+
+            $symfonyRoute = $this->controllerToSymfonyRoute($controller, $action);
+            if ($symfonyRoute) {
+                return $this->router->generate($symfonyRoute);
             }
         }
 
         if ($routeName === 'admin/site') {
-            return $this->router->generate('app_admin_legacy_browse', [
-                'controller' => 'site',
-            ]);
+            return $this->router->generate('app_admin_site_browse');
         }
 
-        return $this->legacyUrlGenerator->generate($routeName, $params);
+        // Fallback: try to generate a Symfony route
+        return $this->router->generate('app_admin');
+    }
+
+    private function controllerToSymfonyRoute(string $controller, string $action): ?string
+    {
+        $routeMap = [
+            'item' => [
+                'browse' => 'app_admin_item_browse',
+                'add' => 'app_admin_item_add',
+            ],
+            'item-set' => [
+                'browse' => 'app_admin_item_set_browse',
+                'add' => 'app_admin_item_set_add',
+            ],
+            'media' => [
+                'browse' => 'app_admin_media_browse',
+            ],
+            'vocabulary' => [
+                'browse' => 'app_admin_vocabulary_browse',
+                'import' => 'app_admin_vocabulary_import',
+            ],
+            'resource-template' => [
+                'browse' => 'app_admin_resource_template_browse',
+                'add' => 'app_admin_resource_template_add',
+                'import' => 'app_admin_resource_template_import',
+            ],
+            'user' => [
+                'browse' => 'app_admin_user_browse',
+                'add' => 'app_admin_user_add',
+            ],
+            'module' => [
+                'browse' => 'app_admin_module_browse',
+            ],
+            'job' => [
+                'browse' => 'app_admin_job_browse',
+            ],
+            'setting' => [
+                'browse' => 'app_admin_setting_browse',
+            ],
+            'asset' => [
+                'browse' => 'app_admin_asset_browse',
+                'add' => 'app_admin_asset_add',
+            ],
+            'site' => [
+                'browse' => 'app_admin_site_browse',
+                'add' => 'app_admin_site_add',
+            ],
+        ];
+
+        return $routeMap[$controller][$action] ?? null;
     }
 
     private function getNavigationSection(string $section): array

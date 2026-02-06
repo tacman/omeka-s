@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/symfony/admin')]
+#[Route('/admin')]
 final class AdminBrowseController extends AbstractController
 {
     public function __construct(private readonly OmekaBrowseService $browseService)

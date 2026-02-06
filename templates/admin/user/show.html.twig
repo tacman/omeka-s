@@ -1,0 +1,18 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ 'User'|trans }}: {{ user.name() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ user.name() }}</h1>
+    <p>{{ 'ID'|trans }}: {{ user.id() }}</p>
+    <p>{{ 'Email'|trans }}: {{ user.email() }}</p>
+    <p>{{ 'Role'|trans }}: {{ user.role() }}</p>
+    <p>{{ 'Active'|trans }}: {{ user.isActive() ? 'Yes'|trans : 'No'|trans }}</p>
+    <p>{{ 'Created'|trans }}: {{ user.created() ? user.created().format('Y-m-d H:i') : '' }}</p>
+    <p>{{ 'Modified'|trans }}: {{ user.modified() ? user.modified().format('Y-m-d H:i') : '' }}</p>
+
+    <div class="admin-actions">
+        <a href="{{ path('app_admin_user_edit', {id: user.id()}) }}">{{ ux_icon('edit') }} {{ 'Edit'|trans }}</a>
+        <a href="{{ path('app_admin_user_delete', {id: user.id()}) }}">{{ ux_icon('delete') }} {{ 'Delete'|trans }}</a>
+    </div>
+{% endblock %}

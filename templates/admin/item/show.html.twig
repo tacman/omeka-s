@@ -23,7 +23,7 @@
                 {% for itemSet in itemSets %}
                     <li>
                         <a href="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: 'item-set', action: 'show', id: itemSet.id()}) }}">
-                            {{ ux_icon('item_set') }} {{ itemSet.displayTitle() }}
+                            {{ ux_icon('itemSet') }} {{ itemSet.displayTitle() }}
                         </a>
                     </li>
                 {% endfor %}
@@ -40,7 +40,7 @@
                 {% for site in sites %}
                     <li>
                         <a href="{{ path('app_legacy_proxy', {routeName: 'admin/site/slug', 'site-slug': site.slug()}) }}">
-                            {{ ux_icon('site') }} {{ site.title() }}
+                            {{ ux_icon('sites') }} {{ site.title() }}
                         </a>
                     </li>
                 {% endfor %}

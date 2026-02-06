@@ -8,22 +8,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/symfony/admin')]
+#[Route('/admin')]
 final class AdminLegacyBrowseController extends AbstractController
 {
     public function __construct(private readonly OmekaBrowseService $browseService)
     {
     }
 
-    #[Route('/{controller}', name: 'app_admin_legacy_browse', requirements: ['controller' => '[a-zA-Z0-9_-]+'])]
+    #[Route('/{controller}', name: 'app_admin_legacy_browse', requirements: ['controller' => '[a-zA-Z0-9_-]+'], priority: -100)]
     public function browse(Request $request, string $controller): Response
     {
         $resourceType = $this->controllerToResourceType($controller);
         if (!$resourceType) {
-            return $this->redirectToRoute('app_legacy_proxy', [
-                'routeName' => 'admin/default',
-                'controller' => $controller,
-                'action' => 'browse',
+            // Show "not implemented" instead of redirecting to legacy
+            return $this->render('app/not_implemented.html.twig', [
+                'route_name' => "admin/{$controller}/browse",
+                'params' => $request->query->all(),
+                'request_uri' => $request->getRequestUri(),
             ]);
         }
 
@@ -32,10 +33,6 @@ final class AdminLegacyBrowseController extends AbstractController
 
         return $this->render('admin/browse.html.twig', [
             'result' => $result,
-            'legacy_route' => $resourceType === 'sites' ? 'admin/site' : 'admin/default',
-            'legacy_params' => $resourceType === 'sites'
-                ? []
-                : ['controller' => $controller, 'action' => 'browse'],
         ]);
     }
 

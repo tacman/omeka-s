@@ -34,9 +34,11 @@ return [
     'compare-versions' => [
         'version' => '6.1.1',
     ],
-    'jquery' => [
-        'version' => '4.0.0',
-    ],
+    // jQuery is loaded from legacy Omeka (application/asset/vendor/jquery/jquery.min.js)
+    // with Chosen and other plugins attached. Don't load jQuery 4 from importmap.
+    // 'jquery' => [
+    //     'version' => '4.0.0',
+    // ],
     'jstree' => [
         'version' => '3.3.17',
     ],
@@ -574,5 +576,11 @@ return [
     'tom-select/dist/css/tom-select.bootstrap5.css' => [
         'version' => '2.4.5',
         'type' => 'css',
+    ],
+    '@stimulus-components/timeago' => [
+        'version' => '5.0.2',
+    ],
+    'date-fns' => [
+        'version' => '4.1.0',
     ],
 ];

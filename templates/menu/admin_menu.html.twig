@@ -1,0 +1,38 @@
+{#
+    Admin menu template with UX Icons
+    Icon aliases are defined in config/packages/ux_icons.yaml
+    CSS class names (items, users, etc.) map directly to aliases
+#}
+{%- set current_path = app.request.pathInfo -%}
+<ul class="navigation">
+{% for child in item.children %}
+    {%- set item_class = child.attribute('class')|default('') -%}
+    {%- set li_classes = [] -%}
+    {# Check if this item or any child matches current path #}
+    {%- set is_current = (child.uri == current_path) or (current_path starts with child.uri ~ '/') -%}
+    {%- set has_current_child = false -%}
+    {%- for subchild in child.children -%}
+        {%- if subchild.uri == current_path or (current_path starts with subchild.uri ~ '/') -%}
+            {%- set has_current_child = true -%}
+        {%- endif -%}
+    {%- endfor -%}
+    {%- if is_current %}{% set li_classes = li_classes|merge(['current']) %}{% endif -%}
+    {%- if is_current or has_current_child %}{% set li_classes = li_classes|merge(['active']) %}{% endif -%}
+    <li{% if li_classes %} class="{{ li_classes|join(' ') }}"{% endif %}>
+        <a href="{{ child.uri }}" class="{{ item_class }}">
+            {%- if item_class %}{{ ux_icon(item_class, {class: 'menu-icon'}) }}{% endif -%}
+            <span class="label">{{ child.label }}</span>
+        </a>
+        {% if child.hasChildren %}
+        <ul>
+            {% for subchild in child.children %}
+            {%- set sub_is_current = (subchild.uri == current_path) or (current_path starts with subchild.uri ~ '/') -%}
+            <li{% if sub_is_current %} class="current"{% endif %}>
+                <a href="{{ subchild.uri }}">{{ subchild.label }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </li>
+{% endfor %}
+</ul>

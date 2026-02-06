@@ -1,0 +1,34 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ 'Pages'|trans }}: {{ site.title() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ 'Pages'|trans }}: {{ site.title() }}</h1>
+
+    <p><a href="{{ path('app_admin_site_show', {slug: site.slug()}) }}">&larr; {{ 'Back to site'|trans }}</a></p>
+
+    {% if pages is empty %}
+        <p>{{ 'No pages.'|trans }}</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>{{ 'Title'|trans }}</th>
+                    <th>{{ 'Slug'|trans }}</th>
+                    <th>{{ 'Created'|trans }}</th>
+                    <th>{{ 'Modified'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for page in pages %}
+                    <tr>
+                        <td>{{ page.title() }}</td>
+                        <td>{{ page.slug() }}</td>
+                        <td>{{ page.created() ? page.created().format('Y-m-d H:i') : '' }}</td>
+                        <td>{{ page.modified() ? page.modified().format('Y-m-d H:i') : '' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

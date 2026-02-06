@@ -41,6 +41,18 @@ security:
         - { path: ^/logout, roles: PUBLIC_ACCESS }
         - { path: ^/symfony/admin, roles: ROLE_ADMIN }
 
+when@dev:
+    security:
+        firewalls:
+            main:
+                lazy: true
+                provider: omeka_users
+                custom_authenticators:
+                    - App\Security\DevAutoLoginAuthenticator
+                logout:
+                    path: app_logout
+                    target: app_login
+
 when@test:
     security:
         password_hashers:

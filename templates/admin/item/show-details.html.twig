@@ -1,0 +1,78 @@
+{# Sidebar details view - no layout wrapper #}
+<div class="meta-group">
+    <h4>{{ item.displayTitle() }}</h4>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Class'|trans }}</h4>
+    <div class="value">{{ item.resourceClass() ? item.resourceClass().label() : 'None'|trans }}</div>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Owner'|trans }}</h4>
+    <div class="value">{{ item.owner() ? item.owner().name() : 'None'|trans }}</div>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Visibility'|trans }}</h4>
+    <div class="value">
+        {% if item.isPublic() %}
+            {{ 'Public'|trans }}
+        {% else %}
+            {{ ux_icon('mdi:lock-outline') }} {{ 'Private'|trans }}
+        {% endif %}
+    </div>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Created'|trans }}</h4>
+    <div class="value">{{ item.created() ? item.created().format('M j, Y') : '' }}</div>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Modified'|trans }}</h4>
+    <div class="value">{{ item.modified() ? item.modified().format('M j, Y') : '' }}</div>
+</div>
+
+{% set mediaItems = item.media() %}
+{% if mediaItems is not empty %}
+<div class="meta-group">
+    <h4>{{ 'Media'|trans }}</h4>
+    <div class="value">
+        <ul class="media-list">
+            {% for media in mediaItems %}
+                <li>{{ media.displayTitle() }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+{% set itemSets = item.itemSets() %}
+{% if itemSets is not empty %}
+<div class="meta-group">
+    <h4>{{ 'Item sets'|trans }}</h4>
+    <div class="value">
+        <ul>
+            {% for itemSet in itemSets %}
+                <li>{{ itemSet.displayTitle() }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+{% set values = item.values() %}
+{% if values is not empty %}
+<div class="meta-group">
+    <h4>{{ 'Values'|trans }}</h4>
+    {% for term, info in values %}
+        <div class="property">
+            <h4>{{ info.property.label() }}</h4>
+            {% for value in info.values %}
+                <div class="value">{{ value.asHtml()|raw }}</div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}

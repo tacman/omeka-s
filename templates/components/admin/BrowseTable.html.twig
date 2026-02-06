@@ -18,62 +18,45 @@
                 <td class="admin-actions">
                     {% if result.resourceType == 'items' %}
                         <ul class="actions">
-                            <li>
-                                <a class="sidebar-content" href="#"
-                                   data-sidebar-selector=".admin-main .sidebar"
-                                   data-sidebar-content-url="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: 'item', action: 'show-details', id: resource.id()}) }}"
-                                   title="{{ 'Details'|trans }}">{{ ux_icon('view') }}</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('app_admin_item_edit', {itemId: resource.id()}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a>
-                            </li>
-                            <li>
-                                <a class="sidebar-content" href="#"
-                                   data-sidebar-selector=".admin-main .sidebar"
-                                   data-sidebar-content-url="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: 'item', action: 'delete-confirm', id: resource.id()}) }}"
-                                   title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a>
-                            </li>
+                            <li><a href="{{ path('app_admin_item_show', {itemId: resource.id()}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a></li>
+                            <li><a href="{{ path('app_admin_item_edit', {itemId: resource.id()}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a></li>
+                            <li><a href="{{ path('app_admin_item_delete', {itemId: resource.id()}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a></li>
                         </ul>
-                    {% elseif result.resourceType in ['item_sets', 'media', 'resource_templates', 'vocabularies'] %}
-                        {% set controller = {
-                            'item_sets': 'item-set',
-                            'resource_templates': 'resource-template',
-                            'vocabularies': 'vocabulary'
-                        }[result.resourceType]|default(result.resourceType|slice(0, -1)) %}
+                    {% elseif result.resourceType == 'item_sets' %}
                         <ul class="actions">
-                            <li>
-                                <a class="sidebar-content" href="#"
-                                   data-sidebar-selector=".admin-main .sidebar"
-                                   data-sidebar-content-url="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: controller, action: 'show-details', id: resource.id()}) }}"
-                                   title="{{ 'Details'|trans }}">{{ ux_icon('view') }}</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: controller, id: resource.id(), action: 'edit'}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a>
-                            </li>
-                            <li>
-                                <a class="sidebar-content" href="#"
-                                   data-sidebar-selector=".admin-main .sidebar"
-                                   data-sidebar-content-url="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: controller, action: 'delete-confirm', id: resource.id()}) }}"
-                                   title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a>
-                            </li>
+                            <li><a href="{{ path('app_admin_item_set_show', {id: resource.id()}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a></li>
+                            <li><a href="{{ path('app_admin_item_set_edit', {id: resource.id()}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a></li>
+                            <li><a href="{{ path('app_admin_item_set_delete', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a></li>
+                        </ul>
+                    {% elseif result.resourceType == 'media' %}
+                        <ul class="actions">
+                            <li><a href="{{ path('app_admin_media_show', {id: resource.id()}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a></li>
+                            <li><a href="{{ path('app_admin_media_edit', {id: resource.id()}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a></li>
+                            <li><a href="{{ path('app_admin_media_delete', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a></li>
+                        </ul>
+                    {% elseif result.resourceType == 'vocabularies' %}
+                        <ul class="actions">
+                            <li><a href="{{ path('app_admin_vocabulary_show', {id: resource.id()}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a></li>
+                            <li><a href="{{ path('app_admin_vocabulary_edit', {id: resource.id()}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a></li>
+                            <li><a href="{{ path('app_admin_vocabulary_delete', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a></li>
+                        </ul>
+                    {% elseif result.resourceType == 'resource_templates' %}
+                        <ul class="actions">
+                            <li><a href="{{ path('app_admin_resource_template_show', {id: resource.id()}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a></li>
+                            <li><a href="{{ path('app_admin_resource_template_edit', {id: resource.id()}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a></li>
+                            <li><a href="{{ path('app_admin_resource_template_delete', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a></li>
+                        </ul>
+                    {% elseif result.resourceType == 'users' %}
+                        <ul class="actions">
+                            <li><a href="{{ path('app_admin_user_show', {id: resource.id()}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a></li>
+                            <li><a href="{{ path('app_admin_user_edit', {id: resource.id()}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a></li>
+                            <li><a href="{{ path('app_admin_user_delete', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a></li>
                         </ul>
                     {% elseif result.resourceType == 'sites' %}
                         <ul class="actions">
-                            <li>
-                                <a class="sidebar-content" href="#"
-                                   data-sidebar-selector=".admin-main .sidebar"
-                                   data-sidebar-content-url="{{ path('app_legacy_proxy', {routeName: 'admin/site/slug/action', 'site-slug': resource.slug(), action: 'show-details'}) }}"
-                                   title="{{ 'Details'|trans }}">{{ ux_icon('view') }}</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('app_legacy_proxy', {routeName: 'admin/site/slug/action', 'site-slug': resource.slug(), action: 'edit'}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a>
-                            </li>
-                            <li>
-                                <a class="sidebar-content" href="#"
-                                   data-sidebar-selector=".admin-main .sidebar"
-                                   data-sidebar-content-url="{{ path('app_legacy_proxy', {routeName: 'admin/site/slug/action', 'site-slug': resource.slug(), action: 'delete-confirm'}) }}"
-                                   title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a>
-                            </li>
+                            <li><a href="{{ path('app_admin_site_show', {slug: resource.slug()}) }}" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a></li>
+                            <li><a href="{{ path('app_admin_site_edit', {slug: resource.slug()}) }}" title="{{ 'Edit'|trans }}">{{ ux_icon('edit') }}</a></li>
+                            <li><a href="{{ path('app_admin_site_delete', {slug: resource.slug()}) }}" title="{{ 'Delete'|trans }}">{{ ux_icon('delete') }}</a></li>
                         </ul>
                     {% else %}
                         <a href="#" title="{{ 'View'|trans }}">{{ ux_icon('view') }}</a>

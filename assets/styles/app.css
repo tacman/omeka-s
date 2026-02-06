@@ -1,1 +1,23 @@
+/*
+ * All CSS loaded via AssetMapper. No build step needed.
+ *
+ * Order matters:
+ * 1. Vendor CSS (tablesaw, chosen)
+ * 2. Legacy Omeka core (iconfonts, style.css)
+ * 3. Third-party plugins (lightgallery)
+ * 4. Our overrides (admin.css)
+ */
+
+/* Vendor */
+@import "../../application/asset/vendor/tablesaw/tablesaw.stackonly.css";
+@import "../../application/asset/vendor/chosen-js/chosen.css";
+
+/* Legacy Omeka core */
+@import "../../application/asset/css/iconfonts.css";
+@import "../../application/asset/css/style.css";
+
+/* Third-party */
 @import "../../application/asset/vendor/lightgallery/css/lightgallery-bundle.min.css";
+
+/* Symfony admin overrides (loaded last to win specificity) */
+@import "./admin.css";

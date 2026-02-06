@@ -2,54 +2,31 @@
 
 namespace App\Controller;
 
-use App\Service\LaminasRouterService;
-use App\Tenant\TenantContext;
-use Omeka\Entity\Site;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/symfony')]
 final class AppController extends AbstractController
 {
-    public function __construct(
-        private readonly TenantContext $tenantContext,
-        private readonly LaminasRouterService $laminasRouter,
-    ) {
-    }
-
-    #[Route('/app', name: 'app_app')]
+    #[Route('/', name: 'app_root')]
     public function index(): Response
     {
-        $sites = $this->tenantContext->getRepository(Site::class)->findBy([], ['title' => 'ASC']);
-
-        return $this->render('app/index.html.twig', [
-            'sites' => $sites,
-        ]);
+        // Redirect root to admin dashboard
+        return $this->redirectToRoute('app_admin');
     }
 
-    #[Route('/legacy/{routeName}', name: 'app_legacy_proxy', requirements: ['routeName' => '.+'])]
+    /**
+     * Catch-all for routes not yet implemented in Symfony.
+     * Shows a clear message instead of redirecting to legacy.
+     */
+    #[Route('/legacy/{routeName}', name: 'app_legacy_proxy', requirements: ['routeName' => '.+'], priority: -1000)]
     public function legacyProxy(Request $request, string $routeName): Response
     {
-        $params = $request->query->all();
-        $url = $this->laminasRouter->url($routeName, $params);
-
-        return new RedirectResponse($url);
-    }
-
-    #[Route('/admin/site/s/{siteSlug}', name: 'app_site_admin', requirements: ['siteSlug' => '[a-zA-Z0-9_-]+'])]
-    public function siteAdmin(string $siteSlug): Response
-    {
-        $site = $this->tenantContext->getRepository(Site::class)->findOneBy(['slug' => $siteSlug]);
-        if (!$site) {
-            throw new NotFoundHttpException(sprintf('Site not found: %s', $siteSlug));
-        }
-
-        return $this->render('app/site_admin.html.twig', [
-            'site' => $site,
+        return $this->render('app/not_implemented.html.twig', [
+            'route_name' => $routeName,
+            'params' => $request->query->all(),
+            'request_uri' => $request->getRequestUri(),
         ]);
     }
 }

@@ -35,9 +35,14 @@ final class LegacyViewRenderer
         return $this->renderer;
     }
 
-    public function formOpen(FormInterface $form): string
+    public function formOpen(FormInterface $form, bool $disableTurbo = true): string
     {
-        return $this->getRenderer()->form()->openTag($form);
+        $tag = $this->getRenderer()->form()->openTag($form);
+        // Disable Turbo on legacy forms - they don't handle Turbo's redirect requirements
+        if ($disableTurbo) {
+            $tag = str_replace('<form ', '<form data-turbo="false" ', $tag);
+        }
+        return $tag;
     }
 
     public function formClose(): string

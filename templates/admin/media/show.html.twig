@@ -1,0 +1,45 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ 'Media'|trans }}: {{ media.displayTitle() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ media.displayTitle() }}</h1>
+    <p>{{ 'ID'|trans }}: {{ media.id() }}</p>
+    <p>{{ 'Created'|trans }}: {{ media.created() ? media.created().format('Y-m-d H:i') : '' }}</p>
+    <p>{{ 'Modified'|trans }}: {{ media.modified() ? media.modified().format('Y-m-d H:i') : '' }}</p>
+    <p>{{ 'Public'|trans }}: {{ media.isPublic() ? 'Yes'|trans : 'No'|trans }}</p>
+    <p>{{ 'Owner'|trans }}: {{ media.owner() ? media.owner().name() : '' }}</p>
+    <p>{{ 'Ingester'|trans }}: {{ media.ingester() }}</p>
+    <p>{{ 'Renderer'|trans }}: {{ media.renderer() }}</p>
+    <p>{{ 'Media type'|trans }}: {{ media.mediaType() }}</p>
+
+    <h2>{{ 'Item'|trans }}</h2>
+    {% set item = media.item() %}
+    {% if item %}
+        <p><a href="{{ path('app_admin_item_show', {itemId: item.id()}) }}">{{ ux_icon('item') }} {{ item.displayTitle() }}</a></p>
+    {% else %}
+        <p>{{ 'None.'|trans }}</p>
+    {% endif %}
+
+    <h2>{{ 'Values'|trans }}</h2>
+    {% set values = media.values() %}
+    {% if values is empty %}
+        <p>{{ 'No values.'|trans }}</p>
+    {% else %}
+        <dl>
+            {% for term, info in values %}
+                <dt>{{ info.property.label() }} ({{ term }})</dt>
+                <dd>
+                    {% for value in info.values %}
+                        <div>{{ value.asHtml()|raw }}</div>
+                    {% endfor %}
+                </dd>
+            {% endfor %}
+        </dl>
+    {% endif %}
+
+    <div class="admin-actions">
+        <a href="{{ path('app_admin_media_edit', {id: media.id()}) }}">{{ ux_icon('edit') }} {{ 'Edit'|trans }}</a>
+        <a href="{{ path('app_admin_media_delete', {id: media.id()}) }}">{{ ux_icon('delete') }} {{ 'Delete'|trans }}</a>
+    </div>
+{% endblock %}

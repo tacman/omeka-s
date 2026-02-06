@@ -1,15 +1,300 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}{{ 'Browse'|trans }} {{ result.resourceType }}{% endblock %}
+{% block title %}{{ 'Browse'|trans }} {{ result.resourceType|replace({'_': ' '})|title }}{% endblock %}
 
 {% block admin_body %}
     <h1>{{ result.resourceType|replace({'_': ' '})|title }}</h1>
-    <p>{{ 'Total'|trans }}: {{ result.total }}</p>
 
-    <twig:AdminBrowseTable :result="result" />
+    {# Search filters - show active filters #}
+    {% set filterKeys = ['page', 'sort_by', 'sort_order', 'per_page'] %}
+    {% set hasFilters = false %}
+    {% for key, value in app.request.query.all %}
+        {% if key not in filterKeys %}
+            {% set hasFilters = true %}
+        {% endif %}
+    {% endfor %}
+    {% if hasFilters %}
+    <div class="search-filters">
+        <span>{{ 'Filters'|trans }}:</span>
+        {% for key, value in app.request.query.all %}
+            {% if key not in filterKeys %}
+                <span class="filter">{{ key }}: {{ value }}</span>
+            {% endif %}
+        {% endfor %}
+        <a href="{{ path(app.request.attributes.get('_route')) }}" class="clear-filters">{{ 'Clear'|trans }}</a>
+    </div>
+    {% endif %}
 
-    <div class="sidebar">
+    {# Browse controls - top #}
+    <div class="browse-controls">
+        {# Pagination #}
+        {% if result.totalPages > 1 %}
+            <nav class="pagination" aria-label="{{ 'Pagination'|trans }}">
+                {% if result.hasPreviousPage %}
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: 1})) }}" class="first" title="{{ 'First page'|trans }}">&laquo;</a>
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: result.currentPage - 1})) }}" class="previous" title="{{ 'Previous page'|trans }}">&lsaquo;</a>
+                {% endif %}
+                <form class="page-input" method="get" style="display: inline;">
+                    {% for key, value in app.request.query.all %}
+                        {% if key != 'page' %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endif %}
+                    {% endfor %}
+                    <input type="text" name="page" value="{{ result.currentPage }}" size="3" aria-label="{{ 'Page'|trans }}">
+                </form>
+                <span class="page-count">{{ 'of'|trans }} {{ result.totalPages }} ({{ result.total }} {{ 'results'|trans }})</span>
+                {% if result.hasNextPage %}
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: result.currentPage + 1})) }}" class="next" title="{{ 'Next page'|trans }}">&rsaquo;</a>
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: result.totalPages})) }}" class="last" title="{{ 'Last page'|trans }}">&raquo;</a>
+                {% endif %}
+            </nav>
+        {% else %}
+            <span class="page-count">{{ result.total }} {{ 'results'|trans }}</span>
+        {% endif %}
+
+        {# Advanced search link #}
+        {% if result.resourceType in ['items', 'item_sets', 'media'] %}
+        <a href="#" class="advanced-search">{{ 'Advanced search'|trans }}</a>
+        {% endif %}
+
+        {# Sort selector #}
+        {% if result.sortOptions|length > 0 %}
+            <div class="sorting">
+                <form method="get" class="sort-form">
+                    {# Preserve existing query params except sort #}
+                    {% for key, value in app.request.query.all %}
+                        {% if key not in ['sort_by', 'sort_order', 'page'] %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endif %}
+                    {% endfor %}
+                    <label for="sort_by">{{ 'Sort by'|trans }}</label>
+                    <select name="sort_by" id="sort_by" onchange="this.form.submit()">
+                        {% for key, label in result.sortOptions %}
+                            <option value="{{ key }}" {{ result.sortBy == key ? 'selected' : '' }}>{{ label|trans }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="sort_order" id="sort_order" onchange="this.form.submit()">
+                        <option value="asc" {{ result.sortOrder == 'asc' ? 'selected' : '' }}>{{ 'Ascending'|trans }}</option>
+                        <option value="desc" {{ result.sortOrder == 'desc' ? 'selected' : '' }}>{{ 'Descending'|trans }}</option>
+                    </select>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    {# Page actions - Add button #}
+    <div id="page-actions">
+        {% if result.resourceType == 'items' %}
+            <a href="{{ path('app_admin_item_add') }}" class="button">{{ ux_icon('add') }} {{ 'Add new item'|trans }}</a>
+        {% elseif result.resourceType == 'item_sets' %}
+            <a href="{{ path('app_admin_item_set_add') }}" class="button">{{ ux_icon('add') }} {{ 'Add new item set'|trans }}</a>
+        {% elseif result.resourceType == 'users' %}
+            <a href="{{ path('app_admin_user_add') }}" class="button">{{ ux_icon('add') }} {{ 'Add new user'|trans }}</a>
+        {% elseif result.resourceType == 'sites' %}
+            <a href="{{ path('app_admin_site_add') }}" class="button">{{ ux_icon('add') }} {{ 'Add new site'|trans }}</a>
+        {% elseif result.resourceType == 'resource_templates' %}
+            <a href="{{ path('app_admin_resource_template_add') }}" class="button">{{ ux_icon('add') }} {{ 'Add new resource template'|trans }}</a>
+            <a href="{{ path('app_admin_resource_template_import') }}" class="button">{{ 'Import'|trans }}</a>
+        {% elseif result.resourceType == 'vocabularies' %}
+            <a href="{{ path('app_admin_vocabulary_import') }}" class="button">{{ ux_icon('add') }} {{ 'Import vocabulary'|trans }}</a>
+        {% endif %}
+    </div>
+
+    {# Batch form wrapper #}
+    {% if result.resources|length > 0 %}
+    <form method="post" id="batch-form" class="disable-unsaved-warning">
+        {# Batch actions #}
+        {% if result.resourceType in ['items', 'item_sets', 'media'] %}
+        <div class="batch-inputs">
+            <select class="batch-actions-select" aria-label="{{ 'Batch actions'|trans }}">
+                <option value="default">{{ 'Batch actions'|trans }}</option>
+                <option value="update-selected" disabled>{{ 'Edit selected'|trans }}</option>
+                <option value="update-all">{{ 'Edit all'|trans }}</option>
+                <option value="delete-selected" disabled>{{ 'Delete selected'|trans }}</option>
+                <option value="delete-all">{{ 'Delete all'|trans }}</option>
+            </select>
+            <div class="batch-actions">
+                <button type="button" class="default active" disabled>{{ 'Go'|trans }}</button>
+                <button type="submit" class="update-selected" name="batch_action" value="edit-selected" style="display:none;">{{ 'Go'|trans }}</button>
+                <button type="submit" class="update-all" name="batch_action" value="edit-all" style="display:none;">{{ 'Go'|trans }}</button>
+                <a class="delete button sidebar-content delete-selected" data-sidebar-selector="#sidebar-delete-selected" style="display:none;">{{ 'Go'|trans }}</a>
+                <a class="delete button sidebar-content delete-all" data-sidebar-selector="#sidebar-delete-all" style="display:none;">{{ 'Go'|trans }}</a>
+            </div>
+        </div>
+        {% endif %}
+
+        {# Table with checkboxes #}
+        <table class="tablesaw batch-edit" data-tablesaw-mode="stack">
+            <thead>
+                <tr>
+                    {% if result.resourceType in ['items', 'item_sets', 'media'] %}
+                    <th>
+                        <input type="checkbox" class="select-all" aria-label="{{ 'Select all'|trans }}">
+                        {{ 'Title'|trans }}
+                    </th>
+                    {% else %}
+                    <th>{{ 'Title'|trans }}</th>
+                    {% endif %}
+                    {% for column in result.columns %}
+                        <th>{{ browse_header(column) }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource in result.resources %}
+                    <tr>
+                        <td>
+                            {% if result.resourceType in ['items', 'item_sets', 'media'] %}
+                            <input type="checkbox" name="resource_ids[]" value="{{ resource.id() }}" aria-label="{{ 'Select resource'|trans }}">
+                            {% endif %}
+                            {{ browse_title(resource) }}
+                            {% if resource.isPublic is defined and not resource.isPublic() %}
+                                <span class="o-icon-private" aria-label="{{ 'Private'|trans }}"></span>
+                            {% endif %}
+                            <ul class="actions">
+                                {% if result.resourceType == 'items' %}
+                                    <li><a href="{{ path('app_admin_item_edit', {itemId: resource.id()}) }}" class="o-icon-edit" title="{{ 'Edit'|trans }}"></a></li>
+                                    <li><a href="#" class="o-icon-delete sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_item_delete', {itemId: resource.id()}) }}" title="{{ 'Delete'|trans }}"></a></li>
+                                    <li><a href="#" class="o-icon-more sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_item_show', {itemId: resource.id()}) }}?show-details=1" title="{{ 'Details'|trans }}"></a></li>
+                                {% elseif result.resourceType == 'item_sets' %}
+                                    <li><a href="{{ path('app_admin_item_set_edit', {id: resource.id()}) }}" class="o-icon-edit" title="{{ 'Edit'|trans }}"></a></li>
+                                    <li><a href="#" class="o-icon-delete sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_item_set_delete', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}"></a></li>
+                                    <li><a href="{{ path('app_admin_item_set_show', {id: resource.id()}) }}" class="o-icon-more" title="{{ 'Details'|trans }}"></a></li>
+                                {% elseif result.resourceType == 'media' %}
+                                    <li><a href="{{ path('app_admin_media_edit', {id: resource.id()}) }}" class="o-icon-edit" title="{{ 'Edit'|trans }}"></a></li>
+                                    <li><a href="#" class="o-icon-delete sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_media_delete', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}"></a></li>
+                                    <li><a href="{{ path('app_admin_media_show', {id: resource.id()}) }}" class="o-icon-more" title="{{ 'Details'|trans }}"></a></li>
+                                {% elseif result.resourceType == 'vocabularies' %}
+                                    <li><a href="{{ path('app_admin_vocabulary_show', {id: resource.id()}) }}" class="o-icon-more" title="{{ 'View'|trans }}"></a></li>
+                                {% elseif result.resourceType == 'resource_templates' %}
+                                    <li><a href="{{ path('app_admin_resource_template_edit', {id: resource.id()}) }}" class="o-icon-edit" title="{{ 'Edit'|trans }}"></a></li>
+                                    <li><a href="{{ path('app_admin_resource_template_show', {id: resource.id()}) }}" class="o-icon-more" title="{{ 'View'|trans }}"></a></li>
+                                {% elseif result.resourceType == 'users' %}
+                                    <li><a href="{{ path('app_admin_user_edit', {id: resource.id()}) }}" class="o-icon-edit" title="{{ 'Edit'|trans }}"></a></li>
+                                    <li><a href="{{ path('app_admin_user_show', {id: resource.id()}) }}" class="o-icon-more" title="{{ 'View'|trans }}"></a></li>
+                                {% elseif result.resourceType == 'sites' %}
+                                    <li><a href="{{ path('app_admin_site_edit', {slug: resource.slug()}) }}" class="o-icon-edit" title="{{ 'Edit'|trans }}"></a></li>
+                                    <li><a href="{{ path('app_admin_site_show', {slug: resource.slug()}) }}" class="o-icon-more" title="{{ 'View'|trans }}"></a></li>
+                                {% endif %}
+                            </ul>
+                        </td>
+                        {% for column in result.columns %}
+                            <td>{{ browse_cell(resource, column) }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+    {% else %}
+    <div class="no-resources">
+        <p>{{ 'No resources found.'|trans }}</p>
+    </div>
+    {% endif %}
+
+    {# Browse controls - bottom #}
+    {% if result.totalPages > 1 %}
+    <div class="browse-controls">
+        <nav class="pagination" aria-label="{{ 'Pagination'|trans }}">
+            {% if result.hasPreviousPage %}
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: 1})) }}" class="first">&laquo;</a>
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: result.currentPage - 1})) }}" class="previous">&lsaquo;</a>
+            {% endif %}
+            <span class="page-count">{{ 'Page'|trans }} {{ result.currentPage }} {{ 'of'|trans }} {{ result.totalPages }}</span>
+            {% if result.hasNextPage %}
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: result.currentPage + 1})) }}" class="next">&rsaquo;</a>
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: result.totalPages})) }}" class="last">&raquo;</a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+
+    {# Sidebars #}
+    <div id="sidebar" class="sidebar">
         <a href="#" class="sidebar-close o-icon-close" title="{{ 'Close'|trans }}"></a>
         <div class="sidebar-content"></div>
     </div>
+
+    <div id="sidebar-delete-selected" class="sidebar">
+        <a href="#" class="sidebar-close o-icon-close" title="{{ 'Close'|trans }}"></a>
+        <div class="sidebar-content">
+            <div id="sidebar-confirm">
+                <h3>{{ 'Delete resources'|trans }}</h3>
+                <p>{{ 'Are you sure you would like to delete the selected resources?'|trans }}</p>
+                <p class="error"><strong>{{ 'Warning'|trans }}</strong>: {{ 'this action will permanently delete the selected resources and cannot be undone.'|trans }}</p>
+                <form method="post" data-turbo="false">
+                    <input type="hidden" name="_token" value="{{ csrf_token('batch_delete') }}">
+                    <input type="submit" value="{{ 'Confirm delete'|trans }}">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar-delete-all" class="sidebar">
+        <a href="#" class="sidebar-close o-icon-close" title="{{ 'Close'|trans }}"></a>
+        <div class="sidebar-content">
+            <div id="sidebar-confirm">
+                <h3>{{ 'Delete all resources'|trans }}</h3>
+                <p>{{ 'Are you sure you would like to delete all resources on all pages?'|trans }}</p>
+                <p class="error"><strong>{{ 'Warning'|trans }}</strong>: {{ 'this action will permanently delete'|trans }} <strong>{{ result.total }}</strong> {{ 'resources and cannot be undone.'|trans }}</p>
+                <label><input type="checkbox" name="confirm-delete-all-check"> {{ 'Are you sure?'|trans }}</label>
+                <form method="post" data-turbo="false">
+                    <input type="hidden" name="_token" value="{{ csrf_token('batch_delete_all') }}">
+                    <input type="submit" value="{{ 'Confirm delete'|trans }}" disabled>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# Batch action JS (from legacy) #}
+    <script>
+    (function($) {
+        $('.select-all').change(function() {
+            if (this.checked) {
+                $('.batch-edit td input[type=checkbox]:not(:disabled)').prop('checked', true);
+            } else {
+                $('.batch-edit td input[type=checkbox]:checked').prop('checked', false);
+            }
+            Omeka.manageSelectedActions();
+        });
+
+        $('.batch-edit td input[type="checkbox"]').change(function() {
+            if ($('.select-all:checked').length > 0) {
+                $('.select-all').prop('checked', false);
+            }
+            Omeka.manageSelectedActions();
+        });
+
+        $('.batch-actions-select').change(function() {
+            var selectedAction = $("option:selected", this);
+            var selectedActionClass = "." + selectedAction.val();
+            $('.batch-actions .active').removeClass('active');
+            $(selectedActionClass).addClass('active').show();
+        });
+
+        // Delete selected handling
+        $('.delete-selected').on('click', function(e) {
+            e.preventDefault();
+            var inputs = $('input[name="resource_ids[]"]');
+            var count = inputs.filter(':checked').length;
+            if (count === 0) {
+                alert('Please select at least one resource.');
+                return;
+            }
+            $('#sidebar-delete-selected').find('strong:last').text(count);
+            Omeka.openSidebar($('#sidebar-delete-selected'));
+        });
+
+        // Delete all handling
+        $('.delete-all').on('click', function(e) {
+            e.preventDefault();
+            Omeka.openSidebar($('#sidebar-delete-all'));
+        });
+
+        // Enable delete all button only when checkbox checked
+        $('#sidebar-delete-all').on('click', 'input[name="confirm-delete-all-check"]', function(e) {
+            $('#sidebar-delete-all input[type="submit"]').prop('disabled', !this.checked);
+        });
+    })(jQuery);
+    </script>
 {% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% if legacy_head_links is defined and legacy_head_links %}
+        {{ legacy_head_links|raw }}
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% if legacy_head_scripts is defined and legacy_head_scripts %}
+        {{ legacy_head_scripts|raw }}
+    {% endif %}
+{% endblock %}
+
+{% block admin_body %}
+    {{ content|raw }}
+{% endblock %}

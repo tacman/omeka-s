@@ -1,0 +1,45 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Route Not Implemented{% endblock %}
+
+{% block admin_body %}
+<div id="page-actions"></div>
+<div class="messages">
+    <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 4px; padding: 24px; margin: 24px 0;">
+        <h1 style="margin: 0 0 16px; color: #856404; font-size: 24px;">
+            {{ ux_icon('mdi:alert-outline', {style: 'vertical-align: middle; margin-right: 8px;'}) }}
+            Symfony Route Not Implemented
+        </h1>
+
+        <p style="margin: 0 0 16px; font-size: 16px; color: #856404;">
+            This page needs to be created in Symfony. The legacy Laminas route is no longer active.
+        </p>
+
+        <table style="background: #fff; border: 1px solid #ddd; border-radius: 4px; width: 100%; margin-bottom: 16px;">
+            <tr>
+                <th style="text-align: left; padding: 8px 12px; border-bottom: 1px solid #ddd; width: 150px;">Request URI</th>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #ddd; font-family: monospace;">{{ request_uri }}</td>
+            </tr>
+            <tr>
+                <th style="text-align: left; padding: 8px 12px; border-bottom: 1px solid #ddd;">Legacy Route</th>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #ddd; font-family: monospace;">{{ route_name }}</td>
+            </tr>
+            {% if params is not empty %}
+            <tr>
+                <th style="text-align: left; padding: 8px 12px;">Parameters</th>
+                <td style="padding: 8px 12px; font-family: monospace;">{{ params|json_encode }}</td>
+            </tr>
+            {% endif %}
+        </table>
+
+        <div style="background: #f8f9fa; padding: 12px; border-radius: 4px; font-size: 14px;">
+            <strong>To implement this route:</strong>
+            <ol style="margin: 8px 0 0 20px; padding: 0;">
+                <li>Create a controller in <code>src/Controller/Admin/</code></li>
+                <li>Add a <code>#[Route]</code> attribute matching this URL pattern</li>
+                <li>Create the corresponding Twig template</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}

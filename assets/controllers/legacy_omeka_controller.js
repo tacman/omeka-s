@@ -10,6 +10,11 @@ export default class extends Controller {
 
     this.overridePopulateSidebarContent();
 
+    // Ensure sidebar space is reserved on page load (needed for Turbo navigation)
+    if (typeof window.Omeka.reserveSidebarSpace === 'function') {
+      window.Omeka.reserveSidebarSpace();
+    }
+
     if (typeof window.Omeka.warnIfUnsaved === 'function') {
       window.Omeka.warnIfUnsaved();
     }
@@ -50,7 +55,11 @@ export default class extends Controller {
       sidebarEl.classList.add('loading');
       sidebarContent.innerHTML = '';
 
-      const response = await fetch(`${url}${url.includes('?') ? '&' : '?'}${data}`);
+      let fetchUrl = url;
+      if (data) {
+        fetchUrl += `${url.includes('?') ? '&' : '?'}${data}`;
+      }
+      const response = await fetch(fetchUrl, { credentials: 'same-origin' });
       if (response.ok) {
         sidebarContent.innerHTML = await response.text();
         const event = new Event('o:sidebar-content-loaded');

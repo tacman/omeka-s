@@ -1,0 +1,22 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ 'Vocabulary'|trans }}: {{ vocabulary.label() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ vocabulary.label() }}</h1>
+    <p>{{ 'ID'|trans }}: {{ vocabulary.id() }}</p>
+    <p>{{ 'Prefix'|trans }}: {{ vocabulary.prefix() }}</p>
+    <p>{{ 'Namespace URI'|trans }}: {{ vocabulary.namespaceUri() }}</p>
+    <p>{{ 'Comment'|trans }}: {{ vocabulary.comment() }}</p>
+
+    <h2>{{ 'Related'|trans }}</h2>
+    <ul>
+        <li><a href="{{ path('app_admin_vocabulary_properties', {id: vocabulary.id()}) }}">{{ 'Properties'|trans }}</a></li>
+        <li><a href="{{ path('app_admin_vocabulary_classes', {id: vocabulary.id()}) }}">{{ 'Resource classes'|trans }}</a></li>
+    </ul>
+
+    <div class="admin-actions">
+        <a href="{{ path('app_admin_vocabulary_edit', {id: vocabulary.id()}) }}">{{ ux_icon('edit') }} {{ 'Edit'|trans }}</a>
+        <a href="{{ path('app_admin_vocabulary_delete', {id: vocabulary.id()}) }}">{{ ux_icon('delete') }} {{ 'Delete'|trans }}</a>
+    </div>
+{% endblock %}

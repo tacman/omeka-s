@@ -1,78 +1,56 @@
-{% extends 'base.html.twig' %}
-
-{% block body_class %}admin{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('application/asset/css/iconfonts.css') }}">
-    <link rel="stylesheet" href="{{ asset('application/asset/css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('application/asset/vendor/chosen-js/chosen.css') }}">
-    <link rel="stylesheet" href="{{ asset('application/asset/vendor/tablesaw/tablesaw.stackonly.css') }}">
-    <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
-{% endblock %}
-
-{% block javascripts %}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Admin · Omeka S{% endblock %}</title>
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro|Lato:400,400italic,700,700italic" rel="stylesheet">
+    {# All CSS loaded via AssetMapper through app.css imports - no manual <link> tags needed #}
+    {% block stylesheets %}{% endblock %}
     <script src="{{ asset('application/asset/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('application/asset/vendor/tablesaw/tablesaw.stackonly.jquery.js') }}"></script>
     <script src="{{ asset('application/asset/vendor/chosen-js/chosen.jquery.js') }}"></script>
     <script src="{{ asset('application/asset/js/chosen-options.js') }}"></script>
     <script src="{{ asset('application/asset/js/global.js') }}"></script>
-    <script>
-        window.Omeka = window.Omeka || {};
-        Omeka.jsTranslate = Omeka.jsTranslate || function (str) { return str; };
-    </script>
     <script src="{{ asset('application/asset/js/admin.js') }}"></script>
-    {{ parent() }}
-{% endblock %}
+    {# Stimulus for gradual migration from jQuery #}
+    {{ importmap('app') }}
+    {% block javascripts %}{% endblock %}
+</head>
+<body class="{% block body_class %}admin{% endblock %}">
+    <a href="#content" class="skip">Skip to main content</a>
+    <div class="flex">
+        <header>
+            <div class="logo"><a href="{{ path('app_admin') }}">{{ 'Omeka S'|trans }}</a></div>
+            <div id="user">
+                {% if app.user %}
+                <p class="user-id">
+                    <a class="user-show o-icon-user button" href="#">{{ app.user.name|default(app.user.userIdentifier) }}</a>
+                </p>
+                <p class="logout"><a href="{{ path('app_logout') }}">{{ 'Logout'|trans }}</a></p>
+                {% endif %}
+            </div>
+            <nav id="menu" aria-label="Navigation menu">
+                {% block admin_nav %}
+                <h5>Resources</h5>
+                {{ knp_menu_render('admin_resource', {template: 'menu/admin_menu.html.twig'}) }}
+                <h5>Admin</h5>
+                {{ knp_menu_render('admin_global', {template: 'menu/admin_menu.html.twig'}) }}
+                {% endblock %}
+            </nav>
+        </header>
 
-{% block body %}
-<div class="admin-layout">
-    <aside class="admin-sidebar">
-        <div class="admin-logo">
-            <a href="{{ path('app_admin') }}">{{ 'Omeka S'|trans }}</a>
-        </div>
-        <div class="admin-legacy">
-            <label for="locale-select">{{ 'Language'|trans }}</label>
-            <select id="locale-select" onchange="if (this.value) { window.location = this.value; }">
-                {% for locale in app_supported_locales %}
-                    {% set currentRoute = app.request.attributes.get('_route') %}
-                    {% set currentParams = app.request.attributes.get('_route_params')|default({}) %}
-                    {% set targetPath = path(currentRoute, currentParams|merge({'_locale': locale})) %}
-                    <option value="{{ path('app_set_locale', {'_locale': app.request.locale, 'newLocale': locale, 'redirect_to': targetPath}) }}"{% if app.request.locale == locale %} selected{% endif %}>{{ locale|language_name(locale) }}</option>
+        <div id="content" role="main" {{ stimulus_controller('legacy_omeka') }} {{ stimulus_controller('sidebar') }}>
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash flash-{{ label }}">{{ message }}</div>
                 {% endfor %}
-            </select>
-        </div>
-        <div class="admin-legacy">
-            {% set legacyRoute = legacy_route|default('admin') %}
-            {% set legacyParams = legacy_params|default({}) %}
-            <a href="{{ legacy_url(legacyRoute, legacyParams) }}">{{ 'View legacy page'|trans }}</a>
-        </div>
-        {% block admin_sidebar %}
-            <div class="admin-section">
-                <h5>{{ 'Sites'|trans }}</h5>
-                {{ knp_menu_render('admin_site') }}
-            </div>
-            <div class="admin-section">
-                <h5>{{ 'Resources'|trans }}</h5>
-                {{ knp_menu_render('admin_resource') }}
-            </div>
-            <div class="admin-section">
-                <h5>{{ 'Admin'|trans }}</h5>
-                {{ knp_menu_render('admin_global') }}
-            </div>
-            <div class="admin-section">
-                <h5>{{ 'Modules'|trans }}</h5>
-                {{ knp_menu_render('admin_module') }}
-            </div>
-        {% endblock %}
-    </aside>
-    <main class="admin-main" data-controller="legacy-omeka">
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <div class="flash flash-{{ label }}">{{ message }}</div>
             {% endfor %}
-        {% endfor %}
-        {% block admin_body %}{% endblock %}
-    </main>
-</div>
-{% endblock %}
+            {% block admin_body %}{% endblock %}
+        </div>
+    </div>
+    <footer>
+        <p class="site-version"><a href="https://omeka.org/s">Omeka S</a></p>
+    </footer>
+</body>
+</html>

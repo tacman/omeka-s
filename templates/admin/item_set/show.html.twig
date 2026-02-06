@@ -1,0 +1,37 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ 'Item set'|trans }}: {{ itemSet.displayTitle() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ itemSet.displayTitle() }}</h1>
+    <p>{{ 'ID'|trans }}: {{ itemSet.id() }}</p>
+    <p>{{ 'Created'|trans }}: {{ itemSet.created() ? itemSet.created().format('Y-m-d H:i') : '' }}</p>
+    <p>{{ 'Modified'|trans }}: {{ itemSet.modified() ? itemSet.modified().format('Y-m-d H:i') : '' }}</p>
+    <p>{{ 'Public'|trans }}: {{ itemSet.isPublic() ? 'Yes'|trans : 'No'|trans }}</p>
+    <p>{{ 'Open'|trans }}: {{ itemSet.isOpen() ? 'Yes'|trans : 'No'|trans }}</p>
+    <p>{{ 'Owner'|trans }}: {{ itemSet.owner() ? itemSet.owner().name() : '' }}</p>
+    <p>{{ 'Resource class'|trans }}: {{ itemSet.resourceClass() ? itemSet.resourceClass().label() : '' }}</p>
+    <p>{{ 'Resource template'|trans }}: {{ itemSet.resourceTemplate() ? itemSet.resourceTemplate().label() : '' }}</p>
+
+    <h2>{{ 'Values'|trans }}</h2>
+    {% set values = itemSet.values() %}
+    {% if values is empty %}
+        <p>{{ 'No values.'|trans }}</p>
+    {% else %}
+        <dl>
+            {% for term, info in values %}
+                <dt>{{ info.property.label() }} ({{ term }})</dt>
+                <dd>
+                    {% for value in info.values %}
+                        <div>{{ value.asHtml()|raw }}</div>
+                    {% endfor %}
+                </dd>
+            {% endfor %}
+        </dl>
+    {% endif %}
+
+    <div class="admin-actions">
+        <a href="{{ path('app_admin_item_set_edit', {id: itemSet.id()}) }}">{{ ux_icon('edit') }} {{ 'Edit'|trans }}</a>
+        <a href="{{ path('app_admin_item_set_delete', {id: itemSet.id()}) }}">{{ ux_icon('delete') }} {{ 'Delete'|trans }}</a>
+    </div>
+{% endblock %}

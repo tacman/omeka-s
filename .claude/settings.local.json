@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(php bin/console cache:clear:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(php bin/console:*)",
+      "Bash(php -l:*)",
+      "Bash(curl:*)",
+      "Bash(ls:*)",
+      "Bash(bin/console debug:router:*)"
+    ]
+  }
+}

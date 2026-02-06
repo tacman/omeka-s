@@ -1,0 +1,22 @@
+{# Sidebar delete confirmation - no layout wrapper #}
+<div id="sidebar-confirm">
+    <h3>{{ 'Delete item'|trans }}</h3>
+    <p>{{ 'Are you sure you would like to delete this item?'|trans }}</p>
+
+    <div class="meta-group">
+        <h4>{{ item.displayTitle() }}</h4>
+    </div>
+
+    {% set mediaItems = item.media() %}
+    {% if mediaItems|length > 0 %}
+    <p class="error">
+        <strong>{{ 'Warning'|trans }}</strong>:
+        {{ 'Deleting this item will also delete'|trans }} {{ mediaItems|length }} {{ 'associated media'|trans }}.
+    </p>
+    {% endif %}
+
+    <form method="post" action="{{ path('app_admin_item_delete', {itemId: item.id()}) }}" data-turbo="false">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_item') }}">
+        <input type="submit" value="{{ 'Confirm delete'|trans }}">
+    </form>
+</div>

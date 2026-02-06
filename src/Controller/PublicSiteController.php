@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/symfony')]
 final class PublicSiteController extends AbstractController
 {
     public function __construct(private readonly OmekaApiService $api)

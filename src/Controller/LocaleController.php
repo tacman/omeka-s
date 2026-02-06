@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/symfony')]
 final class LocaleController extends AbstractController
 {
     #[Route('/locale/{newLocale}', name: 'app_set_locale', requirements: ['newLocale' => '[a-zA-Z_\-]+'])]

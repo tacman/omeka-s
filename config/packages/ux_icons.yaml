@@ -15,35 +15,62 @@ ux_icons:
     ignore_not_found: false
 
     aliases:
+        # Action icons
         add: 'mdi:plus-circle-outline'
         edit: 'mdi:pencil-outline'
         delete: 'mdi:trash-can-outline'
         view: 'mdi:eye-outline'
         browse: 'mdi:view-list-outline'
         search: 'mdi:magnify'
-        settings: 'mdi:cog-outline'
-        users: 'mdi:account-multiple-outline'
-        pages: 'mdi:file-document-outline'
-        navigation: 'mdi:menu'
-        resources: 'mdi:database-outline'
-        theme: 'mdi:palette-outline'
-        public: 'mdi:open-in-new'
-        private: 'mdi:lock-outline'
-        admin: 'mdi:shield-account-outline'
-        site: 'mdi:web'
-        item: 'mdi:package-variant'
-        item_set: 'mdi:package-variant-closed'
-        media: 'mdi:image-outline'
-        vocabulary: 'mdi:book-open-variant'
-        resource_template: 'mdi:clipboard-text-outline'
-        jobs: 'mdi:clipboard-list-outline'
-        assets: 'mdi:folder-outline'
-        modules: 'mdi:puzzle-outline'
-        login: 'mdi:login'
-        logout: 'mdi:logout'
-        help: 'mdi:help-circle-outline'
         save: 'mdi:content-save-outline'
         cancel: 'mdi:close-circle-outline'
+
+        # Navigation menu icons (match CSS class names from legacy Omeka)
+        # Hyphenated versions match CSS classes used in menu
+        items: 'mdi:package-variant'
+        item-sets: 'mdi:package-variant-closed'
+        media: 'mdi:image-outline'
+        vocabularies: 'mdi:book-open-variant'
+        resource-templates: 'mdi:clipboard-text-outline'
+        sites: 'mdi:web'
+        users: 'mdi:account-multiple-outline'
+        modules: 'mdi:puzzle-outline'
+        jobs: 'mdi:clipboard-list-outline'
+        settings: 'mdi:cog-outline'
+        assets: 'mdi:folder-outline'
+
+        # CamelCase aliases for use in templates (cleaner, matches entity names)
+        item: 'mdi:package-variant'
+        itemSet: 'mdi:package-variant-closed'
+        itemSets: 'mdi:package-variant-closed'
+        resourceTemplate: 'mdi:clipboard-text-outline'
+        resourceTemplates: 'mdi:clipboard-text-outline'
+        site: 'mdi:web'
+        user: 'mdi:account-multiple-outline'
+        vocabulary: 'mdi:book-open-variant'
+        module: 'mdi:puzzle-outline'
+        job: 'mdi:clipboard-list-outline'
+        asset: 'mdi:folder-outline'
+
+        # Site admin menu icons
+        pages: 'mdi:file-document-outline'
+        navigation: 'mdi:sitemap'
+        resources: 'mdi:database-outline'
+        theme: 'mdi:palette-outline'
+        site-info: 'mdi:information-outline'
+        siteInfo: 'mdi:information-outline'
+
+        # Visibility icons
+        public: 'mdi:eye-outline'
+        private: 'mdi:eye-off-outline'
+
+        # Auth icons
+        login: 'mdi:login'
+        logout: 'mdi:logout'
+        admin: 'mdi:shield-account-outline'
+
+        # Misc
+        help: 'mdi:help-circle-outline'
         external: 'mdi:open-in-new'
 
 when@prod:

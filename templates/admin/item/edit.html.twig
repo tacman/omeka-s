@@ -45,6 +45,20 @@
     {{ form_close|raw }}
 
     {{ resource_form_templates_html|raw }}
+
+    {# Delete confirmation sidebar - matches legacy Omeka pattern #}
+    <div id="delete" class="sidebar">
+        <a href="#" class="sidebar-close o-icon-close" title="{{ 'Close'|trans }}"></a>
+        <div id="sidebar-confirm">
+            <h3>{{ 'Delete item'|trans }}</h3>
+            <p>{{ 'Are you sure you would like to delete this item?'|trans }}</p>
+            <form method="post" action="{{ path('app_admin_item_delete', {itemId: item.id()}) }}" data-turbo="false">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete_item') }}">
+                <input type="submit" value="{{ 'Confirm delete'|trans }}">
+            </form>
+        </div>
+    </div>
+
     <script src="{{ asset('application/asset/vendor/sortablejs/Sortable.min.js') }}"></script>
     <script src="{{ asset('application/asset/js/resource-form.js') }}"></script>
     <script src="{{ asset('application/asset/js/resource-selector.js') }}"></script>

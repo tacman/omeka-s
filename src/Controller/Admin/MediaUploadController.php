@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/symfony/admin/media')]
+#[Route('/admin/media')]
 final class MediaUploadController extends AbstractController
 {
     public function __construct(

@@ -20,12 +20,33 @@ final class OmekaAdminFormService
         AbstractResourceEntityRepresentation $resource,
         string $actionUrl,
         string $formId,
+        bool $disableCsrf = true,
     ): FormInterface {
         $formElementManager = $this->legacyApp->getServiceManager()->get('FormElementManager');
         $form = $formElementManager->get(ResourceForm::class, ['resource' => $resource]);
         $form->setAttribute('action', $actionUrl);
         $form->setAttribute('enctype', 'multipart/form-data');
         $form->setAttribute('id', $formId);
+
+        // Remove CSRF for dev - the Omeka CSRF initializer adds it automatically
+        // TODO: Properly handle CSRF tokens between Symfony and Laminas
+        if ($disableCsrf) {
+            // Try both possible CSRF element names
+            $csrfNames = ['csrf'];
+            if ($form->getName()) {
+                $csrfNames[] = sprintf('%s_csrf', $form->getName());
+            }
+            foreach ($csrfNames as $csrfName) {
+                if ($form->has($csrfName)) {
+                    $form->remove($csrfName);
+                    // Also remove from input filter if it exists
+                    $inputFilter = $form->getInputFilter();
+                    if ($inputFilter->has($csrfName)) {
+                        $inputFilter->remove($csrfName);
+                    }
+                }
+            }
+        }
 
         return $form;
     }
@@ -67,5 +88,30 @@ final class OmekaAdminFormService
         unset($data['values_json']);
 
         return array_merge($data, $jsonData);
+    }
+
+    /**
+     * Validate form data, optionally skipping CSRF validation.
+     */
+    public function validateForm(FormInterface $form, array $data, bool $skipCsrf = true): bool
+    {
+        if ($skipCsrf) {
+            // Remove CSRF from data and input filter before validation
+            unset($data['csrf']);
+            $csrfName = $form->getName() ? sprintf('%s_csrf', $form->getName()) : 'csrf';
+            unset($data[$csrfName]);
+
+            // Get input filter and remove CSRF input
+            $inputFilter = $form->getInputFilter();
+            if ($inputFilter->has('csrf')) {
+                $inputFilter->remove('csrf');
+            }
+            if ($inputFilter->has($csrfName)) {
+                $inputFilter->remove($csrfName);
+            }
+        }
+
+        $form->setData($data);
+        return $form->isValid();
     }
 }

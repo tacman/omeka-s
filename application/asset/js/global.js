@@ -1,4 +1,8 @@
 var Omeka = {
+    jsTranslate : function(str) {
+        return str;
+    },
+
     openSidebar : function(sidebar) {
         sidebar.addClass('active');
         this.reserveSidebarSpace();

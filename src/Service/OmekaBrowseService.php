@@ -35,12 +35,16 @@ final class OmekaBrowseService
 
         $response = $this->apiService->search($resourceType, $query);
 
+        // Get sort options from browse service
+        $sortOptions = $browse->getSortConfig('admin', $resourceType) ?? [];
+
         return new BrowseResult(
             $resourceType,
             $response->getContent(),
             $browse->getColumnsData('admin', $resourceType, $userId),
             $response->getTotalResults(),
             $query,
+            $sortOptions,
         );
     }
 
