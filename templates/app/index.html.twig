@@ -1,52 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Omeka Sites{% endblock %}
+{% block title %}{{ installationTitle }}{% endblock %}
 
 {% block body %}
-<div>
-    <h1><a href="{{ laminas_url('top') }}">Omeka S</a></h1>
+<div class="landing">
+    <h1>{{ installationTitle }}</h1>
+
+    <form method="get" action="{{ path('app_root') }}" class="search-form">
+        <input type="text" name="fulltext_search" value="{{ searchQuery }}" placeholder="Search sites..." aria-label="Search sites">
+        <button type="submit">Search</button>
+    </form>
+
+    <h2>Sites</h2>
 
     {% if sites is empty %}
         <p>No sites found.</p>
     {% else %}
-        <h2>Sites</h2>
-        <ul>
+        <div class="sites-list">
             {% for site in sites %}
-                <li>
-                    <a href="{{ laminas_url('site', {'site-slug': site.slug}) }}">{{ site.title }}</a>
-                    ({{ site.slug }})
-                </li>
+                <div class="site-summary">
+                    <h3><a href="{{ path('app_site_show', {siteSlug: site.slug()}) }}">{{ site.title() }}</a></h3>
+                    {% if site.summary() %}
+                        <p>{{ site.summary() }}</p>
+                    {% endif %}
+                </div>
             {% endfor %}
-        </ul>
+        </div>
+
+        {% if totalResults > sites|length %}
+            <nav class="pagination">
+                <span>{{ totalResults }} sites total</span>
+            </nav>
+        {% else %}
+            <p class="count">{{ totalResults }} site{{ totalResults != 1 ? 's' : '' }}</p>
+        {% endif %}
     {% endif %}
 
-    <p>
-        <a href="{{ path('app_admin') }}">Admin dashboard (Symfony)</a>
-        | <a href="{{ laminas_url('admin') }}">Admin dashboard (Legacy)</a>
-    </p>
-
-    <h2>Laminas Routes</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Route</th>
-                <th>Type</th>
-                <th>Defaults</th>
-                <th>Constraints</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for route in laminas_route_table() %}
-                <tr>
-                    <td>{{ route.name }}</td>
-                    <td>{{ route.route }}</td>
-                    <td>{{ route.type }}</td>
-                    <td>{{ route.defaults|json_encode }}</td>
-                    <td>{{ route.constraints|json_encode }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <p class="admin-link">Go to the <a href="{{ path('app_admin') }}">Admin dashboard</a> to start working with {{ installationTitle }}.</p>
 </div>
 {% endblock %}

@@ -28,7 +28,7 @@ final class LegacyAuthSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
         $path = $request->getPathInfo();
-        if (!str_starts_with($path, '/admin') && !str_starts_with($path, '/api-local') && !str_starts_with($path, '/symfony')) {
+        if (!str_starts_with($path, '/admin') && !str_starts_with($path, '/api') && !str_starts_with($path, '/symfony')) {
             return;
         }
 

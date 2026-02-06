@@ -1,11 +1,9 @@
-{% extends 'admin/base.html.twig' %}
+{% extends 'admin/site/base.html.twig' %}
 
 {% block title %}{{ 'Pages'|trans }}: {{ site.title() }}{% endblock %}
 
 {% block admin_body %}
     <h1>{{ 'Pages'|trans }}: {{ site.title() }}</h1>
-
-    <p><a href="{{ path('app_admin_site_show', {slug: site.slug()}) }}">&larr; {{ 'Back to site'|trans }}</a></p>
 
     {% if pages is empty %}
         <p>{{ 'No pages.'|trans }}</p>

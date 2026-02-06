@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ item.displayTitle() }} · {{ site.title() }}{% endblock %}
+
+{% block body %}
+<div class="site-content">
+    <p><a href="{{ path('app_site_item_browse', {siteSlug: siteSlug}) }}">&larr; Back to Items</a></p>
+
+    <h1>{{ item.displayTitle() }}</h1>
+
+    {% set thumbnail = item.thumbnailDisplayUrl('large') %}
+    {% if thumbnail %}
+        <div style="margin-bottom: 1.5rem;">
+            <img src="{{ thumbnail }}" alt="{{ item.displayTitle() }}" style="max-width: 100%; max-height: 500px;">
+        </div>
+    {% endif %}
+
+    {% set description = item.displayDescription() %}
+    {% if description %}
+        <div style="margin-bottom: 1.5rem;">
+            <p>{{ description|raw }}</p>
+        </div>
+    {% endif %}
+
+    {# Display all values grouped by property #}
+    <table>
+        <tbody>
+        {% for term, values in item.values() %}
+            <tr>
+                <th style="width: 200px;">{{ values.property.label() }}</th>
+                <td>
+                    {% for value in values.values %}
+                        <div>{{ value }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {# Media files #}
+    {% set mediaList = item.media() %}
+    {% if mediaList|length > 0 %}
+        <h2 style="margin-top: 2rem;">Media</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+            {% for media in mediaList %}
+                <div>
+                    <a href="{{ path('app_site_media_show', {siteSlug: siteSlug, id: media.id()}) }}">
+                        {% set thumb = media.thumbnailUrl('square') %}
+                        {% if thumb %}
+                            <img src="{{ thumb }}" alt="{{ media.displayTitle() }}" style="max-width: 150px;">
+                        {% else %}
+                            {{ media.displayTitle() }}
+                        {% endif %}
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

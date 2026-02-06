@@ -1,0 +1,24 @@
+{% extends 'admin/site/base.html.twig' %}
+
+{% block title %}{{ 'Edit site'|trans }}: {{ site.title() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ 'Site admin'|trans }}: {{ site.title() }}</h1>
+
+    <p class="info">{{ 'Site settings form — to be implemented.'|trans }}</p>
+
+    <div class="meta-group">
+        <h3>{{ 'Current settings'|trans }}</h3>
+        <table>
+            <tr><th>{{ 'Title'|trans }}</th><td>{{ site.title() }}</td></tr>
+            <tr><th>{{ 'Slug'|trans }}</th><td><code>{{ site.slug() }}</code></td></tr>
+            <tr><th>{{ 'Summary'|trans }}</th><td>{{ site.summary()|default('—') }}</td></tr>
+            <tr><th>{{ 'Theme'|trans }}</th><td>{{ site.theme() }}</td></tr>
+            <tr><th>{{ 'Public'|trans }}</th><td>{{ site.isPublic() ? 'Yes'|trans : 'No'|trans }}</td></tr>
+        </table>
+    </div>
+
+    <div id="page-actions">
+        <a href="{{ path('app_admin_site_show', {slug: site.slug()}) }}" class="button">{{ 'Back'|trans }}</a>
+    </div>
+{% endblock %}

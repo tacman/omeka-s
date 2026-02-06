@@ -1,0 +1,13 @@
+{% extends 'admin/site/base.html.twig' %}
+
+{% block title %}{{ 'Theme'|trans }}: {{ site.title() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ 'Theme'|trans }}: {{ site.title() }}</h1>
+
+    <div class="meta-group">
+        <p>{{ 'Current theme'|trans }}: <strong>{{ site.theme() }}</strong></p>
+    </div>
+
+    {# TODO: theme selection and settings interface #}
+{% endblock %}

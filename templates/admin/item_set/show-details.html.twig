@@ -1,0 +1,55 @@
+{# Sidebar details view - no layout wrapper #}
+<div class="meta-group">
+    <h4>{{ itemSet.displayTitle() }}</h4>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Class'|trans }}</h4>
+    <div class="value">{{ itemSet.resourceClass() ? itemSet.resourceClass().label() : 'None'|trans }}</div>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Owner'|trans }}</h4>
+    <div class="value">{{ itemSet.owner() ? itemSet.owner().name() : 'None'|trans }}</div>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Visibility'|trans }}</h4>
+    <div class="value">
+        {% if itemSet.isPublic() %}
+            {{ 'Public'|trans }}
+        {% else %}
+            {{ ux_icon('mdi:lock-outline') }} {{ 'Private'|trans }}
+        {% endif %}
+    </div>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Open/Closed'|trans }}</h4>
+    <div class="value">{{ itemSet.isOpen() ? 'Open'|trans : 'Closed'|trans }}</div>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Created'|trans }}</h4>
+    <div class="value">{{ itemSet.created() ? itemSet.created().format('M j, Y') : '' }}</div>
+</div>
+
+<div class="meta-group">
+    <h4>{{ 'Modified'|trans }}</h4>
+    <div class="value">{{ itemSet.modified() ? itemSet.modified().format('M j, Y') : '' }}</div>
+</div>
+
+{% set values = itemSet.values() %}
+{% if values is not empty %}
+<div class="meta-group">
+    <h4>{{ 'Values'|trans }}</h4>
+    {% for term, info in values %}
+        <div class="property">
+            <h4>{{ info.property.label() }}</h4>
+            {% for value in info.values %}
+                <div class="value">{{ value.asHtml()|raw }}</div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}

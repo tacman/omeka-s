@@ -1,0 +1,13 @@
+{% extends 'admin/base.html.twig' %}
+
+{# Site admin base template — provides the site-specific submenu via KNP menu #}
+
+{% block admin_nav %}
+    {{ knp_menu_render('admin_site', {template: 'menu/admin_menu.html.twig'}) }}
+    <h5>{{ site.title() }}</h5>
+    {{ knp_menu_render('site_admin', {template: 'menu/admin_menu.html.twig'}) }}
+    <h5>Resources</h5>
+    {{ knp_menu_render('admin_resource', {template: 'menu/admin_menu.html.twig'}) }}
+    <h5>Admin</h5>
+    {{ knp_menu_render('admin_global', {template: 'menu/admin_menu.html.twig'}) }}
+{% endblock %}

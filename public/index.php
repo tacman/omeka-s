@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 require dirname(__DIR__).'/config/bootstrap.php';
 
+// Serve legacy static assets directly (application assets, theme assets, uploaded files).
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
 if ($path) {
     $projectRoot = realpath(dirname(__DIR__));
@@ -44,14 +45,9 @@ if ($debug) {
     Debug::enable();
 }
 
+// Symfony handles ALL requests — no legacy fallback.
 $kernel = new Kernel($env, $debug);
 $request = Request::createFromGlobals();
 $response = $kernel->handle($request);
-
-if ($response->getStatusCode() !== 404) {
-    $response->send();
-    $kernel->terminate($request, $response);
-    return;
-}
-
-require dirname(__DIR__).'/index.php';
+$response->send();
+$kernel->terminate($request, $response);

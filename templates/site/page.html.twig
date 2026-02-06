@@ -3,13 +3,84 @@
 {% block title %}{{ page.title() }} · {{ site.title() }}{% endblock %}
 
 {% block body %}
-<div>
-    <p><a href="{{ path('app_site_public', {siteSlug: site.slug()}) }}">Back to {{ site.title() }}</a></p>
+<div class="site-content">
+    {% if isHomepage is not defined or not isHomepage %}
+        <p><a href="{{ path('app_site_show', {siteSlug: site.slug()}) }}">&larr; {{ site.title() }}</a></p>
+    {% else %}
+        <p><a href="{{ path('app_root') }}">&larr; All sites</a></p>
+    {% endif %}
     <h1>{{ page.title() }}</h1>
 
     {% for block in page.blocks() %}
-        {% if block.layout() == 'html' %}
+        {% set layout = block.layout() %}
+        {% if layout == 'html' %}
             <div class="page-block page-block-html">{{ block.dataValue('html')|raw }}</div>
+        {% elseif layout == 'pageTitle' %}
+            {# Already showing page title above #}
+        {% elseif layout == 'media' %}
+            <div class="page-block page-block-media">
+                {% for attachment in block.attachments() %}
+                    {% set attachedItem = attachment.item() %}
+                    {% set attachedMedia = attachment.media() %}
+                    {% if attachedMedia %}
+                        {% set thumb = attachedMedia.thumbnailUrl('medium') %}
+                        {% if thumb %}
+                            <img src="{{ thumb }}" alt="{{ attachedMedia.displayTitle() }}" style="max-width: 200px; margin: 0.5rem;">
+                        {% endif %}
+                    {% elseif attachedItem %}
+                        {% set thumb = attachedItem.thumbnailDisplayUrl('medium') %}
+                        {% if thumb %}
+                            <img src="{{ thumb }}" alt="{{ attachedItem.displayTitle() }}" style="max-width: 200px; margin: 0.5rem;">
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% elseif layout == 'lineBreak' %}
+            <hr>
+        {% elseif layout == 'browsePreview' %}
+            <div class="page-block page-block-browse-preview">
+                {% set resourceType = block.dataValue('resource_type') ?? 'items' %}
+                <h3>{{ block.dataValue('heading') }}</h3>
+                <p><a href="{{ path('app_site_item_browse', {siteSlug: site.slug()}) }}">Browse all</a></p>
+            </div>
+        {% elseif layout == 'tableOfContents' %}
+            <div class="page-block page-block-toc">
+                <h3>Table of Contents</h3>
+                {# TODO: render navigation tree #}
+            </div>
+        {% elseif layout == 'listOfPages' %}
+            <div class="page-block page-block-list-of-pages">
+                {# TODO: render linked pages #}
+            </div>
+        {% elseif layout == 'listOfSites' %}
+            <div class="page-block page-block-list-of-sites">
+                {# TODO: render sites list #}
+            </div>
+        {% elseif layout == 'itemWithMetadata' %}
+            <div class="page-block page-block-item-metadata">
+                {% for attachment in block.attachments() %}
+                    {% set attachedItem = attachment.item() %}
+                    {% if attachedItem %}
+                        <h3>{{ attachedItem.displayTitle() }}</h3>
+                        <table>
+                            {% for term, values in attachedItem.values() %}
+                                <tr>
+                                    <th>{{ values.property.label() }}</th>
+                                    <td>{% for value in values.values %}<div>{{ value }}</div>{% endfor %}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% elseif layout == 'asset' %}
+            <div class="page-block page-block-asset">
+                {# TODO: render asset block #}
+            </div>
+        {% else %}
+            <div class="page-block page-block-{{ layout }}">
+                {# Unhandled block type: {{ layout }} #}
+            </div>
         {% endif %}
     {% endfor %}
 </div>

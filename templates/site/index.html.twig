@@ -3,9 +3,21 @@
 {% block title %}{{ site.title() }}{% endblock %}
 
 {% block body %}
-<div>
+<div class="site-content">
     <h1>{{ site.title() }}</h1>
-    <p>Slug: {{ site.slug() }}</p>
+
+    {% set summary = site.summary() %}
+    {% if summary %}
+        <p>{{ summary }}</p>
+    {% endif %}
+
+    <nav style="margin-bottom: 2rem;">
+        <ul style="list-style: none; padding: 0; display: flex; gap: 1rem; flex-wrap: wrap;">
+            <li><a href="{{ path('app_site_item_browse', {siteSlug: site.slug()}) }}">Items</a></li>
+            <li><a href="{{ path('app_site_item_set_browse', {siteSlug: site.slug()}) }}">Item Sets</a></li>
+            <li><a href="{{ path('app_site_search', {siteSlug: site.slug()}) }}">Search</a></li>
+        </ul>
+    </nav>
 
     {% if pages is empty %}
         <p>No pages yet.</p>

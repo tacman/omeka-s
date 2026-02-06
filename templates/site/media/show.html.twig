@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ media.displayTitle() }} · {{ site.title() }}{% endblock %}
+
+{% block body %}
+<div class="site-content">
+    <p><a href="{{ path('app_site_show', {siteSlug: siteSlug}) }}">&larr; {{ site.title() }}</a></p>
+
+    <h1>{{ media.displayTitle() }}</h1>
+
+    {# Render the media itself #}
+    {% set mediaType = media.mediaType() %}
+    {% set originalUrl = media.originalUrl() %}
+
+    {% if originalUrl %}
+        {% if mediaType starts with 'image/' %}
+            <div style="margin-bottom: 1.5rem;">
+                <img src="{{ originalUrl }}" alt="{{ media.displayTitle() }}" style="max-width: 100%;">
+            </div>
+        {% elseif mediaType starts with 'video/' %}
+            <div style="margin-bottom: 1.5rem;">
+                <video controls style="max-width: 100%;"><source src="{{ originalUrl }}" type="{{ mediaType }}"></video>
+            </div>
+        {% elseif mediaType starts with 'audio/' %}
+            <div style="margin-bottom: 1.5rem;">
+                <audio controls><source src="{{ originalUrl }}" type="{{ mediaType }}"></audio>
+            </div>
+        {% elseif mediaType == 'application/pdf' %}
+            <div style="margin-bottom: 1.5rem;">
+                <iframe src="{{ originalUrl }}" style="width: 100%; height: 600px; border: 1px solid #ddd;"></iframe>
+            </div>
+        {% else %}
+            <p><a href="{{ originalUrl }}">Download file ({{ mediaType }})</a></p>
+        {% endif %}
+    {% endif %}
+
+    {# Metadata #}
+    <table>
+        <tbody>
+        {% for term, values in media.values() %}
+            <tr>
+                <th style="width: 200px;">{{ values.property.label() }}</th>
+                <td>
+                    {% for value in values.values %}
+                        <div>{{ value }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {# Link back to parent item #}
+    {% set parentItem = media.item() %}
+    {% if parentItem %}
+        <p style="margin-top: 1.5rem;">
+            Part of: <a href="{{ path('app_site_item_show', {siteSlug: siteSlug, id: parentItem.id()}) }}">{{ parentItem.displayTitle() }}</a>
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

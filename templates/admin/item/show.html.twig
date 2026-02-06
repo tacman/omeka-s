@@ -22,7 +22,7 @@
             <ul>
                 {% for itemSet in itemSets %}
                     <li>
-                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: 'item-set', action: 'show', id: itemSet.id()}) }}">
+                        <a href="{{ path('app_admin_item_set_show', {id: itemSet.id()}) }}">
                             {{ ux_icon('itemSet') }} {{ itemSet.displayTitle() }}
                         </a>
                     </li>
@@ -39,7 +39,7 @@
             <ul>
                 {% for site in sites %}
                     <li>
-                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/site/slug', 'site-slug': site.slug()}) }}">
+                        <a href="{{ path('app_admin_site_show', {slug: site.slug()}) }}">
                             {{ ux_icon('sites') }} {{ site.title() }}
                         </a>
                     </li>
@@ -56,7 +56,7 @@
             <ul>
                 {% for media in mediaItems %}
                     <li>
-                        <a href="{{ path('app_legacy_proxy', {routeName: 'admin/id', controller: 'media', action: 'show', id: media.id()}) }}">
+                        <a href="{{ path('app_admin_media_show', {id: media.id()}) }}">
                             {{ ux_icon('media') }} {{ media.displayTitle() }}
                         </a>
                     </li>

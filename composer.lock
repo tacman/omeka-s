@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6b20a4bf338929560e1c8bdbffec7189",
+    "content-hash": "d8760e945b885e8581ab8075f2801fe5",
     "packages": [
         {
             "name": "api-platform/core",
@@ -2796,74 +2796,6 @@
             "time": "2025-12-30T11:30:39+00:00"
         },
         {
-            "name": "laminas/laminas-math",
-            "version": "3.8.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laminas/laminas-math.git",
-                "reference": "a9e54f68accf5f8a3e66dd01fc6b32180e520018"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-math/zipball/a9e54f68accf5f8a3e66dd01fc6b32180e520018",
-                "reference": "a9e54f68accf5f8a3e66dd01fc6b32180e520018",
-                "shasum": ""
-            },
-            "require": {
-                "ext-mbstring": "*",
-                "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
-            },
-            "conflict": {
-                "zendframework/zend-math": "*"
-            },
-            "require-dev": {
-                "laminas/laminas-coding-standard": "~2.4.0",
-                "phpunit/phpunit": "~9.5.25"
-            },
-            "suggest": {
-                "ext-bcmath": "If using the bcmath functionality",
-                "ext-gmp": "If using the gmp functionality"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.2.x-dev",
-                    "dev-develop": "3.3.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Laminas\\Math\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Create cryptographically secure pseudo-random numbers, and manage big integers",
-            "homepage": "https://laminas.dev",
-            "keywords": [
-                "laminas",
-                "math"
-            ],
-            "support": {
-                "chat": "https://laminas.dev/chat",
-                "docs": "https://docs.laminas.dev/laminas-math/",
-                "forum": "https://discourse.laminas.dev",
-                "issues": "https://github.com/laminas/laminas-math/issues",
-                "rss": "https://github.com/laminas/laminas-math/releases.atom",
-                "source": "https://github.com/laminas/laminas-math"
-            },
-            "funding": [
-                {
-                    "url": "https://funding.communitybridge.org/projects/laminas-project",
-                    "type": "community_bridge"
-                }
-            ],
-            "abandoned": true,
-            "time": "2024-12-05T13:49:56+00:00"
-        },
-        {
             "name": "laminas/laminas-modulemanager",
             "version": "2.19.0",
             "source": {
@@ -5157,16 +5089,16 @@
         },
         {
             "name": "survos/data-bundle",
-            "version": "2.0.109",
+            "version": "2.0.110",
             "source": {
                 "type": "git",
                 "url": "https://github.com/survos/data-bundle.git",
-                "reference": "1c17c769dfd15d1387b0989d19e3f4b4612c90b4"
+                "reference": "325cac78ced41dd9cfec539a14a5d6b710622104"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/survos/data-bundle/zipball/1c17c769dfd15d1387b0989d19e3f4b4612c90b4",
-                "reference": "1c17c769dfd15d1387b0989d19e3f4b4612c90b4",
+                "url": "https://api.github.com/repos/survos/data-bundle/zipball/325cac78ced41dd9cfec539a14a5d6b710622104",
+                "reference": "325cac78ced41dd9cfec539a14a5d6b710622104",
                 "shasum": ""
             },
             "require": {
@@ -5196,7 +5128,7 @@
             "description": "Shared data directory conventions and path utilities for dataset-driven apps (APP_DATA_DIR).",
             "support": {
                 "issues": "https://github.com/survos/data-bundle/issues",
-                "source": "https://github.com/survos/data-bundle/tree/2.0.109"
+                "source": "https://github.com/survos/data-bundle/tree/2.0.110"
             },
             "funding": [
                 {
@@ -5204,7 +5136,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-05T22:20:19+00:00"
+            "time": "2026-02-06T14:41:58+00:00"
         },
         {
             "name": "sweetrdf/easyrdf",

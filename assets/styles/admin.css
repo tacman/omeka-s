@@ -61,6 +61,29 @@ header nav ul.navigation li li.current a {
     font-weight: bold;
 }
 
+/* Menu badges - entity counts */
+.navigation .badge {
+    display: inline-block;
+    min-width: 1.4em;
+    padding: 0.1em 0.4em;
+    font-size: 0.75em;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    border-radius: 0.75em;
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.85);
+    margin-left: 0.3em;
+    vertical-align: middle;
+}
+
+.navigation li:hover .badge,
+.navigation li.current .badge,
+.navigation li.active .badge {
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
 /* Browse table - actions inline with title (not on a separate line) */
 .batch-edit td ul.actions {
     display: inline-flex;

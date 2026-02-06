@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace App\Menu;
 
+use App\Service\OmekaApiService;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class AdminMenuBuilder
 {
     private ?array $navigationConfig = null;
+    private ?array $counts = null;
 
     public function __construct(
         private readonly FactoryInterface $factory,
         private readonly UrlGeneratorInterface $router,
         private readonly string $projectDir,
+        private readonly OmekaApiService $api,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -66,14 +71,19 @@ final class AdminMenuBuilder
                     'uri' => $this->resolveMenuUri($routeName, $params),
                 ]);
                 $menuItem->setAttribute('class', $item['class'] ?? '');
+                $menuItem->setExtra('badge', $this->getCountForController('item'));
 
-                $menuItem->addChild('Metadata', [
+                $metadata = $menuItem->addChild('Metadata', [
                     'uri' => $this->router->generate('app_admin_item_browse'),
-                ])->setAttribute('class', 'items');
+                ]);
+                $metadata->setAttribute('class', 'items');
+                $metadata->setExtra('badge', $this->getCountForController('item'));
 
-                $menuItem->addChild('Media', [
+                $media = $menuItem->addChild('Media', [
                     'uri' => $this->router->generate('app_admin_media_browse'),
-                ])->setAttribute('class', 'media');
+                ]);
+                $media->setAttribute('class', 'media');
+                $media->setExtra('badge', $this->getCountForController('media'));
 
                 continue;
             }
@@ -82,6 +92,20 @@ final class AdminMenuBuilder
                 'uri' => $this->resolveMenuUri($routeName, $params),
             ]);
             $menuItem->setAttribute('class', $item['class'] ?? '');
+
+            // Add entity count badge
+            $controllerName = $item['controller'] ?? null;
+            $badgeResource = $controllerName;
+            // Sites use route 'admin/site' instead of controller name
+            if ($routeName === 'admin/site') {
+                $badgeResource = 'site';
+            }
+            if ($badgeResource) {
+                $count = $this->getCountForController($badgeResource);
+                if ($count !== null) {
+                    $menuItem->setExtra('badge', $count);
+                }
+            }
 
             // Add visible child pages as submenu items
             if (!empty($item['pages'])) {
@@ -194,6 +218,44 @@ final class AdminMenuBuilder
         ];
 
         return $routeMap[$controller][$action] ?? null;
+    }
+
+    private function getCountForController(string $controller): ?int
+    {
+        if ($this->counts === null) {
+            $this->counts = $this->loadCounts();
+        }
+
+        return $this->counts[$controller] ?? null;
+    }
+
+    private function loadCounts(): array
+    {
+        $resourceMap = [
+            'item' => 'items',
+            'item-set' => 'item_sets',
+            'media' => 'media',
+            'vocabulary' => 'vocabularies',
+            'resource-template' => 'resource_templates',
+            'user' => 'users',
+            'site' => 'sites',
+            'asset' => 'assets',
+        ];
+
+        $counts = [];
+        foreach ($resourceMap as $controller => $apiResource) {
+            try {
+                $response = $this->api->search($apiResource, ['limit' => 0]);
+                $counts[$controller] = $response->getTotalResults();
+            } catch (\Throwable $e) {
+                $this->logger->debug('[AdminMenuBuilder] Failed to get count for {resource}: {message}', [
+                    'resource' => $apiResource,
+                    'message' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $counts;
     }
 
     private function getNavigationSection(string $section): array

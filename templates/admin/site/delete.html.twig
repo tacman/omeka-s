@@ -1,0 +1,20 @@
+{# Sidebar delete confirmation — no layout wrapper #}
+<div id="sidebar-confirm">
+    <h3>{{ 'Delete site'|trans }}</h3>
+    <p>{{ 'Are you sure you would like to delete this site?'|trans }}</p>
+
+    <div class="meta-group">
+        <h4>{{ site.title() }}</h4>
+        <p>{{ site.slug() }}</p>
+    </div>
+
+    <p class="error">
+        <strong>{{ 'Warning'|trans }}</strong>:
+        {{ 'Deleting this site will permanently remove all its pages and settings. This cannot be undone.'|trans }}
+    </p>
+
+    <form method="post" action="{{ path('app_admin_site_delete', {slug: site.slug()}) }}" data-turbo="false">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_site') }}">
+        <input type="submit" value="{{ 'Confirm delete'|trans }}">
+    </form>
+</div>

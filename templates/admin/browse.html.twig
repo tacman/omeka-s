@@ -158,12 +158,12 @@
                                     <li><a href="#" class="o-icon-more sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_item_show', {itemId: resource.id()}) }}?show-details=1" title="{{ 'Details'|trans }}"></a></li>
                                 {% elseif result.resourceType == 'item_sets' %}
                                     <li><a href="{{ path('app_admin_item_set_edit', {id: resource.id()}) }}" class="o-icon-edit" title="{{ 'Edit'|trans }}"></a></li>
-                                    <li><a href="#" class="o-icon-delete sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_item_set_delete', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}"></a></li>
-                                    <li><a href="{{ path('app_admin_item_set_show', {id: resource.id()}) }}" class="o-icon-more" title="{{ 'Details'|trans }}"></a></li>
+                                    <li><a href="#" class="o-icon-delete sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_item_set_delete_confirm', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}"></a></li>
+                                    <li><a href="#" class="o-icon-more sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_item_set_show', {id: resource.id()}) }}?show-details=1" title="{{ 'Details'|trans }}"></a></li>
                                 {% elseif result.resourceType == 'media' %}
                                     <li><a href="{{ path('app_admin_media_edit', {id: resource.id()}) }}" class="o-icon-edit" title="{{ 'Edit'|trans }}"></a></li>
-                                    <li><a href="#" class="o-icon-delete sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_media_delete', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}"></a></li>
-                                    <li><a href="{{ path('app_admin_media_show', {id: resource.id()}) }}" class="o-icon-more" title="{{ 'Details'|trans }}"></a></li>
+                                    <li><a href="#" class="o-icon-delete sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_media_delete_confirm', {id: resource.id()}) }}" title="{{ 'Delete'|trans }}"></a></li>
+                                    <li><a href="#" class="o-icon-more sidebar-content" data-sidebar-selector="#sidebar" data-sidebar-content-url="{{ path('app_admin_media_show', {id: resource.id()}) }}?show-details=1" title="{{ 'Details'|trans }}"></a></li>
                                 {% elseif result.resourceType == 'vocabularies' %}
                                     <li><a href="{{ path('app_admin_vocabulary_show', {id: resource.id()}) }}" class="o-icon-more" title="{{ 'View'|trans }}"></a></li>
                                 {% elseif result.resourceType == 'resource_templates' %}

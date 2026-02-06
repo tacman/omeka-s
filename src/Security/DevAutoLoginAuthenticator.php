@@ -29,13 +29,24 @@ final class DevAutoLoginAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request): ?bool
     {
-        // Don't authenticate if already logged in
-        if ($request->getSession()->has('_security_main')) {
+        // Only for admin routes
+        if (!str_starts_with($request->getPathInfo(), '/admin')) {
             return false;
         }
 
-        // Only for admin routes
-        return str_starts_with($request->getPathInfo(), '/admin');
+        // Don't authenticate if already logged in
+        if ($request->hasPreviousSession()) {
+            try {
+                if ($request->getSession()->has('_security_main')) {
+                    return false;
+                }
+            } catch (\Throwable) {
+                // Session may contain corrupt Laminas data; clear it
+                $request->getSession()->invalidate();
+            }
+        }
+
+        return true;
     }
 
     public function authenticate(Request $request): Passport

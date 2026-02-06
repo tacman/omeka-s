@@ -32,6 +32,7 @@
             </div>
             <nav id="menu" aria-label="Navigation menu">
                 {% block admin_nav %}
+                {{ knp_menu_render('admin_site', {template: 'menu/admin_menu.html.twig'}) }}
                 <h5>Resources</h5>
                 {{ knp_menu_render('admin_resource', {template: 'menu/admin_menu.html.twig'}) }}
                 <h5>Admin</h5>

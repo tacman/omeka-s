@@ -22,13 +22,16 @@
         <a href="{{ child.uri }}" class="{{ item_class }}">
             {%- if item_class %}{{ ux_icon(item_class, {class: 'menu-icon'}) }}{% endif -%}
             <span class="label">{{ child.label }}</span>
+            {%- if child.getExtra('badge') is not null %} <span class="badge">{{ child.getExtra('badge') }}</span>{% endif -%}
         </a>
         {% if child.hasChildren %}
         <ul>
             {% for subchild in child.children %}
             {%- set sub_is_current = (subchild.uri == current_path) or (current_path starts with subchild.uri ~ '/') -%}
             <li{% if sub_is_current %} class="current"{% endif %}>
-                <a href="{{ subchild.uri }}">{{ subchild.label }}</a>
+                <a href="{{ subchild.uri }}">{{ subchild.label }}
+                    {%- if subchild.getExtra('badge') is not null %} <span class="badge">{{ subchild.getExtra('badge') }}</span>{% endif -%}
+                </a>
             </li>
             {% endfor %}
         </ul>

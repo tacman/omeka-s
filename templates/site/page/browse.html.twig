@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pages · {{ site.title() }}{% endblock %}
+
+{% block body %}
+<div class="site-content">
+    <p><a href="{{ path('app_site_show', {siteSlug: siteSlug}) }}">&larr; {{ site.title() }}</a></p>
+
+    <h1>Pages</h1>
+
+    {% if pages is empty %}
+        <p>No pages found.</p>
+    {% else %}
+        <ul>
+            {% for page in pages %}
+                <li>
+                    <a href="{{ path('app_site_page', {siteSlug: siteSlug, pageSlug: page.slug()}) }}">{{ page.title() }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}

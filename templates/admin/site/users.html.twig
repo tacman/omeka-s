@@ -1,0 +1,10 @@
+{% extends 'admin/site/base.html.twig' %}
+
+{% block title %}{{ 'User permissions'|trans }}: {{ site.title() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ 'User permissions'|trans }}: {{ site.title() }}</h1>
+
+    <p>{{ 'Manage user access and roles for this site.'|trans }}</p>
+    {# TODO: user permission management interface #}
+{% endblock %}

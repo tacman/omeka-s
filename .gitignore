@@ -54,3 +54,4 @@
 .castor.stub.php
 application/data/doctrine-proxies/
 logs/db.log
+/public/fortepan

@@ -1,0 +1,13 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ 'Add new site'|trans }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ 'Add new site'|trans }}</h1>
+
+    <p>{{ 'Site creation form — to be implemented.'|trans }}</p>
+
+    <div id="page-actions">
+        <a href="{{ path('app_admin_site_browse') }}" class="button">{{ 'Back to sites'|trans }}</a>
+    </div>
+{% endblock %}

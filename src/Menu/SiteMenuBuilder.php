@@ -4,40 +4,73 @@ declare(strict_types=1);
 
 namespace App\Menu;
 
-use App\Menu\Event\SiteMenuEvent;
-use App\Tenant\TenantContext;
+use App\Service\OmekaApiService;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
-use Omeka\Entity\Site;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class SiteMenuBuilder
 {
     public function __construct(
         private readonly FactoryInterface $factory,
         private readonly RequestStack $requestStack,
-        private readonly TenantContext $tenantContext,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly UrlGeneratorInterface $router,
+        private readonly OmekaApiService $api,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
     public function createSiteMenu(array $options = []): ItemInterface
     {
         $menu = $this->factory->createItem('site_admin');
-        $menu->setChildrenAttribute('class', 'site-admin-menu');
+        $menu->setChildrenAttribute('class', 'navigation');
 
-        $siteSlug = $this->resolveSiteSlug();
-        if (!$siteSlug) {
+        $slug = $this->resolveSiteSlug();
+        if (!$slug) {
             return $menu;
         }
 
-        $site = $this->tenantContext->getRepository(Site::class)->findOneBy(['slug' => $siteSlug]);
+        $site = $this->findSite($slug);
         if (!$site) {
             return $menu;
         }
 
-        $this->eventDispatcher->dispatch(new SiteMenuEvent($menu, $site));
+        $siteId = $site->id();
+        $params = ['slug' => $slug];
+
+        $edit = $menu->addChild('Site admin', [
+            'uri' => $this->router->generate('app_admin_site_edit', $params),
+        ]);
+        $edit->setAttribute('class', 'site-info');
+
+        $pages = $menu->addChild('Pages', [
+            'uri' => $this->router->generate('app_admin_site_pages', $params),
+        ]);
+        $pages->setAttribute('class', 'pages');
+        $pages->setExtra('badge', $this->count('site_pages', ['site_id' => $siteId]));
+
+        $nav = $menu->addChild('Navigation', [
+            'uri' => $this->router->generate('app_admin_site_navigation', $params),
+        ]);
+        $nav->setAttribute('class', 'navigation');
+
+        $resources = $menu->addChild('Resources', [
+            'uri' => $this->router->generate('app_admin_site_resources', $params),
+        ]);
+        $resources->setAttribute('class', 'resources');
+        $resources->setExtra('badge', $this->count('items', ['site_id' => $siteId]));
+
+        $users = $menu->addChild('User permissions', [
+            'uri' => $this->router->generate('app_admin_site_users', $params),
+        ]);
+        $users->setAttribute('class', 'users');
+
+        $theme = $menu->addChild('Theme', [
+            'uri' => $this->router->generate('app_admin_site_theme', $params),
+        ]);
+        $theme->setAttribute('class', 'theme');
 
         return $menu;
     }
@@ -49,10 +82,33 @@ final class SiteMenuBuilder
             return null;
         }
 
-        $slug = $request->attributes->get('siteSlug')
-            ?? $request->attributes->get('site-slug')
-            ?? $request->query->get('site-slug');
+        // The Symfony site admin routes use {slug} as the parameter name
+        $slug = $request->attributes->get('slug');
 
         return is_string($slug) && $slug !== '' ? $slug : null;
+    }
+
+    private function findSite(string $slug): mixed
+    {
+        try {
+            $sites = $this->api->search('sites', ['slug' => $slug])->getContent();
+            return $sites[0] ?? null;
+        } catch (\Throwable $e) {
+            $this->logger->debug('[SiteMenuBuilder] Failed to find site {slug}: {message}', [
+                'slug' => $slug,
+                'message' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    private function count(string $resource, array $query): ?int
+    {
+        try {
+            $query['limit'] = 0;
+            return $this->api->search($resource, $query)->getTotalResults();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

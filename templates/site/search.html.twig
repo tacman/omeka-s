@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Search · {{ site.title() }}{% endblock %}
+
+{% block body %}
+<div class="site-content">
+    <p><a href="{{ path('app_site_show', {siteSlug: siteSlug}) }}">&larr; {{ site.title() }}</a></p>
+
+    <h1>Search</h1>
+
+    <form method="get" action="{{ path('app_site_search', {siteSlug: siteSlug}) }}" style="margin-bottom: 2rem;">
+        <input type="text" name="fulltext_search" value="{{ query }}" placeholder="Search this site..." style="padding: 0.4rem; width: 300px;">
+        <button type="submit" style="padding: 0.4rem 1rem;">Search</button>
+    </form>
+
+    {% if query %}
+        {% if results is empty %}
+            <p>No results found for "{{ query }}".</p>
+        {% else %}
+            {% if results.site_pages is defined %}
+                <h2>Pages ({{ results.site_pages.total }})</h2>
+                <ul>
+                    {% for page in results.site_pages.resources %}
+                        <li>
+                            <a href="{{ path('app_site_page', {siteSlug: siteSlug, pageSlug: page.slug()}) }}">{{ page.title() }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if results.items is defined %}
+                <h2>Items ({{ results.items.total }})</h2>
+                <ul>
+                    {% for item in results.items.resources %}
+                        <li>
+                            <a href="{{ path('app_site_item_show', {siteSlug: siteSlug, id: item.id()}) }}">{{ item.displayTitle() }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

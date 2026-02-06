@@ -1,0 +1,15 @@
+{% extends 'admin/site/base.html.twig' %}
+
+{% block title %}{{ 'Navigation'|trans }}: {{ site.title() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ 'Navigation'|trans }}: {{ site.title() }}</h1>
+
+    {% set nav = site.jsonSerialize()['o:navigation'] %}
+    {% if nav %}
+        <p>{{ nav|length }} {{ 'navigation links configured.'|trans }}</p>
+        {# TODO: drag-and-drop navigation editor #}
+    {% else %}
+        <p>{{ 'No navigation configured.'|trans }}</p>
+    {% endif %}
+{% endblock %}

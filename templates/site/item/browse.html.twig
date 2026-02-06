@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if itemSet is defined and itemSet %}
+        Items in {{ itemSet.displayTitle() }} · {{ site.title() }}
+    {% else %}
+        Items · {{ site.title() }}
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="site-content">
+    <p><a href="{{ path('app_site_show', {siteSlug: siteSlug}) }}">&larr; {{ site.title() }}</a></p>
+
+    {% if itemSet is defined and itemSet %}
+        <h1>Items in "{{ itemSet.displayTitle() }}"</h1>
+    {% else %}
+        <h1>Items</h1>
+    {% endif %}
+
+    {% if totalResults is defined %}
+        <p>{{ totalResults }} result{{ totalResults != 1 ? 's' : '' }}</p>
+    {% endif %}
+
+    {% if items is empty %}
+        <p>No items found.</p>
+    {% else %}
+        <div class="resources">
+            {% for item in items %}
+                <div class="resource" style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #eee;">
+                    {% set thumbnail = item.thumbnailDisplayUrl('medium') %}
+                    {% if thumbnail %}
+                        <a href="{{ path('app_site_item_show', {siteSlug: siteSlug, id: item.id()}) }}" style="float: left; margin-right: 1rem;">
+                            <img src="{{ thumbnail }}" alt="" style="max-width: 100px; max-height: 100px;">
+                        </a>
+                    {% endif %}
+                    <h3 style="margin: 0 0 0.25rem;">
+                        <a href="{{ path('app_site_item_show', {siteSlug: siteSlug, id: item.id()}) }}">
+                            {{ item.displayTitle() }}
+                        </a>
+                    </h3>
+                    {% set description = item.displayDescription() %}
+                    {% if description %}
+                        <p style="margin: 0; color: #555;">{{ description|striptags|slice(0, 200) }}{% if description|length > 200 %}&hellip;{% endif %}</p>
+                    {% endif %}
+                    <div style="clear: both;"></div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

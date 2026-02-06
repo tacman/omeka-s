@@ -38,10 +38,18 @@ final class ItemSetController extends AbstractController
 
     #[Route('/{id}', name: 'app_admin_item_set_show', requirements: ['id' => '\d+'])]
     #[Template('admin/item_set/show.html.twig')]
-    public function show(int $id): array
+    public function show(Request $request, int $id): Response|array
     {
+        $itemSet = $this->api->read('item_sets', $id)->getContent();
+
+        if ($request->query->has('show-details')) {
+            return $this->render('admin/item_set/show-details.html.twig', [
+                'itemSet' => $itemSet,
+            ]);
+        }
+
         return [
-            'itemSet' => $this->api->read('item_sets', $id)->getContent(),
+            'itemSet' => $itemSet,
         ];
     }
 
@@ -49,6 +57,12 @@ final class ItemSetController extends AbstractController
     public function edit(Request $request, int $id): Response
     {
         return $this->legacyDispatcher->dispatch($request, 'item-set', 'edit', ['id' => $id]);
+    }
+
+    #[Route('/{id}/delete-confirm', name: 'app_admin_item_set_delete_confirm', requirements: ['id' => '\d+'])]
+    public function deleteConfirm(Request $request, int $id): Response
+    {
+        return $this->legacyDispatcher->dispatch($request, 'item-set', 'delete-confirm', ['id' => $id]);
     }
 
     #[Route('/{id}/delete', name: 'app_admin_item_set_delete', requirements: ['id' => '\d+'])]

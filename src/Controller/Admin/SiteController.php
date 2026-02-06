@@ -34,7 +34,7 @@ final class SiteController extends AbstractController
     #[Route('/add', name: 'app_admin_site_add')]
     public function add(Request $request): Response
     {
-        return $this->legacyDispatcher->dispatch($request, 'site', 'add');
+        return $this->legacyDispatcher->dispatch($request, 'index', 'add', [], 'SiteAdmin');
     }
 
     #[Route('/{slug}', name: 'app_admin_site_show', requirements: ['slug' => '[a-zA-Z0-9_-]+'])]
@@ -52,50 +52,105 @@ final class SiteController extends AbstractController
     public function edit(Request $request, string $slug): Response
     {
         $site = $this->findSiteBySlug($slug);
-        return $this->legacyDispatcher->dispatch($request, 'site', 'edit', ['site-slug' => $slug, 'id' => $site->id()]);
+        return $this->legacyDispatcher->dispatch($request, 'index', 'edit', [
+            'site-slug' => $slug,
+            'id' => $site->id(),
+        ], 'SiteAdmin');
     }
 
     #[Route('/{slug}/pages', name: 'app_admin_site_pages', requirements: ['slug' => '[a-zA-Z0-9_-]+'])]
-    #[Template('admin/site/pages.html.twig')]
-    public function pages(string $slug): array
+    public function pages(Request $request, string $slug): Response
     {
-        $site = $this->findSiteBySlug($slug);
+        return $this->legacyDispatcher->dispatch($request, 'page', 'index', [
+            'site-slug' => $slug,
+        ], 'SiteAdmin');
+    }
 
-        return [
-            'site' => $site,
-            'pages' => $this->api->search('site_pages', ['site_id' => $site->id()])->getContent(),
-        ];
+    #[Route('/{slug}/page/add', name: 'app_admin_site_page_add', requirements: ['slug' => '[a-zA-Z0-9_-]+'])]
+    public function addPage(Request $request, string $slug): Response
+    {
+        return $this->legacyDispatcher->dispatch($request, 'index', 'add-page', [
+            'site-slug' => $slug,
+        ], 'SiteAdmin');
+    }
+
+    #[Route('/{slug}/page/{pageSlug}', name: 'app_admin_site_page_edit', requirements: ['slug' => '[a-zA-Z0-9_-]+', 'pageSlug' => '[a-zA-Z0-9_-]+'])]
+    public function editPage(Request $request, string $slug, string $pageSlug): Response
+    {
+        return $this->legacyDispatcher->dispatch($request, 'page', 'edit', [
+            'site-slug' => $slug,
+            'page-slug' => $pageSlug,
+        ], 'SiteAdmin');
+    }
+
+    #[Route('/{slug}/page/{pageSlug}/delete-confirm', name: 'app_admin_site_page_delete_confirm', requirements: ['slug' => '[a-zA-Z0-9_-]+', 'pageSlug' => '[a-zA-Z0-9_-]+'])]
+    public function deletePageConfirm(Request $request, string $slug, string $pageSlug): Response
+    {
+        return $this->legacyDispatcher->dispatch($request, 'page', 'delete-confirm', [
+            'site-slug' => $slug,
+            'page-slug' => $pageSlug,
+        ], 'SiteAdmin');
+    }
+
+    #[Route('/{slug}/page/{pageSlug}/delete', name: 'app_admin_site_page_delete', requirements: ['slug' => '[a-zA-Z0-9_-]+', 'pageSlug' => '[a-zA-Z0-9_-]+'])]
+    public function deletePage(Request $request, string $slug, string $pageSlug): Response
+    {
+        return $this->legacyDispatcher->dispatch($request, 'page', 'delete', [
+            'site-slug' => $slug,
+            'page-slug' => $pageSlug,
+        ], 'SiteAdmin');
     }
 
     #[Route('/{slug}/navigation', name: 'app_admin_site_navigation', requirements: ['slug' => '[a-zA-Z0-9_-]+'])]
     public function navigation(Request $request, string $slug): Response
     {
-        return $this->legacyDispatcher->dispatch($request, 'site', 'navigation', ['site-slug' => $slug]);
+        return $this->legacyDispatcher->dispatch($request, 'index', 'navigation', [
+            'site-slug' => $slug,
+        ], 'SiteAdmin');
     }
 
     #[Route('/{slug}/resources', name: 'app_admin_site_resources', requirements: ['slug' => '[a-zA-Z0-9_-]+'])]
     public function resources(Request $request, string $slug): Response
     {
-        return $this->legacyDispatcher->dispatch($request, 'site', 'resources', ['site-slug' => $slug]);
+        return $this->legacyDispatcher->dispatch($request, 'index', 'resources', [
+            'site-slug' => $slug,
+        ], 'SiteAdmin');
     }
 
     #[Route('/{slug}/users', name: 'app_admin_site_users', requirements: ['slug' => '[a-zA-Z0-9_-]+'])]
     public function users(Request $request, string $slug): Response
     {
-        return $this->legacyDispatcher->dispatch($request, 'site', 'users', ['site-slug' => $slug]);
+        return $this->legacyDispatcher->dispatch($request, 'index', 'users', [
+            'site-slug' => $slug,
+        ], 'SiteAdmin');
     }
 
     #[Route('/{slug}/theme', name: 'app_admin_site_theme', requirements: ['slug' => '[a-zA-Z0-9_-]+'])]
     public function theme(Request $request, string $slug): Response
     {
-        return $this->legacyDispatcher->dispatch($request, 'site', 'theme', ['site-slug' => $slug]);
+        return $this->legacyDispatcher->dispatch($request, 'index', 'theme', [
+            'site-slug' => $slug,
+        ], 'SiteAdmin');
     }
 
     #[Route('/{slug}/delete', name: 'app_admin_site_delete', requirements: ['slug' => '[a-zA-Z0-9_-]+'])]
     public function delete(Request $request, string $slug): Response
     {
         $site = $this->findSiteBySlug($slug);
-        return $this->legacyDispatcher->dispatch($request, 'site', 'delete', ['site-slug' => $slug, 'id' => $site->id()]);
+
+        if ($request->isMethod('POST')) {
+            $token = $request->request->get('_token');
+            if ($this->isCsrfTokenValid('delete_site', $token)) {
+                $this->api->getApiManager()->delete('sites', $site->id());
+                $this->addFlash('success', 'Site successfully deleted');
+                return $this->redirectToRoute('app_admin_site_browse');
+            }
+            $this->addFlash('error', 'Invalid CSRF token');
+        }
+
+        return $this->render('admin/site/delete.html.twig', [
+            'site' => $site,
+        ]);
     }
 
     private function findSiteBySlug(string $slug): mixed

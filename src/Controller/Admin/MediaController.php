@@ -32,10 +32,18 @@ final class MediaController extends AbstractController
 
     #[Route('/{id}', name: 'app_admin_media_show', requirements: ['id' => '\d+'])]
     #[Template('admin/media/show.html.twig')]
-    public function show(int $id): array
+    public function show(Request $request, int $id): Response|array
     {
+        $media = $this->api->read('media', $id)->getContent();
+
+        if ($request->query->has('show-details')) {
+            return $this->render('admin/media/show-details.html.twig', [
+                'media' => $media,
+            ]);
+        }
+
         return [
-            'media' => $this->api->read('media', $id)->getContent(),
+            'media' => $media,
         ];
     }
 
@@ -43,6 +51,12 @@ final class MediaController extends AbstractController
     public function edit(Request $request, int $id): Response
     {
         return $this->legacyDispatcher->dispatch($request, 'media', 'edit', ['id' => $id]);
+    }
+
+    #[Route('/{id}/delete-confirm', name: 'app_admin_media_delete_confirm', requirements: ['id' => '\d+'])]
+    public function deleteConfirm(Request $request, int $id): Response
+    {
+        return $this->legacyDispatcher->dispatch($request, 'media', 'delete-confirm', ['id' => $id]);
     }
 
     #[Route('/{id}/delete', name: 'app_admin_media_delete', requirements: ['id' => '\d+'])]

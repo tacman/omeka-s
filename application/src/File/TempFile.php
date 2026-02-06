@@ -8,7 +8,6 @@ use Omeka\File\Store\StoreInterface;
 use Omeka\Stdlib\ErrorStore;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\EventManagerAwareTrait;
-use Laminas\Math\Rand;
 
 class TempFile
 {
@@ -190,7 +189,7 @@ class TempFile
         if (isset($this->storageId)) {
             return $this->storageId;
         }
-        $this->storageId = bin2hex(Rand::getBytes(20));
+        $this->storageId = bin2hex(random_bytes(20));
         return $this->storageId;
     }
 

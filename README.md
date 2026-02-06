@@ -1,6 +1,6 @@
-# Omeka T
+# Omeka S/Symfony
 
-Omeka S is a Symfony-powered web publication system for universities, galleries, libraries, archives, and museums. It consists of a local network of independently curated exhibits sharing a collaboratively built pool of items, media, and their metadata.
+This repo is a fork of the Omeka-S 4.2 heavily modified to be Symfony-powered.  It is a web publication system for universities, galleries, libraries, archives, and museums. It consists of a local network of independently curated exhibits sharing a collaboratively built pool of items, media, and their metadata.
 
 See the [user manual](https://omeka.org/s/docs/user-manual) for more information.
 

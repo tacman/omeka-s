@@ -9,7 +9,14 @@
       "Bash(php -l:*)",
       "Bash(curl:*)",
       "Bash(ls:*)",
-      "Bash(bin/console debug:router:*)"
+      "Bash(bin/console debug:router:*)",
+      "Bash(php -r:*)",
+      "Bash(composer require:*)",
+      "Bash(python3:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)",
+      "Bash(csrf=caf34cb471a9d5b100d64fcbd888b5d5-2bd84014371c0310988ab5d72df832c5)"
     ]
   }
 }

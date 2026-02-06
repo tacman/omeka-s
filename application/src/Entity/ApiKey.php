@@ -7,7 +7,6 @@ namespace Omeka\Entity;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Laminas\Math\Rand;
 use Omeka\Entity\User;
 
 #[ORM\Entity]
@@ -147,6 +146,12 @@ class ApiKey extends AbstractEntity
 
     protected function getString()
     {
-        return Rand::getString(self::STRING_LENGTH, self::STRING_CHARLIST, true);
+        $charlist = self::STRING_CHARLIST;
+        $charlistLen = strlen($charlist);
+        $result = '';
+        for ($i = 0; $i < self::STRING_LENGTH; $i++) {
+            $result .= $charlist[random_int(0, $charlistLen - 1)];
+        }
+        return $result;
     }
 }

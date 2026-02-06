@@ -1,0 +1,10 @@
+{% extends 'admin/site/base.html.twig' %}
+
+{% block title %}{{ 'Resources'|trans }}: {{ site.title() }}{% endblock %}
+
+{% block admin_body %}
+    <h1>{{ 'Resources'|trans }}: {{ site.title() }}</h1>
+
+    <p>{{ 'Manage which item pools and item sets are available on this site.'|trans }}</p>
+    {# TODO: item pool / item set assignment interface #}
+{% endblock %}
