@@ -39,6 +39,7 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/api2, roles: PUBLIC_ACCESS }
         - { path: ^/symfony/admin, roles: ROLE_ADMIN }
 
 when@dev:

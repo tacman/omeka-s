@@ -51,5 +51,14 @@ services:
 
     App\Service\OmekaAdminFormService: ~
 
+    Omeka\Db\Event\Listener\ResourceDiscriminatorMap:
+        arguments:
+            - 'Omeka\Entity\Item': 'Omeka\Entity\Item'
+              'Omeka\Entity\Media': 'Omeka\Entity\Media'
+              'Omeka\Entity\ItemSet': 'Omeka\Entity\ItemSet'
+              'Omeka\Entity\ValueAnnotation': 'Omeka\Entity\ValueAnnotation'
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

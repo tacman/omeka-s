@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Omeka\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,8 +14,16 @@ use Omeka\Entity\Media;
 use Omeka\Entity\SiteBlockAttachment;
 use Omeka\Entity\ItemSet;
 use Omeka\Entity\Site;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+    ],
+    normalizationContext: ['groups' => ['item:read', 'resource:read']],
+)]
 class Item extends Resource
 {
     #[ORM\ManyToOne(targetEntity: Media::class)]

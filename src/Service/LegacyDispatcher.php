@@ -61,7 +61,7 @@ final class LegacyDispatcher
             '__NAMESPACE__' => 'Omeka\\Controller\\Admin',
             '__CONTROLLER__' => $controller,
         ] + $params);
-        $routeMatch->setMatchedRouteName('admin/id');
+        $routeMatch->setMatchedRouteName(isset($params['id']) ? 'admin/id' : 'admin/default');
 
         // Create Laminas request from Symfony request
         $laminasRequest = new LaminasRequest();
@@ -73,7 +73,13 @@ final class LegacyDispatcher
         }
         $laminasRequest->setQuery(new \Laminas\Stdlib\Parameters($request->query->all()));
 
-        // Create MVC event
+        // Set RouteMatch on the application's MVC event and the Url view helper
+        // so that templates can generate URLs for the current route.
+        $app->getMvcEvent()->setRouteMatch($routeMatch);
+        $viewHelperManager = $serviceManager->get('ViewHelperManager');
+        $viewHelperManager->get('url')->setRouteMatch($routeMatch);
+
+        // Create MVC event for the controller
         $event = new MvcEvent();
         $event->setApplication($app);
         $event->setRequest($laminasRequest);
@@ -107,6 +113,11 @@ final class LegacyDispatcher
             // Render the legacy .phtml content
             $renderer = $this->viewRenderer->getRenderer();
             $content = $renderer->render($result);
+
+            // Terminal views (sidebars, AJAX fragments) return bare HTML without layout
+            if ($result->terminate()) {
+                return new Response($content);
+            }
 
             // Capture scripts/styles that .phtml templates registered via headScript()/headLink()
             $headScripts = $renderer->headScript() ? $renderer->headScript()->toString() : '';

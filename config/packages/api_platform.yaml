@@ -1,0 +1,16 @@
+api_platform:
+    title: Omeka S API
+    description: Read-only API for Omeka S resources
+    version: 2.0.0
+    defaults:
+        stateless: false
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+    mapping:
+        paths:
+            - '%kernel.project_dir%/application/src/Entity'
+    formats:
+        json:
+            mime_types: ['application/json']
+        jsonld:
+            mime_types: ['application/ld+json']

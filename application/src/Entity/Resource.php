@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Omeka\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
@@ -13,6 +14,7 @@ use Omeka\Entity\ResourceClass;
 use Omeka\Entity\ResourceTemplate;
 use Omeka\Entity\Asset;
 use Omeka\Entity\Value;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * A resource, representing the subject in an RDF triple.
@@ -41,18 +43,23 @@ abstract class Resource extends AbstractEntity
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]
     #[ORM\GeneratedValue]
+    #[ApiProperty(identifier: true)]
+    #[Groups(['resource:read'])]
     protected $id;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(onDelete: "SET NULL")]
+    #[Groups(['resource:read'])]
     protected $owner;
 
     #[ORM\ManyToOne(targetEntity: ResourceClass::class, inversedBy: "resources")]
     #[ORM\JoinColumn(onDelete: "SET NULL")]
+    #[Groups(['resource:read'])]
     protected $resourceClass;
 
     #[ORM\ManyToOne(targetEntity: ResourceTemplate::class, inversedBy: "resources")]
     #[ORM\JoinColumn(onDelete: "SET NULL")]
+    #[Groups(['resource:read'])]
     protected $resourceTemplate;
 
     #[ORM\ManyToOne(targetEntity: Asset::class)]
@@ -60,15 +67,19 @@ abstract class Resource extends AbstractEntity
     protected $thumbnail;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['resource:read'])]
     protected $title;
 
     #[ORM\Column(type: Types::BOOLEAN)]
+    #[Groups(['resource:read'])]
     protected $isPublic = true;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['resource:read'])]
     protected $created;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(['resource:read'])]
     protected $modified;
 
     #[ORM\OneToMany(targetEntity: Value::class, mappedBy: "resource", orphanRemoval: true, cascade: ["persist", "remove", "detach"])]

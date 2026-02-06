@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Omeka\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Omeka\Entity\Item;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity]
 #[ORM\Table(indexes: [
@@ -19,21 +23,33 @@ name: "media_type",
 columns: ["media_type"]
 )
 ])]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+    ],
+    normalizationContext: ['groups' => ['media:read', 'resource:read']],
+)]
 class Media extends Resource
 {
     #[ORM\Column]
+    #[Groups(['media:read'])]
     protected $ingester;
 
     #[ORM\Column]
+    #[Groups(['media:read'])]
     protected $renderer;
 
     #[ORM\Column(type: "json_array", nullable: true)]
+    #[Groups(['media:read'])]
     protected $data;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['media:read'])]
     protected $source;
 
     #[ORM\Column(nullable: true, length: 190)]
+    #[Groups(['media:read'])]
     protected $mediaType;
 
     #[ORM\Column(nullable: true, unique: true, length: 190)]
@@ -46,25 +62,32 @@ class Media extends Resource
     protected $sha256;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    #[Groups(['media:read'])]
     protected $size;
 
     #[ORM\Column(type: Types::BOOLEAN)]
+    #[Groups(['media:read'])]
     protected $hasOriginal = false;
 
     #[ORM\Column(type: Types::BOOLEAN)]
+    #[Groups(['media:read'])]
     protected $hasThumbnails = false;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[Groups(['media:read'])]
     protected $position;
 
     #[ORM\ManyToOne(targetEntity: Item::class, inversedBy: "media")]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['media:read'])]
     protected $item;
 
     #[ORM\Column(nullable: true, length: 190)]
+    #[Groups(['media:read'])]
     protected $lang;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['media:read'])]
     protected $altText;
 
     public function getResourceName()

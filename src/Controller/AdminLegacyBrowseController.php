@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\LegacyDispatcher;
 use App\Service\OmekaBrowseService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,8 +12,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin')]
 final class AdminLegacyBrowseController extends AbstractController
 {
-    public function __construct(private readonly OmekaBrowseService $browseService)
-    {
+    public function __construct(
+        private readonly OmekaBrowseService $browseService,
+        private readonly LegacyDispatcher $legacyDispatcher,
+    ) {
     }
 
     #[Route('/{controller}', name: 'app_admin_legacy_browse', requirements: ['controller' => '[a-zA-Z0-9_-]+'], priority: -100)]
@@ -34,6 +37,12 @@ final class AdminLegacyBrowseController extends AbstractController
         return $this->render('admin/browse.html.twig', [
             'result' => $result,
         ]);
+    }
+
+    #[Route('/{controller}/{action}', name: 'app_admin_legacy_action', requirements: ['controller' => '[a-z][a-z0-9-]*', 'action' => '[a-z][a-z0-9-]*'], priority: -200)]
+    public function legacyAction(Request $request, string $controller, string $action): Response
+    {
+        return $this->legacyDispatcher->dispatch($request, $controller, $action);
     }
 
     private function controllerToResourceType(string $controller): ?string

@@ -88,7 +88,8 @@
         "symfony/ux-autocomplete": "^2.32",
         "league/flysystem-bundle": "^3.6",
         "twig/intl-extra": "^3.23",
-        "survos/data-bundle": "^2.0"
+        "survos/data-bundle": "^2.0",
+        "api-platform/core": "^4.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",

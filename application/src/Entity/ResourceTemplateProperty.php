@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Omeka\Entity\ResourceTemplate;
 use Omeka\Entity\Property;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity]
 #[ORM\Table]
@@ -17,6 +18,7 @@ class ResourceTemplateProperty extends AbstractEntity
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]
     #[ORM\GeneratedValue]
+    #[Groups(['resource_template:detail'])]
     protected $id;
 
     #[ORM\ManyToOne(targetEntity: ResourceTemplate::class, inversedBy: "resourceTemplateProperties")]
@@ -25,27 +27,35 @@ class ResourceTemplateProperty extends AbstractEntity
 
     #[ORM\ManyToOne(targetEntity: Property::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Groups(['resource_template:detail'])]
     protected $property;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['resource_template:detail'])]
     protected $alternateLabel;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['resource_template:detail'])]
     protected $alternateComment;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[Groups(['resource_template:detail'])]
     protected $position;
 
     #[ORM\Column(type: "json_array", nullable: true)]
+    #[Groups(['resource_template:detail'])]
     protected $dataType;
 
     #[ORM\Column(type: Types::BOOLEAN)]
+    #[Groups(['resource_template:detail'])]
     protected $isRequired = false;
 
     #[ORM\Column(type: Types::BOOLEAN)]
+    #[Groups(['resource_template:detail'])]
     protected $isPrivate = false;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['resource_template:detail'])]
     protected $defaultLang;
 
     public function getId()

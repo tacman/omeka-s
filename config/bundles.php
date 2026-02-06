@@ -22,4 +22,5 @@ return [
     Symfony\UX\Autocomplete\AutocompleteBundle::class => ['all' => true],
     League\FlysystemBundle\FlysystemBundle::class => ['all' => true],
     Survos\DataBundle\SurvosDataBundle::class => ['all' => true],
+    ApiPlatform\Symfony\Bundle\ApiPlatformBundle::class => ['all' => true],
 ];
