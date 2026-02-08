@@ -716,6 +716,13 @@ class BundleCreateCommand extends Command
 - **nikic/php-parser**: https://github.com/nikic/PHP-Parser
 - **nette/php-generator**: https://github.com/nette/php-generator
 
+## Jobs and Tasks Redesign
+
+- Tasks are migrating into Symfony console commands for CLI and queued execution.
+- Jobs remain tracking records; they no longer execute logic directly.
+- Messenger handlers run the commands and update job status/progress.
+- Full details: `doc/jobs-and-tasks.md`.
+
 ## Contact & Collaboration
 
 **Tac Tacelosky**

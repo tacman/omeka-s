@@ -4,10 +4,16 @@ This repo is a fork of the Omeka-S 4.2 heavily modified to be Symfony-powered.  
 
 See the [user manual](https://omeka.org/s/docs/user-manual) for more information.
 
-## Project Status (Symfony Integration)
+## Project Status
 
-- Symfony console commands are available for defaults and sample data: `app:install-defaults`, `app:load-sample-data`.
-- We are beginning to render select Omeka routes through Symfony/Twig; next target is `/browse/item`.
+Development on this fork is currently suspended. The original goal was an Omeka-S compatible branch that replaced Laminas with Symfony, but after discussions with the Omeka team it’s clear this won’t happen, largely due to migration challenges (see `doc/modules_challenges.md`).
+
+## Jobs and Tasks Redesign
+
+- Tasks are moving to Symfony console commands so they can run via CLI or queue.
+- Jobs remain as tracking records for status, progress, and audit history.
+- Execution shifts into `Messenger/Handlers`, which run commands and update job state.
+- Full design notes: `doc/jobs-and-tasks.md`.
 
 ## Local Dev Quick Start
 
